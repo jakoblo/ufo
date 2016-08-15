@@ -16,7 +16,14 @@ const store = configureStore({});
 
 ReactDOM.render(
     <Provider store={ store }>
-      <Counter/>
+      <Window>
+        <Sidebar>
+          <Toolbar></Toolbar>
+          <Navbar></Navbar>
+        </Sidebar>
+        <ViewContainer></ViewContainer>
+      </Window>
+      // <Counter/>
     </Provider>
   ,
   document.getElementById('app')
