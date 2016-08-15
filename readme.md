@@ -1,4 +1,4 @@
-# Electron + Redux + React Boilerplate
+# FileFlow - Electron File Manager 
 
 ### + Babel, Gulp, electron-connect
 
