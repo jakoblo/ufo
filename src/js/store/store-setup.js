@@ -6,14 +6,20 @@ import {calulateCounter} from '../actions/counterActions'
 
 // import promiseMiddleware from '../middleware/promise-middleware'
 
-export function configureStore(initialState) {
+export function storeSetup(initialState) {
 
-  // http://redux.js.org/docs/api/compose.html kapier ich nicht
-  const store = compose(_getMiddleware())(createStore)(rootReducer, initialState, window.devToolsExtension ? window.devToolsExtension() : f => f);
+const store = createStore(
+  rootReducer,
+  initialState,
+  compose(
+    getMiddleware(),
+    window.devToolsExtension()
+  )
+)
   return store;
 }
 
-function _getMiddleware() {
+function getMiddleware() {
   let middleware = [
     // promiseMiddleware,
     thunk

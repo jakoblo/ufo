@@ -2,8 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Counter} from './components/counter'
 import {Provider} from 'react-redux'
-import {configureStore} from './store/configure-store'
+import {storeSetup} from './store/store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
+/* React Components */
+import {Foundation} from './components/foundation'
+import {Sidebar} from './components/sidebar'
+import {Navbar} from './components/navbar'
+import {ViewContainer} from './components/viewContainer'
+
 
 
 if (process.env.NODE_ENV !== 'production') {
@@ -12,18 +18,16 @@ if (process.env.NODE_ENV !== 'production') {
   require('electron-connect').client.create()
 }
 
-const store = configureStore({});
+const store = storeSetup({});
 
 ReactDOM.render(
     <Provider store={ store }>
-      <Window>
+      <Foundation>
         <Sidebar>
-          <Toolbar></Toolbar>
           <Navbar></Navbar>
         </Sidebar>
         <ViewContainer></ViewContainer>
-      </Window>
-      // <Counter/>
+      </Foundation>
     </Provider>
   ,
   document.getElementById('app')

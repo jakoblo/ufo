@@ -5,6 +5,29 @@ $font-default: 'Open Sans', Arial;
 $font-serif: Bitter, Arial;
 $size-font-default: 13.3px;
 
-$color-background-selected: #a8dcf8;
+/* Color */
+$color-background: #fff;
+$color-font-default: #000;
+$color-font-light: rgb(118,118,118);
+$color-font-red: #BA3526;
+$color-background-hover: #333;
+$color-background-active: #E1E1E1;
+$color-background-selected: #A8DCF8;
+$color-border-gray: rgb(150,150,150);
+$color-border-gray-light: rgb(211,211,211);
+$color-border-gray-lighter: rgb(240,240,240);
+$color-button-border-hover: #ddd;
+
+$shadow-mouse-over: 0px 0px 2px 0px rgba(0,0,0,0.27);
+
+$view-padding-horiz: 5%;
+$view-padding-horiz-number: 0.05;
+
+$view-bottom-space: 10px;
+$view-toolbar-height: 45px;
+$button-height: 25px;
 
 @import 'reset';
+@import 'layout';
+@import 'sidebar';
+@import 'viewContainer';

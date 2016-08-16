@@ -2,14 +2,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-export class Sidebar extends React.Component {
+export class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
   }
 
   render() {
     return(
-      <section className="sidebar">{this.props.children}</section>
+      <section className="viewContainer">ViewContainer{this.props.children}</section>
     )
   }
 }

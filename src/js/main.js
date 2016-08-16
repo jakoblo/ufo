@@ -16,10 +16,10 @@ function createNewBrowserWindow() {
           width : 800,
           height: 600,
           resizable: true,
-          frame: false
+          frame: true
         });
   windowID = browserWindow.id
-  
+
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
 
   // Emitted when the window is closed.
@@ -53,7 +53,7 @@ ipcMain.on('global-favbar-changed', function(event) {
 ipcMain.on('writeFile', function(event, path, content) {
   console.log('writeFile: '+path);
   let pathObj = Utils.Path.createPathObj(path)
-  
+
   fs.access(pathObj.dir, (error) => {
       if(!error) {
         fs.writeFileSync(path, content)
@@ -203,8 +203,8 @@ if (process.platform == 'darwin') {
         label: 'Preferences',
         accelerator: 'Command+,',
         role: 'preferences',
-        click: function() { 
-          
+        click: function() {
+
          }
       },
       {
@@ -254,7 +254,7 @@ if (process.platform == 'darwin') {
   );
 }
 
-  
+
   var menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 }
