@@ -10,10 +10,9 @@ import { List } from 'immutable'
 
 const INITIAL_STATE = Immutable.fromJS({groupItems: [
     {title: "Favbar 1", items: ["/Users/jakoblo/Applications", "/Users/jakoblo/Desktop"]},
-    {title: "Favbar 2", items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads"]}
+    {title: "Favbar 2", items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads", "/Users/jakoblo/Applications"]}
   ],
-  activeGroup: 0,
-  activeItem: 0
+  activeItem: ''
 })
 
 export function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
@@ -25,7 +24,7 @@ export function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
       // return state.groupItems.setIn([0, 'name'], 'HUgo')
       break;
     case APP_CHANGE_PATH:
-      return state.set('activeGroup', action.payload.groupID).set('activeItem', action.payload.itemID)
+      return state.set('activeItem', action.payload.fromPath)
       break;
     default:
       return state;

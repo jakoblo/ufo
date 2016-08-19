@@ -5,10 +5,10 @@ import {
   } from '../constants/action-types'
 
 // http://redux.js.org/docs/basics/Actions.html
-export function changeSelection(newPath, groupID, itemID) { // Action Creator
+export function changeSelection(fromPath) { // Action Creator
   return { // action
     type: APP_CHANGE_PATH,
-    payload: {newPath: newPath, groupID : groupID, itemID: itemID}
+    payload: {fromPath: fromPath}
   };
 }
 

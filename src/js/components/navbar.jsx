@@ -19,19 +19,16 @@ export class Navbar extends React.Component {
 
   handleSelectionChanged = (path, groupID, itemID) => {
     console.log("DISPATCH")
-    this.props.dispatch(changeSelection(path, groupID, itemID))
+    this.props.dispatch(changeSelection(path))
   }
 
   render() {
     let groupItems = this.props.groupItems.toJS()
     let x = groupItems.map((item, index) => {
-      let activeItem = null
-      if(this.props.navbar.get("activeGroup") == index)
-        activeItem = this.props.navbar.get("activeItem")
       return <NavGroup
         key={index}
         groupID={index}
-        activeItem={activeItem}
+        activeItem={this.props.navbar.get("activeItem")}
         title={item.title}
         items={item.items}
         onSelectionChanged={this.handleSelectionChanged}>

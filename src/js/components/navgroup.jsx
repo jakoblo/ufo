@@ -17,13 +17,13 @@ export class NavGroup extends React.Component {
   renderItem = (path, itemID) => {
     let basePath = nodePath.basename(path)
     let active = false
-    if(itemID == this.props.activeItem)
+    if(path === this.props.activeItem)
     active = true
 
     return (
       <NavGroupItem
         key={itemID}
-        onClick={this.props.onSelectionChanged.bind(this, path, this.props.groupID, itemID)}
+        onClick={this.props.onSelectionChanged.bind(this, path)}
         path={basePath}
         active={active}
         >
