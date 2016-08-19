@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Counter} from './components/counter'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store/store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
@@ -9,8 +8,8 @@ import {Foundation} from './components/foundation'
 import {Sidebar} from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
-
-
+import Immutable from 'immutable'
+import { List, Map } from 'immutable'
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -18,10 +17,21 @@ if (process.env.NODE_ENV !== 'production') {
   require('electron-connect').client.create()
 }
 
-const store = storeSetup({});
+const initialState = Immutable.fromJS({
+  config: {windowWidth: 600, windowHeight: 800},
+  navbar: {groupItems: [
+      {name: "Favbar 1", items: ["/Users/jakoblo/Applications", "/Users/jakoblo/Desktop"]},
+      {name: "Favbar 2", items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads"]}
+    ]
+  }
+})
+
+// console.log(initialState)
+const store = storeSetup();
+window.store = store
 
 ReactDOM.render(
-    <Provider store={ store }>
+      <Provider store={ store }>
       <Foundation>
         <Sidebar>
           <Navbar></Navbar>

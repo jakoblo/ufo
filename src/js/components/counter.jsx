@@ -11,6 +11,7 @@ export class Counter extends React.Component {
   constructor(props) {
     super(props)
     this.state = {}
+    console.log(this.props)
   }
 
   asyncInc = () => { this.props.dispatch( asyncCalculate(this.props.count, 10)) }

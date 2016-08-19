@@ -9,7 +9,7 @@ export class Foundation extends React.Component {
 
   render() {
     return(
-      <div className="layout">{this.props.children}</div>
+      <div className="foundation">{this.props.children}</div>
     )
   }
 }
