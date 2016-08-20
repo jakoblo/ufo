@@ -19,7 +19,7 @@ const TEST_STATE = Immutable.fromJS({pathList: [
 
     switch (action.type) {
       case APP_CHANGE_PATH:
-      console.log("APP REDUCER")
+      // console.log("APP REDUCER")
         // return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newName)
         return state
         break;

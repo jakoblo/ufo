@@ -26,15 +26,15 @@ export class NavGroup extends React.Component {
         key={itemID}
         onClick={this.props.onSelectionChanged.bind(this, path)}
         onItemRemove={this.props.onItemRemove.bind(this,this.props.groupID, itemID)}
-        path={basePath}
+        title={basePath}
         active={active}
         glyph={glyph}
         >
       </NavGroupItem>)
   }
 
-  handleFeedback() {
-    console.log("FEEDBACK")
+  handleOnTitleDoubleClick() {
+
   }
 
   render() {
@@ -45,7 +45,7 @@ export class NavGroup extends React.Component {
     });
     return(
       <div className="nav-group">
-        <NavGroupTitle title={this.props.title} hideButtonText={hideButtonText} onClick={this.props.onHideGroup.bind(this, this.props.groupID)}/>
+        <NavGroupTitle title={this.props.title} groupID={this.props.groupID} onGroupTitleChange={this.props.onGroupTitleChange} hideButtonText={hideButtonText} onClick={this.props.onHideGroup.bind(this, this.props.groupID)}/>
         <div className={itemWrapperClasses}>
           {this.props.items.map(this.createGroupItem)}
         </div>
@@ -55,29 +55,18 @@ export class NavGroup extends React.Component {
 }
 
 export class NavGroupItem extends React.Component {
-
   constructor(props) {
     super(props)
   }
-
-  // private getIconComponent() {
-  //   if(this.props.glyph)
-  //
-  //   return <Icon glyph={this.props.glyph} />
-  // }
-  //
 
  render() {
     // let icon = this.getIconComponent()
     let className = classnames(this.props.className, "nav-group-item", {"active": this.props.active})
 
     return (
-      <a
-      onClick={this.props.onClick}
-      className={className}
-      >
+      <a onClick={this.props.onClick} className={className}>
         <Icon glyph={this.props.glyph} />
-        <span className="text">{this.props.path}</span>
+        <span className="text">{this.props.title}</span>
         <button className="remove" onClick={this.props.onItemRemove}></button>
       </a>
     )
@@ -85,15 +74,50 @@ export class NavGroupItem extends React.Component {
 }
 
 export class NavGroupTitle extends React.Component {
-
   constructor(props) {
     super(props)
+    this.state = {editGroupTitle: false, updateComp: false}
+  }
+
+  shouldComponentUpdate(x, newState) {
+    return newState.updateComp
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.refs.input && this.refs.input.focus();
+  }
+
+  handleDoubleClick = () => {
+    this.setState({editGroupTitle: true, updateComp: true})
+  }
+
+  changeTitle(e) {
+    if(e.keyCode === 13 || e.type === 'blur') {
+      if(this.props.title != e.target.value && e.target.value != '') {
+      this.props.onGroupTitleChange(this.props.groupID, e.target.value)
+      this.setState({editGroupTitle: false, updateComp: false})
+      }
+      this.setState({editGroupTitle: false, updateComp: true})
+    }
+  }
+
+  handleKeyDown = (e) => {
+    this.changeTitle(e)
+  }
+
+  handleOnBlur = (e) => {
+    this.changeTitle(e)
   }
 
  render() {
-    return (
+   let title = <span className="nav-group-text" onDoubleClick={this.handleDoubleClick}>{this.props.title}</span>
+   if(this.state.editGroupTitle) {
+     title = <input ref="input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
+   }
+
+  return (
       <div className="nav-group-title">
-        <span className="nav-group-text">{this.props.title}</span>
+        {title}
         <button className="nav-group-hide" onClick={this.props.onClick}>{this.props.hideButtonText}</button>
       </div>
     )

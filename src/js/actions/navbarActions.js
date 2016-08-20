@@ -1,9 +1,9 @@
 import {
   NAVBAR_SELECTION_CHANGED,
   APP_CHANGE_PATH,
-  NAVBAR_GROUP_NAME_CHANGED,
   NAVBAR_HIDE_GROUP,
-  NAVBAR_REMOVE_GROUP_ITEM
+  NAVBAR_REMOVE_GROUP_ITEM,
+  NAVBAR_CHANGE_GROUP_TITLE
   } from '../constants/action-types'
 
 // http://redux.js.org/docs/basics/Actions.html
@@ -25,6 +25,13 @@ export function hideGroup(groupID) { // Action Creator
   return { // action
     type: NAVBAR_HIDE_GROUP,
     payload: {groupID: groupID}
+  };
+}
+
+export function changeGroupTitle(groupID, newTitle) { // Action Creator
+  return { // action
+    type: NAVBAR_CHANGE_GROUP_TITLE,
+    payload: {groupID: groupID, newTitle: newTitle}
   };
 }
 

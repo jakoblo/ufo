@@ -5,7 +5,7 @@ import {storeSetup} from './store/store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
 /* React Components */
 import {Foundation} from './components/foundation'
-import {Sidebar} from './components/sidebar'
+import Sidebar from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
 import Immutable from 'immutable'
@@ -26,8 +26,9 @@ const initialState = Immutable.fromJS({
   }
 })
 
-// console.log(initialState)
 const store = storeSetup();
+
+// TEST
 window.store = store
 
 ReactDOM.render(

@@ -2,7 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-export class Sidebar extends React.Component {
+export default class Sidebar extends React.Component {
   constructor(props) {
     super(props)
   }

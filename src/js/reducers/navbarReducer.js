@@ -2,9 +2,9 @@
 import {
   NAVBAR_SELECTION_CHANGED,
   APP_CHANGE_PATH,
-  NAVBAR_GROUP_NAME_CHANGED,
   NAVBAR_HIDE_GROUP,
-  NAVBAR_REMOVE_GROUP_ITEM
+  NAVBAR_REMOVE_GROUP_ITEM,
+  NAVBAR_CHANGE_GROUP_TITLE
 } from '../constants/action-types'
 import Immutable from 'immutable'
 import { List } from 'immutable'
@@ -19,11 +19,6 @@ const INITIAL_STATE = Immutable.fromJS({groupItems: [
 export function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
 
   switch (action.type) {
-    case NAVBAR_GROUP_NAME_CHANGED:
-      console.log(state.get('groupItems'))
-      return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newName)
-      // return state.groupItems.setIn([0, 'name'], 'HUgo')
-      break;
     case APP_CHANGE_PATH:
       return state.set('activeItem', action.payload.fromPath)
       break;
@@ -33,6 +28,9 @@ export function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
       break;
     case NAVBAR_REMOVE_GROUP_ITEM:
       return state.deleteIn(['groupItems', action.payload.groupID, 'items', action.payload.itemID])
+      break;
+    case NAVBAR_CHANGE_GROUP_TITLE:
+      return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newTitle)
       break;
     default:
       return state;
