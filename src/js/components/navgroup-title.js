@@ -11,8 +11,7 @@ export class NavGroupTitle extends React.Component {
     return (
       <div className="nav-group-title">
         <span className="nav-group-text">{this.props.title}</span>
-
-
+        <button className="nav-group-hide" onClick={this.props.onClick}>{this.props.hideButtonText}</button>
       </div>
     )
   }

@@ -4,14 +4,11 @@ import { connect } from 'react-redux'
 import { NavGroupItem } from './navgroup-item'
 import { NavGroupTitle } from './navgroup-title'
 import nodePath from 'path'
+import classnames from 'classnames'
 
 export class NavGroup extends React.Component {
   constructor(props) {
     super(props)
-  }
-
-  handleClick = (e) =>   {
-      console.log(this.props.dispatch)
   }
 
   renderItem = (path, itemID) => {
@@ -35,10 +32,15 @@ export class NavGroup extends React.Component {
   }
 
   render() {
+    let hideButtonText = this.props.hidden ? "show" : "hide";
+    let itemWrapperClasses = classnames({
+      'nav-group-item-wrapper': true,
+      'hide': this.props.hidden
+    });
     return(
       <div className="nav-group">
-        <NavGroupTitle title={this.props.title} />
-        <div className={"nav-group-item-wrapper"}>
+        <NavGroupTitle title={this.props.title} hideButtonText={hideButtonText} onClick={this.props.onHideGroup.bind(this, this.props.groupID)}/>
+        <div className={itemWrapperClasses}>
           {this.props.items.map(this.renderItem)}
         </div>
       </div>

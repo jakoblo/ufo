@@ -14,9 +14,6 @@ export class NavGroupItem extends React.Component {
   //   return <Icon glyph={this.props.glyph} />
   // }
   //
-  handleClick = () => {
-    this.props.onClick()
-  }
 
  render() {
     // let icon = this.getIconComponent()
@@ -28,7 +25,7 @@ export class NavGroupItem extends React.Component {
       className={className}
       >
         <span className="text">{this.props.path}</span>
-        <button onClick={this.props.onClick} className="remove"></button>
+        <button className="remove"></button>
       </a>
     )
   }
