@@ -11,11 +11,16 @@ export class NavGroup extends React.Component {
     super(props)
   }
 
-  renderItem = (path, itemID) => {
+  createGroupItem = (path, itemID) => {
     let basePath = nodePath.basename(path)
     let active = false
     if(path === this.props.activeItem)
     active = true
+    let glyph = "folder"
+    // if(path.ext) {
+    //   let res = path.ext.replace(".", "")
+    //   glyph = "file " + res
+    // }
 
     return (
       <NavGroupItem
@@ -23,6 +28,7 @@ export class NavGroup extends React.Component {
         onClick={this.props.onSelectionChanged.bind(this, path)}
         path={basePath}
         active={active}
+        glyph={glyph}
         >
       </NavGroupItem>)
   }
@@ -41,7 +47,7 @@ export class NavGroup extends React.Component {
       <div className="nav-group">
         <NavGroupTitle title={this.props.title} hideButtonText={hideButtonText} onClick={this.props.onHideGroup.bind(this, this.props.groupID)}/>
         <div className={itemWrapperClasses}>
-          {this.props.items.map(this.renderItem)}
+          {this.props.items.map(this.createGroupItem)}
         </div>
       </div>
     )

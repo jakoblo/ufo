@@ -1,6 +1,7 @@
 "use strict"
 import React from 'react'
 import classnames from 'classnames'
+import  Icon from './icon'
 
 export class NavGroupItem extends React.Component {
 
@@ -24,6 +25,7 @@ export class NavGroupItem extends React.Component {
       onClick={this.props.onClick}
       className={className}
       >
+        <Icon glyph={this.props.glyph} />
         <span className="text">{this.props.path}</span>
         <button className="remove"></button>
       </a>
