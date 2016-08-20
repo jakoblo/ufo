@@ -3,9 +3,9 @@ import {
   NAVBAR_SELECTION_CHANGED,
   APP_CHANGE_PATH,
   NAVBAR_GROUP_NAME_CHANGED,
-  NAVBAR_HIDE_GROUP
+  NAVBAR_HIDE_GROUP,
+  NAVBAR_REMOVE_GROUP_ITEM
 } from '../constants/action-types'
-
 import Immutable from 'immutable'
 import { List } from 'immutable'
 
@@ -30,6 +30,9 @@ export function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
     case NAVBAR_HIDE_GROUP:
       let hidden = state.getIn(['groupItems', action.payload.groupID, 'hidden'])
       return state.setIn(['groupItems', action.payload.groupID, 'hidden'], !hidden)
+      break;
+    case NAVBAR_REMOVE_GROUP_ITEM:
+      return state.deleteIn(['groupItems', action.payload.groupID, 'items', action.payload.itemID])
       break;
     default:
       return state;

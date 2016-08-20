@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { changeSelection, changeGroupName, hideGroup } from '../actions/navbarActions'
+import { changeSelection, changeGroupName, hideGroup, removeGroupItem } from '../actions/navbarActions'
 import {NavGroup} from './navgroup'
 import { List } from 'immutable'
 
@@ -25,6 +25,10 @@ export class Navbar extends React.Component {
     this.props.dispatch(hideGroup(groupID))
   }
 
+  handleOnItemRemove = (groupID, itemID) => {
+    this.props.dispatch(removeGroupItem(groupID, itemID))
+  }
+
   render() {
     let groupItems = this.props.groupItems.toJS()
     let x = groupItems.map((item, index) => {
@@ -36,6 +40,7 @@ export class Navbar extends React.Component {
         items={item.items}
         hidden={item.hidden}
         onSelectionChanged={this.handleSelectionChanged}
+        onItemRemove={this.handleOnItemRemove}
         onHideGroup={this.handleOnHideGroup}>
       </NavGroup>
     })
