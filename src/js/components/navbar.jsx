@@ -34,8 +34,7 @@ export class Navbar extends React.Component {
   }
 
   render() {
-    let groupItems = this.props.groupItems.toJS()
-    let x = groupItems.map((item, index) => {
+    let groups = this.props.groupItems.toJS().map((item, index) => {
       return <NavGroup
         key={index}
         groupID={index}
@@ -51,7 +50,7 @@ export class Navbar extends React.Component {
     })
     return(
       <div className="nav-bar">
-        {x}
+        {groups}
       </div>
     )
   }

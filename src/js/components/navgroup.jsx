@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
 import classnames from 'classnames'
-import  Icon from './icon'
+import Icon from './icon'
 
 export class NavGroup extends React.Component {
   constructor(props) {
@@ -76,11 +76,11 @@ export class NavGroupItem extends React.Component {
 export class NavGroupTitle extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {editGroupTitle: false, updateComp: false}
+    this.state = {editGroupTitle: false}
   }
 
-  shouldComponentUpdate(x, newState) {
-    return newState.updateComp
+  shouldComponentUpdate(nextProps, nextState) {
+    return true
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -88,16 +88,15 @@ export class NavGroupTitle extends React.Component {
   }
 
   handleDoubleClick = () => {
-    this.setState({editGroupTitle: true, updateComp: true})
+    this.setState({editGroupTitle: true})
   }
 
   changeTitle(e) {
     if(e.keyCode === 13 || e.type === 'blur') {
       if(this.props.title != e.target.value && e.target.value != '') {
       this.props.onGroupTitleChange(this.props.groupID, e.target.value)
-      this.setState({editGroupTitle: false, updateComp: false})
       }
-      this.setState({editGroupTitle: false, updateComp: true})
+      this.setState({editGroupTitle: false})
     }
   }
 
@@ -107,6 +106,10 @@ export class NavGroupTitle extends React.Component {
 
   handleOnBlur = (e) => {
     this.changeTitle(e)
+  }
+
+  handleHideGroup = () => {
+    this.set
   }
 
  render() {
