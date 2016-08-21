@@ -11,6 +11,7 @@ import Sidebar from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
 import ToggleBar from './components/togglebar'
+import ActionBar from './components/actionbar'
 
 
 if (process.env.NODE_ENV !== 'production') {
@@ -37,6 +38,7 @@ ReactDOM.render(
       <Provider store={ store }>
       <Foundation>
         <Sidebar>
+          <ActionBar></ActionBar>
           <Navbar></Navbar>
           <ToggleBar></ToggleBar>
         </Sidebar>

@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import nodePath from 'path'
 import classnames from 'classnames'
 import Icon from './icon'
+import Button from './button'
 
 export class NavGroup extends React.Component {
   constructor(props) {
@@ -54,6 +55,12 @@ export class NavGroup extends React.Component {
   }
 }
 
+/*
+*
+* NAVGROUP ITEM
+*
+*/
+
 export class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
@@ -67,11 +74,17 @@ export class NavGroupItem extends React.Component {
       <a onClick={this.props.onClick} className={className}>
         <Icon glyph={this.props.glyph} />
         <span className="text">{this.props.title}</span>
-        <button className="remove" onClick={this.props.onItemRemove}></button>
+        <Button className="remove" onClick={this.props.onItemRemove}></Button>
       </a>
     )
   }
 }
+
+/*
+*
+* NAVGROUP TITLE
+*
+*/
 
 export class NavGroupTitle extends React.Component {
   constructor(props) {
@@ -121,7 +134,7 @@ export class NavGroupTitle extends React.Component {
   return (
       <div className="nav-group-title">
         {title}
-        <button className="nav-group-hide" onClick={this.props.onClick}>{this.props.hideButtonText}</button>
+        <Button className="nav-group-hide" onClick={this.props.onClick} text={this.props.hideButtonText}/>
       </div>
     )
   }
