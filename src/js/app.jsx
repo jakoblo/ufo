@@ -3,13 +3,15 @@ import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store/store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
+import Immutable from 'immutable'
+import { List, Map } from 'immutable'
 /* React Components */
 import {Foundation} from './components/foundation'
 import Sidebar from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
-import Immutable from 'immutable'
-import { List, Map } from 'immutable'
+import ToggleBar from './components/togglebar'
+
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -36,6 +38,7 @@ ReactDOM.render(
       <Foundation>
         <Sidebar>
           <Navbar></Navbar>
+          <ToggleBar></ToggleBar>
         </Sidebar>
         <ViewContainer></ViewContainer>
       </Foundation>
