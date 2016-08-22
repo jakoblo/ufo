@@ -21,10 +21,6 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
       return state.setIn([action.payload.root, action.payload.base], action.payload)
 
     case t.FILE_UNLINK:
-      if(action.payload.type == TYPE_DIR) {
-        state = state.deleteIn([action.payload.path])
-        console.log('delete dir, maybe views have to change, but how?')
-      }
       return state.deleteIn([action.payload.root, action.payload.base])
 
     case t.FILE_CHANGE:
