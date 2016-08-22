@@ -8,6 +8,8 @@ import {
   TYPE_DIR
   } from './fs-action-types'
 import watchHandler from './fs-watch-handler'
+import nodePath from 'path'
+import {changeAppPath} from '../actions/appActions'
 const watcherSettings = {
   ignored: /[\/\\]\./,
   persistent: true,
@@ -28,7 +30,7 @@ export function watcherRequest(path) {
       path,
       watcherSettings,
       (fileObj)     => {dispatch( fileAdd(fileObj) )},
-      (fileObj)     => {dispatch( fileUnlink(fileObj) )},
+      (fileObj, activeWatcher) => {dispatch( fileUnlink(fileObj, activeWatcher) )},
       (fileObj)     => {dispatch( fileChange(fileObj) )},
       (path, files) => {dispatch( watcherReady(path, files) )}
     )
@@ -93,19 +95,23 @@ function fileAdd(fileObj) {
 }
 
 /**
- * Action Creator
+ * Action Creator to remove file from view
+ * It checks the if the removed path is currently watched 
+ * and changes the app Path if necessary to not look in an not existing folder
+ * 
  * @param  {Object} fileObj
+ * @param  {Array} activeWatcher
  * @returns {Object}
  */
-function fileUnlink(fileObj) {
-
-  if(fileObj.type == TYPE_DIR) {
-    // PUh?...
-  }
-
-  return {
-    type: FILE_UNLINK,
-    payload: fileObj
+function fileUnlink(fileObj, activeWatcher) {
+  return dispatch => {
+    if(activeWatcher[fileObj.path]) {
+      dispatch(changeAppPath(null, nodePath.dirname(fileObj.path)))
+    }
+    dispatch({
+      type: FILE_UNLINK,
+      payload: fileObj
+    })
   }
 }
 
