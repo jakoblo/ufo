@@ -19,6 +19,7 @@ export class ViewContainer extends React.Component {
       <section className="viewContainer">
         ViewContainer
         <p>{this.props.viewContainer.get(0)}</p>
+        {this.props.children}
       </section>
     )
   }

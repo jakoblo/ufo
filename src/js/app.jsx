@@ -8,8 +8,11 @@ import {Foundation} from './components/foundation'
 import Sidebar from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
+import {FSTester} from './components/fs-tester'
 import Immutable from 'immutable'
 import { List, Map } from 'immutable'
+import os from 'os'
+import {changeAppPath} from './actions/appActions'
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -28,8 +31,8 @@ const initialState = Immutable.fromJS({
 
 const store = storeSetup();
 
-// TEST
-window.store = store
+// INIT APP PATH
+store.dispatch(changeAppPath(os.homedir(), os.homedir()))
 
 ReactDOM.render(
       <Provider store={ store }>
@@ -37,7 +40,9 @@ ReactDOM.render(
         <Sidebar>
           <Navbar></Navbar>
         </Sidebar>
-        <ViewContainer></ViewContainer>
+        <ViewContainer>
+          <FSTester/>
+        </ViewContainer>
       </Foundation>
     </Provider>
   ,
