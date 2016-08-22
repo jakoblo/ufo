@@ -1,5 +1,5 @@
 import * as actions from './fs-actions';
-import * as actionTypes from './fs-action-types';
+import * as actionTypes from './fs-actiontypes';
 import * as constants from './fs-constants';
 import reducer from './fs-reducer';
 import FSTester from './fs-tester';

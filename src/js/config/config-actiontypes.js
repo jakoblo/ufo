@@ -1,0 +1,2 @@
+/* CONFIG */
+export const APP_TOGGLE_EDIT_MODE = 'APP_TOGGLE_EDIT_MODE'

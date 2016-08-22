@@ -1,6 +1,4 @@
-import {
-  APP_CHANGE_PATH
-  } from '../app/app-actiontypes'
+import * as t from './app-actiontypes'
 import _ from 'underscore'
 import nodePath from 'path'
 import FileSystem from '../filesystem/fs-index'
@@ -28,7 +26,7 @@ export function changeAppPath(fromPath, toPath) {
     let newPathRoute = buildPathRoute(fromPath, toPath)
 
     dispatch({
-      type: APP_CHANGE_PATH,
+      type: t.APP_CHANGE_PATH,
       payload: {
         pathRoute : newPathRoute
       }

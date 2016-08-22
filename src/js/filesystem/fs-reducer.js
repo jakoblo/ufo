@@ -1,11 +1,5 @@
 "use strict"
-import {
-  WATCHER_READY,
-  WATCHER_CLOSE,
-  FILE_ADD,
-  FILE_UNLINK,
-  FILE_CHANGE
-} from './fs-action-types'
+import * as t from './fs-actiontypes'
 import {
   TYPE_DIR
 } from './fs-constants'
@@ -17,23 +11,23 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
 
   switch (action.type) {
 
-    case WATCHER_CLOSE:
+    case t.WATCHER_CLOSE:
       return state.deleteIn([action.payload.path])
 
-    case WATCHER_READY:
+    case t.WATCHER_READY:
       return state.setIn([action.payload.path], Map(action.payload.files))
 
-    case FILE_ADD:
+    case t.FILE_ADD:
       return state.setIn([action.payload.root, action.payload.base], action.payload)
 
-    case FILE_UNLINK:
+    case t.FILE_UNLINK:
       if(action.payload.type == DIR) {
         state = state.deleteIn([action.payload.path])
         console.log('delete dir, maybe views have to change, but how?')
       }
       return state.deleteIn([action.payload.root, action.payload.base])
 
-    case FILE_CHANGE:
+    case t.FILE_CHANGE:
       return state.updateIn([action.payload.root, action.payload.base], action.payload)
 
     default:

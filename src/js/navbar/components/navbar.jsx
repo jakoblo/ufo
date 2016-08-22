@@ -2,7 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
-import { changeAppPath } from '../../app/app-actions'
+import App from '../../app/app-index'
 import { List } from 'immutable'
 import NavGroup from './navgroup'
 
@@ -19,7 +19,7 @@ export default class Navbar extends React.Component {
 
 
   handleSelectionChanged = (path, groupID, itemID) => {
-    this.props.dispatch(changeAppPath(path))
+    this.props.dispatch(App.actions.changeAppPath(path))
   }
 
   handleOnHideGroup = (groupID) => {

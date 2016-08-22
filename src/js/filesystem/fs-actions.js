@@ -1,12 +1,4 @@
-import {
-  WATCHER_READING,
-  WATCHER_CLOSE,
-  WATCHER_READY,
-  FILE_ADD,
-  FILE_UNLINK,
-  FILE_CHANGE,
-  TYPE_DIR
-  } from './fs-action-types'
+import * as t from './fs-actiontypes'
 import watchHandler from './fs-watch-handler'
 const watcherSettings = {
   ignored: /[\/\\]\./,
@@ -43,7 +35,7 @@ export function watcherRequest(path) {
 export function watcherClose(path) {
   watchHandler.unwatch(path)
   return {
-    type: WATCHER_CLOSE,
+    type: t.WATCHER_CLOSE,
     payload: {
       path: path
     }
@@ -57,7 +49,7 @@ export function watcherClose(path) {
  */
 let watcherReading = (path) => {
   return {
-    type: WATCHER_READING,
+    type: t.WATCHER_READING,
     payload: {
       path: path
     }
@@ -72,7 +64,7 @@ let watcherReading = (path) => {
  */
 function watcherReady(path, files) {
   return {
-    type: WATCHER_READY,
+    type: t.WATCHER_READY,
     payload: {
       path: path,
       files: files
@@ -87,7 +79,7 @@ function watcherReady(path, files) {
  */
 function fileAdd(fileObj) {
   return {
-    type: FILE_ADD,
+    type: t.FILE_ADD,
     payload: fileObj
   }
 }
@@ -104,7 +96,7 @@ function fileUnlink(fileObj) {
   }
 
   return {
-    type: FILE_UNLINK,
+    type: t.FILE_UNLINK,
     payload: fileObj
   }
 }
@@ -116,7 +108,7 @@ function fileUnlink(fileObj) {
  */
 function fileChange(fileObj) {
   return {
-    type: FILE_CHANGE,
+    type: t.FILE_CHANGE,
     payload: fileObj
   }
 }

@@ -1,6 +1,6 @@
 "use strict"
 import * as t from './navbar-actiontypes'
-import * as appTypes from '../app/app-actiontypes'
+import App from '../app/app-index'
 import Immutable from 'immutable'
 import { List } from 'immutable'
 
@@ -14,7 +14,7 @@ const INITIAL_STATE = Immutable.fromJS({groupItems: [
 export default function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
 
   switch (action.type) {
-    case appTypes.APP_CHANGE_PATH:
+    case App.actiontypes.APP_CHANGE_PATH:
       return state.set('activeItem', action.payload.pathRoute[0])
       break;
     case t.NAVBAR_HIDE_GROUP:

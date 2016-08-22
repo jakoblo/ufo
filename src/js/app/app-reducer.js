@@ -1,9 +1,7 @@
 "use strict"
 import Immutable from 'immutable'
 import { List } from 'immutable'
-import {
-  APP_CHANGE_PATH
-  } from '../constants/action-types'
+import * as t from './app-actiontypes'
 
 const INITIAL_STATE = {pathList: List([])}
 
@@ -18,7 +16,7 @@ const TEST_STATE = Immutable.fromJS({pathList: [
   export default function appReducer(state = TEST_STATE, action = { type: '' }) {
 
     switch (action.type) {
-      case APP_CHANGE_PATH:
+      case t.APP_CHANGE_PATH:
       // console.log("APP REDUCER")
         // return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newName)
         return state

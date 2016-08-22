@@ -1,7 +1,5 @@
 "use strict"
-import {
-  APP_TOGGLE_EDIT_MODE
-} from '../constants/action-types'
+import * as t from './config-actiontypes'
 import { Map } from 'immutable'
 
 const INITIAL_STATE = Map({
@@ -12,7 +10,7 @@ const INITIAL_STATE = Map({
 
 export default function configReducer(state = INITIAL_STATE, action = { type: '' }) {
   switch (action.type) {
-    case APP_TOGGLE_EDIT_MODE:
+    case t.APP_TOGGLE_EDIT_MODE:
         return state.set('editMode', action.payload.editMode)
       break
     default:
