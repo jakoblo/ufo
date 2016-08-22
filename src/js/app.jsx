@@ -36,7 +36,7 @@ const initialState = Immutable.fromJS({
 const store = storeSetup();
 
 // INIT APP PATH
-store.dispatch(App.actions.changeAppPath(os.homedir(), os.homedir()))
+store.dispatch(App.actions.changeAppPath(os.homedir()))
 
 ReactDOM.render(
       <Provider store={ store }>
