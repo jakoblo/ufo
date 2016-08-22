@@ -5,7 +5,7 @@ import Immutable from 'immutable'
 import { List } from 'immutable'
 
 const INITIAL_STATE = Immutable.fromJS({groupItems: [
-    {title: "FavGroup 1", hidden: false, items: ["/Users/jakoblo", "/Users/jakoblo/Desktop"]},
+    {title: "FavGroup 1", hidden: false, items: ["/", "/Users/jakoblo/Desktop"]},
     {title: "FavGroup 2", hidden: false, items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads", "/Users/jakoblo/Applications"]}
   ],
   activeItem: ''
