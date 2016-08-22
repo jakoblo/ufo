@@ -1,7 +1,7 @@
 import * as t from './fs-actiontypes'
 import watchHandler from './fs-watch-handler'
 import nodePath from 'path'
-import {changeAppPath} from '../actions/appActions'
+import App from '../app/app-index'
 const watcherSettings = {
   ignored: /[\/\\]\./,
   persistent: true,
@@ -99,7 +99,7 @@ function fileAdd(fileObj) {
 function fileUnlink(fileObj, activeWatcher) {
   return dispatch => {
     if(activeWatcher[fileObj.path]) {
-      dispatch(changeAppPath(null, nodePath.dirname(fileObj.path)))
+      dispatch(App.actions.changeAppPath(null, nodePath.dirname(fileObj.path)))
     }
     dispatch({
       type: FILE_UNLINK,
