@@ -15,7 +15,7 @@ const TEST_STATE = Immutable.fromJS({pathList: [
     ]
   })
 
-  export function appReducer(state = TEST_STATE, action = { type: '' }) {
+  export default function appReducer(state = TEST_STATE, action = { type: '' }) {
 
     switch (action.type) {
       case APP_CHANGE_PATH:

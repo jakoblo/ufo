@@ -6,19 +6,17 @@ import {DevToolsSetup} from './tools/devtools-setup'
 import Immutable from 'immutable'
 import { List, Map } from 'immutable'
 import os from 'os'
-import {changeAppPath} from './actions/appActions'
+import App from './app/app-index'
 /* React Components */
-import {Foundation} from './components/foundation'
-import Sidebar from './components/sidebar'
+import {Foundation} from './general-components/foundation'
+import Sidebar from './general-components/sidebar'
 // import {Navbar} from './components/navbar'
 import Navbar from './navbar/navbar-index'
-import {ViewContainer} from './components/viewContainer'
+import ViewContainer from './viewcontainer/vc-index'
 import FileSystem from './filesystem/fs-index'
-import ToggleBar from './components/togglebar'
-import ActionBar from './components/actionbar'
+import ToggleBar from './general-components/togglebar'
 
 window.fs = FileSystem
-
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -38,19 +36,19 @@ const initialState = Immutable.fromJS({
 const store = storeSetup();
 
 // INIT APP PATH
-store.dispatch(changeAppPath(os.homedir(), os.homedir()))
+store.dispatch(App.actions.changeAppPath(os.homedir(), os.homedir()))
 
 ReactDOM.render(
       <Provider store={ store }>
       <Foundation>
         <Sidebar>
-          <ActionBar></ActionBar>
-            <Navbar.Container></Navbar.Container>
+          <App.components.actionbar></App.components.actionbar>
+          <Navbar.components.parent></Navbar.components.parent>
           <ToggleBar></ToggleBar>
         </Sidebar>
-        <ViewContainer>
+        <ViewContainer.components.parent>
           <FileSystem.components.FSTester/>
-        </ViewContainer>
+        </ViewContainer.components.parent>
       </Foundation>
     </Provider>
   ,

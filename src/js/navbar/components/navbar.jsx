@@ -1,10 +1,10 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from './navbar-actions'
-import { changeAppPath } from '../actions/appActions'
+import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
+import { changeAppPath } from '../../app/app-actions'
 import { List } from 'immutable'
-import { NavGroup } from './components/navgroup'
+import NavGroup from './navgroup'
 
 @connect((store) => {
   // console.log("STORE ", store.toJS())
@@ -12,7 +12,7 @@ import { NavGroup } from './components/navgroup'
           groupItems: store.navbar.get('groupItems')
   }
 })
-export default class Container extends React.Component {
+export default class Navbar extends React.Component {
   constructor(props) {
     super(props)
   }

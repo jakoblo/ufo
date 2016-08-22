@@ -1,12 +1,12 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { toggleEditMode } from '../actions/configActions'
+import { toggleEditMode } from '../../config/config-actions'
 import { List } from 'immutable'
 import classnames from 'classnames'
 import { remote } from 'electron'
-import ButtonGroup from './buttonGroup'
-import Button from './button'
+import ButtonGroup from '../../general-components/button-group'
+import Button from '../../general-components/button'
 
 @connect((state) => {
   return {foo: state}

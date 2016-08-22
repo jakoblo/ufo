@@ -1,6 +1,6 @@
 "use strict"
 import React from 'react'
-import { changeAppPath } from '../actions/appActions'
+import { changeAppPath } from '../app/app-actions'
 import { connect } from 'react-redux'
 
 @connect((store) => {

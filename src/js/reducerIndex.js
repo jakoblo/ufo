@@ -1,15 +1,14 @@
 import { combineReducers } from 'redux'
-import { appReducer } from './reducers/appReducer'
-import filesystem from './filesystem/fs-index'
-import { configReducer } from './reducers/configReducer'
+import App from './app/app-index'
+import Filesystem from './filesystem/fs-index'
+import Config from './config/config-index'
+import ViewContainer from './viewcontainer/vc-index'
 import Navbar from './navbar/navbar-index'
-import { viewContainerReducer } from './reducers/view-container-reducer'
-import { List, Map } from 'immutable'
 
 export const rootReducer = combineReducers({
-  app: appReducer,
-  [filesystem.constants.NAME]: filesystem.reducer,
-  config: configReducer,
-  navbar: Navbar.reducer,
-  viewContainer: viewContainerReducer
+  [App.constants.NAME]: App.reducer,
+  [Filesystem.constants.NAME]: Filesystem.reducer,
+  [Config.constants.NAME]: Config.reducer,
+  [Navbar.constants.NAME]: Navbar.reducer,
+  [ViewContainer.constants.NAME]: ViewContainer.reducer
 }) 

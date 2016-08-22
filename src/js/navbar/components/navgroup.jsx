@@ -3,10 +3,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
 import classnames from 'classnames'
-import Icon from '../../components/icon'
-import Button from '../../components/button'
+import Icon from '../../general-components/icon'
+import Button from '../../general-components/button'
 
-export class NavGroup extends React.Component {
+export default class NavGroup extends React.Component {
   constructor(props) {
     super(props)
   }
@@ -61,7 +61,7 @@ export class NavGroup extends React.Component {
 *
 */
 
-export class NavGroupItem extends React.Component {
+class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
   }
@@ -86,7 +86,7 @@ export class NavGroupItem extends React.Component {
 *
 */
 
-export class NavGroupTitle extends React.Component {
+class NavGroupTitle extends React.Component {
   constructor(props) {
     super(props)
     this.state = {editGroupTitle: false}

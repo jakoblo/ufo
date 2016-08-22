@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { toggleEditMode } from '../actions/configActions'
+import { toggleEditMode } from '../config/config-actions'
 import { List } from 'immutable'
 import classnames from 'classnames'
 

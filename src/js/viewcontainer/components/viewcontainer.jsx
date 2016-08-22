@@ -6,10 +6,10 @@ import { List } from 'immutable'
 @connect((store) => {
   // console.log("STORE ", store.toJS())
   return {
-    viewContainer: store.viewContainer
+    viewcontainer: store.viewcontainer
   }
 })
-export class ViewContainer extends React.Component {
+export default class ViewContainer extends React.Component {
   constructor(props) {
     super(props)
   }
@@ -18,7 +18,6 @@ export class ViewContainer extends React.Component {
     return(
       <section className="viewContainer">
         ViewContainer
-        <p>{this.props.viewContainer.get(0)}</p>
         {this.props.children}
       </section>
     )
