@@ -12,6 +12,7 @@ let pathRoute = []
  * Should be called by user actions (Click on a folder) or by walking through the history
  * If you call it the first the, you need to Provied fromPath and toPath.
  * After that only of them is possible.
+ * 
  * @param  {string} fromPath The first folder of the pathRout that will be displayed is optional
  * @param  {string} toPath   The last folder of the pathRout that will be displayed is optional
  */
@@ -19,8 +20,10 @@ export function changeAppPath(fromPath, toPath) {
 
   return dispatch => {
 
+    if(fromPath && !toPath) { toPath = fromPath }
     fromPath = fromPath   ||  _.first(pathRoute)
     toPath =   toPath     ||  _.last(pathRoute)
+
     if(!fromPath || !toPath) { throw "Set 'from' and 'to' at the first call of changeAppPath()"}
     let newPathRoute = buildPathRoute(fromPath, toPath)
 
