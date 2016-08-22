@@ -41,7 +41,7 @@ export function fsWatcherRequest(path) {
  * @returns {Object}
  */
 export function fsWatcherClose(path) {
-  fsWatcher._unwatch(path)
+  fsWatcher.unwatch(path)
   return {
     type: FS_WATCHER_CLOSE,
     payload: {
