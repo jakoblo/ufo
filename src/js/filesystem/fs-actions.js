@@ -102,7 +102,7 @@ function fileUnlink(fileObj, activeWatcher) {
       dispatch(App.actions.changeAppPath(null, nodePath.dirname(fileObj.path)))
     }
     dispatch({
-      type: FILE_UNLINK,
+      type: t.FILE_UNLINK,
       payload: fileObj
     })
   }
