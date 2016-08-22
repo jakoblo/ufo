@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../actions/navbarActions'
+import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from './navbar-actions'
 import { changeAppPath } from '../actions/appActions'
 import { List } from 'immutable'
 import { NavGroup } from './components/navgroup'

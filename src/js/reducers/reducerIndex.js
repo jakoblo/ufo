@@ -3,7 +3,7 @@ import { combineReducers } from 'redux'
 import { appReducer } from './appReducer'
 import { fsReducer } from './fs-reducer'
 import { configReducer } from './configReducer'
-import { navbarReducer } from './navbarReducer'
+import Navbar from '../navbar/navbar-index'
 import { viewContainerReducer } from './view-container-reducer'
 import { List, Map } from 'immutable'
 
@@ -11,6 +11,6 @@ export const rootReducer = combineReducers({
   app: appReducer,
   fs: fsReducer,
   config: configReducer,
-  navbar: navbarReducer,
+  navbar: Navbar.reducer,
   viewContainer: viewContainerReducer
 })

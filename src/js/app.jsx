@@ -43,7 +43,7 @@ ReactDOM.render(
       <Foundation>
         <Sidebar>
           <ActionBar></ActionBar>
-          <Navbar.Container></Navbar.Container>
+            <Navbar.Container></Navbar.Container>
           <ToggleBar></ToggleBar>
         </Sidebar>
         <ViewContainer>

@@ -11,7 +11,7 @@ const INITIAL_STATE = Immutable.fromJS({groupItems: [
   activeItem: ''
 })
 
-export function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
+export default function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
 
   switch (action.type) {
     case appTypes.APP_CHANGE_PATH:

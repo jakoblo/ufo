@@ -1,7 +1,5 @@
 import * as t from './navbar-actiontypes'
 
-console.log(t.NAVBAR_CHANGE_GROUP_TITLE)
-
 export function changeGroupName(groupID, newName) {
   return {
     type: t.NAVBAR_CHANGE_GROUP_TITLE,
