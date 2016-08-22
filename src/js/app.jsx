@@ -5,11 +5,14 @@ import {storeSetup} from './store/store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
 import Immutable from 'immutable'
 import { List, Map } from 'immutable'
+import os from 'os'
+import {changeAppPath} from './actions/appActions'
 /* React Components */
 import {Foundation} from './components/foundation'
 import Sidebar from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
+import {FSTester} from './components/fs-tester'
 import ToggleBar from './components/togglebar'
 import ActionBar from './components/actionbar'
 
@@ -31,8 +34,8 @@ const initialState = Immutable.fromJS({
 
 const store = storeSetup();
 
-// TEST
-window.store = store
+// INIT APP PATH
+store.dispatch(changeAppPath(os.homedir(), os.homedir()))
 
 ReactDOM.render(
       <Provider store={ store }>
@@ -42,7 +45,9 @@ ReactDOM.render(
           <Navbar></Navbar>
           <ToggleBar></ToggleBar>
         </Sidebar>
-        <ViewContainer></ViewContainer>
+        <ViewContainer>
+          <FSTester/>
+        </ViewContainer>
       </Foundation>
     </Provider>
   ,

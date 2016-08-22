@@ -1,9 +1,7 @@
 import { createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
-// import logger from './logger'
 import {rootReducer} from '../reducers/reducerIndex'
 import {calulateCounter} from '../actions/counterActions'
-
 // import promiseMiddleware from '../middleware/promise-middleware'
 
 export function storeSetup(initialState) {
