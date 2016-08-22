@@ -1,14 +1,14 @@
 import {
-  FS_WATCHER_READING,
-  FS_WATCHER_CLOSE,
-  FS_WATCHER_READY,
-  FS_ADD,
-  FS_UNLINK,
-  FS_CHANGE
-  } from '../constants/action-types'
-import {DIR} from '../constants/fs-types'
-import {fsWatcher} from '../filesystem/fs-watcher'
-const fsWatcherSettings = {
+  WATCHER_READING,
+  WATCHER_CLOSE,
+  WATCHER_READY,
+  FILE_ADD,
+  FILE_UNLINK,
+  FILE_CHANGE,
+  TYPE_DIR
+  } from './fs-action-types'
+import watchHandler from './fs-watch-handler'
+const watcherSettings = {
   ignored: /[\/\\]\./,
   persistent: true,
   depth: 0,
@@ -19,18 +19,18 @@ const fsWatcherSettings = {
  * they will dispatch further actions
  * @param  {String} path
  */
-export function fsWatcherRequest(path) {
+export function watcherRequest(path) {
   return function (dispatch) {
 
-    dispatch(  fsWatcherReading(path)  )
+    dispatch(  watcherReading(path)  )
 
-    let watcher = fsWatcher.watch(
+    let watcher = watchHandler.watch(
       path,
-      fsWatcherSettings,
-      (fileObj)     => {dispatch( fsAdd(fileObj) )},
-      (fileObj)     => {dispatch( fsUnlink(fileObj) )},
-      (fileObj)     => {dispatch( fsChange(fileObj) )},
-      (path, files) => {dispatch( fsWatcherReady(path, files) )}
+      watcherSettings,
+      (fileObj)     => {dispatch( fileAdd(fileObj) )},
+      (fileObj)     => {dispatch( fileUnlink(fileObj) )},
+      (fileObj)     => {dispatch( fileChange(fileObj) )},
+      (path, files) => {dispatch( watcherReady(path, files) )}
     )
   }
 }
@@ -40,10 +40,10 @@ export function fsWatcherRequest(path) {
  * @param  {String} path
  * @returns {Object}
  */
-export function fsWatcherClose(path) {
-  fsWatcher.unwatch(path)
+export function watcherClose(path) {
+  watchHandler.unwatch(path)
   return {
-    type: FS_WATCHER_CLOSE,
+    type: WATCHER_CLOSE,
     payload: {
       path: path
     }
@@ -55,9 +55,9 @@ export function fsWatcherClose(path) {
  * @param  {String} path
  * @returns {Object}
  */
-let fsWatcherReading = (path) => {
+let watcherReading = (path) => {
   return {
-    type: FS_WATCHER_READING,
+    type: WATCHER_READING,
     payload: {
       path: path
     }
@@ -70,9 +70,9 @@ let fsWatcherReading = (path) => {
  * @param  {[Object]} files Array of all fileObj which the watch found
  * @returns {Object}
  */
-function fsWatcherReady(path, files) {
+function watcherReady(path, files) {
   return {
-    type: FS_WATCHER_READY,
+    type: WATCHER_READY,
     payload: {
       path: path,
       files: files
@@ -85,9 +85,9 @@ function fsWatcherReady(path, files) {
  * @param  {Object} fileObj
  * @returns {Object}
  */
-function fsAdd(fileObj) {
+function fileAdd(fileObj) {
   return {
-    type: FS_ADD,
+    type: FILE_ADD,
     payload: fileObj
   }
 }
@@ -97,14 +97,14 @@ function fsAdd(fileObj) {
  * @param  {Object} fileObj
  * @returns {Object}
  */
-function fsUnlink(fileObj) {
+function fileUnlink(fileObj) {
 
-  if(fileObj.type == DIR) {
+  if(fileObj.type == TYPE_DIR) {
     // PUh?...
   }
 
   return {
-    type: FS_UNLINK,
+    type: FILE_UNLINK,
     payload: fileObj
   }
 }
@@ -114,9 +114,9 @@ function fsUnlink(fileObj) {
  * @param  {Object} fileObj
  * @returns {Object}
  */
-function fsChange(fileObj) {
+function fileChange(fileObj) {
   return {
-    type: FS_CHANGE,
+    type: FILE_CHANGE,
     payload: fileObj
   }
 }

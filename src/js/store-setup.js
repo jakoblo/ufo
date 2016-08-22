@@ -1,7 +1,6 @@
 import { createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
-import {rootReducer} from '../reducers/reducerIndex'
-import {calulateCounter} from '../actions/counterActions'
+import {rootReducer} from './reducerIndex'
 // import promiseMiddleware from '../middleware/promise-middleware'
 
 export function storeSetup(initialState) {
