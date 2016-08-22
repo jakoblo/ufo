@@ -38,14 +38,14 @@ gulp.task('production', ['set-prod-node-env'], function () {
 gulp.task('compile-babel', function () {
   return gulp.src(config.jsNext)
     .pipe(sourcemaps.init())
-    .pipe(babel())
+    .pipe(babel().on('error', swallowError))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(config.js2015));
 });
 
 gulp.task('compile-sass', function () {
   return gulp.src(config.sass)
-    .pipe(sass.sync().on('error', sass.logError))
+    .pipe(sass.sync().on('error', swallowError))
     .pipe(gulp.dest(config.css));
 });
 
@@ -106,3 +106,9 @@ gulp.task('set-prod-node-env', function() {
 gulp.task('set-debug-node-env', function() {
     return process.env.NODE_ENV = 'debug';
 });
+
+
+function swallowError (error) {
+  console.log(error.toString())
+  this.emit('end')
+}
