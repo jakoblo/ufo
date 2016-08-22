@@ -1,6 +1,6 @@
 import chokidar from 'chokidar'
 import nodePath from 'path'
-import {FILE, DIR} from '../constants/fs-types'
+import {TYPE_FILE, TYPE_DIR} from './fs-constants'
 
 const logging = true
 
@@ -35,15 +35,15 @@ class ChokidarHandler {
     let root = path
 
     if(addCallback) {
-      watcher.on('add', this._handleEvent.bind(this, addCallback, root, FILE))
-      watcher.on('addDir', this._handleEvent.bind(this, addCallback, root, DIR))
+      watcher.on('add', this._handleEvent.bind(this, addCallback, root, TYPE_FILE))
+      watcher.on('addDir', this._handleEvent.bind(this, addCallback, root, TYPE_DIR))
     }
     if(unlinkCallback) {
-      watcher.on('unlink', this._handleEvent.bind(this, unlinkCallback, root, FILE))
-      watcher.on('unlinkDir', this._handleEvent.bind(this, unlinkCallback, root, DIR))
+      watcher.on('unlink', this._handleEvent.bind(this, unlinkCallback, root, TYPE_FILE))
+      watcher.on('unlinkDir', this._handleEvent.bind(this, unlinkCallback, root, TYPE_DIR))
     }
     if(changeCallback) {
-      watcher.on('change', this._handleEvent.bind(this, changeCallback, root, FILE))
+      watcher.on('change', this._handleEvent.bind(this, changeCallback, root, TYPE_FILE))
     }
     if(readyCallback) {
       watcher.on('ready', this._handleReady.bind(this, readyCallback, root))
@@ -112,4 +112,4 @@ class ChokidarHandler {
   }
 }
 
-export let fsWatcher = new ChokidarHandler()
+export default new ChokidarHandler()

@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 @connect((store) => {
   return {fs: store.fs}
 })
-export class FSTester extends React.Component {
+export default class FSTester extends React.Component {
 
   constructor(props) {
     super(props)

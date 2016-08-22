@@ -3,7 +3,7 @@ import {
   } from '../app/app-actiontypes'
 import _ from 'underscore'
 import nodePath from 'path'
-import {fsWatcherRequest, fsWatcherClose} from './fs-actions'
+import FileSystem from '../filesystem/fs-index'
 
 let pathRoute = []
 
@@ -36,13 +36,13 @@ export function changeAppPath(fromPath, toPath) {
 
     let closeFsWatcher = _.difference(pathRoute, newPathRoute)
     closeFsWatcher.forEach((path, index) => {
-      dispatch( fsWatcherClose(path) )
+      dispatch( FileSystem.actions.watcherClose(path) )
       pathRoute.splice( pathRoute.indexOf(path), 1 )
     })
 
     let createFsWatcher = _.difference(newPathRoute, pathRoute)
     createFsWatcher.forEach((path, index) => {
-      dispatch( fsWatcherRequest(path) )
+      dispatch( FileSystem.actions.watcherRequest(path) )
       pathRoute.push(path)
     })
 

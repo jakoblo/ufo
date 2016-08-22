@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
-import {storeSetup} from './store/store-setup'
+import {storeSetup} from './store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
 import Immutable from 'immutable'
 import { List, Map } from 'immutable'
@@ -13,9 +13,11 @@ import Sidebar from './components/sidebar'
 // import {Navbar} from './components/navbar'
 import Navbar from './navbar/navbar-index'
 import {ViewContainer} from './components/viewContainer'
-import {FSTester} from './components/fs-tester'
+import FileSystem from './filesystem/fs-index'
 import ToggleBar from './components/togglebar'
 import ActionBar from './components/actionbar'
+
+window.fs = FileSystem
 
 
 if (process.env.NODE_ENV !== 'production') {
@@ -47,7 +49,7 @@ ReactDOM.render(
           <ToggleBar></ToggleBar>
         </Sidebar>
         <ViewContainer>
-          <FSTester/>
+          <FileSystem.components.FSTester/>
         </ViewContainer>
       </Foundation>
     </Provider>
