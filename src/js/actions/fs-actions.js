@@ -14,7 +14,11 @@ const fsWatcherSettings = {
   depth: 0,
   alwaysStat: true
 }
-
+/**
+ * Creats a new FileSystem watcher with async Callbacks
+ * they will dispatch further actions
+ * @param  {String} path
+ */
 export function fsWatcherRequest(path) {
   return function (dispatch) {
 
@@ -31,8 +35,13 @@ export function fsWatcherRequest(path) {
   }
 }
 
+/**
+ * Close/Unwatch the FileSystem watcher for the given path
+ * @param  {String} path
+ * @returns {Object}
+ */
 export function fsWatcherClose(path) {
-  fsWatcher.unwatch(path)
+  fsWatcher._unwatch(path)
   return {
     type: FS_WATCHER_CLOSE,
     payload: {
@@ -41,6 +50,11 @@ export function fsWatcherClose(path) {
   }
 }
 
+/**
+ * Action Creator
+ * @param  {String} path
+ * @returns {Object}
+ */
 let fsWatcherReading = (path) => {
   return {
     type: FS_WATCHER_READING,
@@ -50,6 +64,12 @@ let fsWatcherReading = (path) => {
   }
 }
 
+/**
+ * Action Creator
+ * @param  {String} path the path where the watcher is looking into
+ * @param  {[Object]} files Array of all fileObj which the watch found
+ * @returns {Object}
+ */
 function fsWatcherReady(path, files) {
   return {
     type: FS_WATCHER_READY,
@@ -60,6 +80,11 @@ function fsWatcherReady(path, files) {
   }
 }
 
+/**
+ * Action Creator
+ * @param  {Object} fileObj
+ * @returns {Object}
+ */
 function fsAdd(fileObj) {
   return {
     type: FS_ADD,
@@ -67,10 +92,15 @@ function fsAdd(fileObj) {
   }
 }
 
+/**
+ * Action Creator
+ * @param  {Object} fileObj
+ * @returns {Object}
+ */
 function fsUnlink(fileObj) {
 
   if(fileObj.type == DIR) {
-
+    // PUh?...
   }
 
   return {
@@ -79,6 +109,11 @@ function fsUnlink(fileObj) {
   }
 }
 
+/**
+ * Action Creator
+ * @param  {Object} fileObj
+ * @returns {Object}
+ */
 function fsChange(fileObj) {
   return {
     type: FS_CHANGE,

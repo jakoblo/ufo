@@ -11,9 +11,9 @@ let pathRoute = []
  * change the path of folders that is displayed in the app
  * Should be called by user actions (Click on a folder) or by walking through the history
  * If you call it the first the, you need to Provied fromPath and toPath.
- * After that only of is possible.
- * @param  {string} fromPath The first folder of the pathRout that will be displayed
- * @param  {string} toPath   The last folder of the pathRout that will be displayed
+ * After that only of them is possible.
+ * @param  {string} fromPath The first folder of the pathRout that will be displayed is optional
+ * @param  {string} toPath   The last folder of the pathRout that will be displayed is optional
  */
 export function changeAppPath(fromPath, toPath) {
 
@@ -52,9 +52,9 @@ export function changeAppPath(fromPath, toPath) {
 
 /**
  * pure helper function that takes to paths and creates every "path step" between them
- * @param  {string} fromPath The first folder of the pathRout
- * @param  {string} toPath   The last folder of the pathRout
- * @return {array}        A array of paths inculding fromPath and toPath and every path between them
+ * @param  {string} fromPath
+ * @param  {string} toPath
+ * @returns {[string]}
  */
 function buildPathRoute(fromPath, toPath) {
   let newPathRoute = []

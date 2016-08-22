@@ -9,17 +9,18 @@ class ChokidarHandler {
   constructor() {
     this.watcherStack = []
   }
-
-/**
- * Create a new Watcher to watch a direcotry
- * @param  {string} path                            the folder to watch
- * @param  {object} settings                        settings for chokidar
- * @param  {callback} addCallback(fileObj)          for add-file and add-dir events
- * @param  {callback} unlinkCallback(fileObj)       for delete/remove of files and dirs
- * @param  {callback} changeCallback(fielObj)
- * @param  {callback} readyCallback(path, files[])  When the watcher is ready, argument path&folder all files of the folder
- * @return {ChokidarWatcher} ChokidarWatcher        Created watcher from Chokidar
- */
+  
+  /**
+   * Create a new Watcher to watch a direcotry
+   * 
+   * @param  {String} path
+   * @param  {Object} settings
+   * @param  {Function} addCallback
+   * @param  {Function} unlinkCallback
+   * @param  {Function} changeCallback
+   * @param  {Function} readyCallback
+   * @returns {Object}
+   */
   watch = (path, settings, addCallback, unlinkCallback, changeCallback, readyCallback ) => {
 
     this._verify(path, settings)
@@ -34,18 +35,18 @@ class ChokidarHandler {
     let root = path
 
     if(addCallback) {
-      watcher.on('add', this.handleEvent.bind(this, addCallback, root, FILE))
-      watcher.on('addDir', this.handleEvent.bind(this, addCallback, root, DIR))
+      watcher.on('add', this._handleEvent.bind(this, addCallback, root, FILE))
+      watcher.on('addDir', this._handleEvent.bind(this, addCallback, root, DIR))
     }
     if(unlinkCallback) {
-      watcher.on('unlink', this.handleEvent.bind(this, unlinkCallback, root, FILE))
-      watcher.on('unlinkDir', this.handleEvent.bind(this, unlinkCallback, root, DIR))
+      watcher.on('unlink', this._handleEvent.bind(this, unlinkCallback, root, FILE))
+      watcher.on('unlinkDir', this._handleEvent.bind(this, unlinkCallback, root, DIR))
     }
     if(changeCallback) {
-      watcher.on('change', this.handleEvent.bind(this, changeCallback, root, FILE))
+      watcher.on('change', this._handleEvent.bind(this, changeCallback, root, FILE))
     }
     if(readyCallback) {
-      watcher.on('ready', this.handleReady.bind(this, readyCallback, root))
+      watcher.on('ready', this._handleReady.bind(this, readyCallback, root))
     }
     if(logging) {
       watcher.on('ready', this._logging.bind(this, watcher, root))
@@ -53,7 +54,9 @@ class ChokidarHandler {
 
     return watcher
   }
-
+  /**
+   * @param  {string} path
+   */
   unwatch = (path) => {
     if(this.watcherStack[path]) {
       this.watcherStack[path].watcher.close()
@@ -61,7 +64,7 @@ class ChokidarHandler {
     }
   }
 
-  handleEvent(callback, root, type, path, stats) {
+  _handleEvent(callback, root, type, path, stats) {
 
     let fileObj = {
       base: nodePath.basename(path),
@@ -82,7 +85,7 @@ class ChokidarHandler {
     }
   }
 
-  handleReady(readyCallback, root) {
+  _handleReady(readyCallback, root) {
     readyCallback(root, this.watcherStack[root].holdingLine)
     this.watcherStack[root].ready = true
     delete this.watcherStack[root].holdingLine
