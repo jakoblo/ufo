@@ -31,7 +31,6 @@ class ChokidarHandler {
       holdingLine: {},
       ready: false
     }
-
     let root = path
 
     if(addCallback) {
@@ -51,7 +50,6 @@ class ChokidarHandler {
     if(logging) {
       watcher.on('ready', this._logging.bind(this, watcher, root))
     }
-
     return watcher
   }
   /**
@@ -65,9 +63,7 @@ class ChokidarHandler {
   }
 
   _handleEventOther(callback, root, type, path, stats) {
-
     let fileObj = this._createFileObj(...arguments)
-
     callback(fileObj)
   }
 
@@ -78,13 +74,10 @@ class ChokidarHandler {
 
 
   _handleEventAdd(callback, root, type, path, stats) {
-
     let fileObj = this._createFileObj(...arguments)
-
     if(root == path) {
       return // the file is direcotry itself. Chokidar... i don't know why
     }
-
     if(this.watcherStack[root].ready) {
       callback(fileObj)
     } else {
