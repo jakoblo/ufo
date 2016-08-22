@@ -3,13 +3,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
 import App from '../../app/app-index'
+import * as constants from '../navbar-constants'
 import { List } from 'immutable'
 import NavGroup from './navgroup'
 
-@connect((store) => {
+@connect((state) => {
   // console.log("STORE ", store.toJS())
-  return {navbar: store.navbar,
-          groupItems: store.navbar.get('groupItems')
+  return {navbar: state[constants.NAME],
+          groupItems: state[constants.NAME].get('groupItems')
   }
 })
 export default class Navbar extends React.Component {
