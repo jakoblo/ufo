@@ -1,6 +1,6 @@
 import {
   APP_CHANGE_PATH
-  } from '../constants/action-types'
+  } from '../app/app-actiontypes'
 import _ from 'underscore'
 import nodePath from 'path'
 import {fsWatcherRequest, fsWatcherClose} from './fs-actions'

@@ -3,8 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
 import classnames from 'classnames'
-import Icon from './icon'
-import Button from './button'
+import Icon from '../../components/icon'
+import Button from '../../components/button'
 
 export class NavGroup extends React.Component {
   constructor(props) {

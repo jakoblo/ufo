@@ -3,8 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../actions/navbarActions'
 import { changeAppPath } from '../actions/appActions'
-import {NavGroup} from './navgroup'
 import { List } from 'immutable'
+import { NavGroup } from './components/navgroup'
 
 @connect((store) => {
   // console.log("STORE ", store.toJS())
@@ -12,7 +12,7 @@ import { List } from 'immutable'
           groupItems: store.navbar.get('groupItems')
   }
 })
-export class Navbar extends React.Component {
+export default class Container extends React.Component {
   constructor(props) {
     super(props)
   }

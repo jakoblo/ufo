@@ -10,7 +10,8 @@ import {changeAppPath} from './actions/appActions'
 /* React Components */
 import {Foundation} from './components/foundation'
 import Sidebar from './components/sidebar'
-import {Navbar} from './components/navbar'
+// import {Navbar} from './components/navbar'
+import Navbar from './navbar/navbar-index'
 import {ViewContainer} from './components/viewContainer'
 import {FSTester} from './components/fs-tester'
 import ToggleBar from './components/togglebar'
@@ -42,7 +43,7 @@ ReactDOM.render(
       <Foundation>
         <Sidebar>
           <ActionBar></ActionBar>
-          <Navbar></Navbar>
+          <Navbar.Container></Navbar.Container>
           <ToggleBar></ToggleBar>
         </Sidebar>
         <ViewContainer>
