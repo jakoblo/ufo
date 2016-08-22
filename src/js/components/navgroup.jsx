@@ -3,7 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
 import classnames from 'classnames'
-import  Icon from './icon'
+import Icon from './icon'
+import Button from './button'
 
 export class NavGroup extends React.Component {
   constructor(props) {
@@ -54,6 +55,12 @@ export class NavGroup extends React.Component {
   }
 }
 
+/*
+*
+* NAVGROUP ITEM
+*
+*/
+
 export class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
@@ -67,20 +74,26 @@ export class NavGroupItem extends React.Component {
       <a onClick={this.props.onClick} className={className}>
         <Icon glyph={this.props.glyph} />
         <span className="text">{this.props.title}</span>
-        <button className="remove" onClick={this.props.onItemRemove}></button>
+        <Button className="remove" onClick={this.props.onItemRemove}></Button>
       </a>
     )
   }
 }
 
+/*
+*
+* NAVGROUP TITLE
+*
+*/
+
 export class NavGroupTitle extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {editGroupTitle: false, updateComp: false}
+    this.state = {editGroupTitle: false}
   }
 
-  shouldComponentUpdate(x, newState) {
-    return newState.updateComp
+  shouldComponentUpdate(nextProps, nextState) {
+    return true
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -88,16 +101,15 @@ export class NavGroupTitle extends React.Component {
   }
 
   handleDoubleClick = () => {
-    this.setState({editGroupTitle: true, updateComp: true})
+    this.setState({editGroupTitle: true})
   }
 
   changeTitle(e) {
     if(e.keyCode === 13 || e.type === 'blur') {
       if(this.props.title != e.target.value && e.target.value != '') {
       this.props.onGroupTitleChange(this.props.groupID, e.target.value)
-      this.setState({editGroupTitle: false, updateComp: false})
       }
-      this.setState({editGroupTitle: false, updateComp: true})
+      this.setState({editGroupTitle: false})
     }
   }
 
@@ -109,6 +121,10 @@ export class NavGroupTitle extends React.Component {
     this.changeTitle(e)
   }
 
+  handleHideGroup = () => {
+    this.set
+  }
+
  render() {
    let title = <span className="nav-group-text" onDoubleClick={this.handleDoubleClick}>{this.props.title}</span>
    if(this.state.editGroupTitle) {
@@ -118,7 +134,7 @@ export class NavGroupTitle extends React.Component {
   return (
       <div className="nav-group-title">
         {title}
-        <button className="nav-group-hide" onClick={this.props.onClick}>{this.props.hideButtonText}</button>
+        <Button className="nav-group-hide" onClick={this.props.onClick} text={this.props.hideButtonText}/>
       </div>
     )
   }

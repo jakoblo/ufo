@@ -3,16 +3,19 @@ import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store/store-setup'
 import {DevToolsSetup} from './tools/devtools-setup'
+import Immutable from 'immutable'
+import { List, Map } from 'immutable'
+import os from 'os'
+import {changeAppPath} from './actions/appActions'
 /* React Components */
 import {Foundation} from './components/foundation'
 import Sidebar from './components/sidebar'
 import {Navbar} from './components/navbar'
 import {ViewContainer} from './components/viewContainer'
 import {FSTester} from './components/fs-tester'
-import Immutable from 'immutable'
-import { List, Map } from 'immutable'
-import os from 'os'
-import {changeAppPath} from './actions/appActions'
+import ToggleBar from './components/togglebar'
+import ActionBar from './components/actionbar'
+
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -38,7 +41,9 @@ ReactDOM.render(
       <Provider store={ store }>
       <Foundation>
         <Sidebar>
+          <ActionBar></ActionBar>
           <Navbar></Navbar>
+          <ToggleBar></ToggleBar>
         </Sidebar>
         <ViewContainer>
           <FSTester/>

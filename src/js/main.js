@@ -22,6 +22,10 @@ function createNewBrowserWindow() {
 
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
 
+  // TEST
+  browserWindow.toggleDevTools()
+  browserWindow.maximize()
+
   // Emitted when the window is closed.
   browserWindow.on('closed', () => {
     allBrowserWindows.splice(allBrowserWindows.indexOf(browserWindow), 1)

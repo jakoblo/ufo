@@ -5,6 +5,7 @@ import { fsReducer } from './fs-reducer'
 import { configReducer } from './configReducer'
 import { navbarReducer } from './navbarReducer'
 import { viewContainerReducer } from './view-container-reducer'
+import { List, Map } from 'immutable'
 
 export const rootReducer = combineReducers({
   app: appReducer,
@@ -12,4 +13,4 @@ export const rootReducer = combineReducers({
   config: configReducer,
   navbar: navbarReducer,
   viewContainer: viewContainerReducer
-});
+})
