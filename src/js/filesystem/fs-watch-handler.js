@@ -35,15 +35,15 @@ class ChokidarHandler {
     let root = path
 
     if(addCallback) {
-      watcher.on('add', this._handleEvent.bind(this, addCallback, root, TYPE_FILE))
-      watcher.on('addDir', this._handleEvent.bind(this, addCallback, root, TYPE_DIR))
+      watcher.on('add', this._handleEventAdd.bind(this, addCallback, root, TYPE_FILE))
+      watcher.on('addDir', this._handleEventAdd.bind(this, addCallback, root, TYPE_DIR))
     }
     if(unlinkCallback) {
-      watcher.on('unlink', this._handleEvent.bind(this, unlinkCallback, root, TYPE_FILE))
-      watcher.on('unlinkDir', this._handleEvent.bind(this, unlinkCallback, root, TYPE_DIR))
+      watcher.on('unlink', this._handleEventDelete.bind(this, unlinkCallback, root, TYPE_FILE))
+      watcher.on('unlinkDir', this._handleEventDelete.bind(this, unlinkCallback, root, TYPE_DIR))
     }
     if(changeCallback) {
-      watcher.on('change', this._handleEvent.bind(this, changeCallback, root, TYPE_FILE))
+      watcher.on('change', this._handleEventOther.bind(this, changeCallback, root, TYPE_FILE))
     }
     if(readyCallback) {
       watcher.on('ready', this._handleReady.bind(this, readyCallback, root))
@@ -64,15 +64,22 @@ class ChokidarHandler {
     }
   }
 
-  _handleEvent(callback, root, type, path, stats) {
+  _handleEventOther(callback, root, type, path, stats) {
 
-    let fileObj = {
-      base: nodePath.basename(path),
-      root: root,
-      path: path,
-      type: type,
-      stats: stats
-    }
+    let fileObj = this._createFileObj(...arguments)
+
+    callback(fileObj)
+  }
+
+  _handleEventDelete(callback, root, type, path, stats) {
+    let fileObj = this._createFileObj(...arguments)
+    callback(fileObj, this.watcherStack)
+  }
+
+
+  _handleEventAdd(callback, root, type, path, stats) {
+
+    let fileObj = this._createFileObj(...arguments)
 
     if(root == path) {
       return // the file is direcotry itself. Chokidar... i don't know why
@@ -97,6 +104,16 @@ class ChokidarHandler {
     }
     if(settings.alwaysStat == false) {
       throw "Chokidar Settings 'alwaysStat' should be true"
+    }
+  }
+
+  _createFileObj(callback, root, type, path, stats) {
+    return {
+      base: nodePath.basename(path),
+      root: root,
+      path: path,
+      type: type,
+      stats: stats
     }
   }
 
