@@ -7,9 +7,10 @@ import classnames from 'classnames'
 import { remote } from 'electron'
 import ButtonGroup from '../../general-components/button-group'
 import Button from '../../general-components/button'
+import { ActionCreators } from 'redux-undo';
 
 @connect((state) => {
-  return {foo: state}
+  return {navbar: state.navbar}
 })
 export default class ActionBar extends React.Component {
   constructor(props) {
@@ -17,11 +18,11 @@ export default class ActionBar extends React.Component {
   }
 
   handleHistoryBack = () => {
-
+    this.props.dispatch(ActionCreators.undo())
   }
 
   handleHistoryForward = () => {
-
+    this.props.dispatch(ActionCreators.redo())
   }
 
   handleFolderUp = () => {
@@ -29,12 +30,14 @@ export default class ActionBar extends React.Component {
   }
 
   render() {
+    let canUndo = this.props.navbar.past.length > 0
+    let canRedo = this.props.navbar.future.length > 0
     return (
       <div className="toolbar">
         <WindowControls></WindowControls>
         <ButtonGroup>
-          <Button className="icon arrow-back" onClick={this.handleHistoryBack} />
-          <Button className="icon arrow-forward" onClick={this.handleHistoryForward} />
+          <Button className="icon arrow-back" active={canUndo} onClick={this.handleHistoryBack} />
+          <Button className="icon arrow-forward" active={canRedo} onClick={this.handleHistoryForward} />
           <Button className="icon arrow-up" onClick={this.handleFolderUp}/>
         </ButtonGroup>
       </div>

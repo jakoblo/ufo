@@ -11,8 +11,7 @@ const INITIAL_STATE = Map({
 export default function configReducer(state = INITIAL_STATE, action = { type: '' }) {
   switch (action.type) {
     case t.APP_TOGGLE_EDIT_MODE:
-        return state.set('editMode', action.payload.editMode)
-      break
+      return state.set('editMode', action.payload.editMode)
     default:
       return state
   }
