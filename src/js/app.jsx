@@ -46,9 +46,7 @@ ReactDOM.render(
           <Navbar.components.parent></Navbar.components.parent>
           <ToggleBar></ToggleBar>
         </Sidebar>
-        <ViewContainer.components.parent>
-          <FileSystem.components.FSTester/>
-        </ViewContainer.components.parent>
+        <ViewContainer.components.parent/>
       </Foundation>
     </Provider>
   ,
