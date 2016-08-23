@@ -8,9 +8,7 @@ import { List, Map } from 'immutable'
 import NavGroup from './navgroup'
 
 @connect((state) => {
-  // console.log("STORE ", store.toJS())
-  return {navbar: state[constants.NAME],
-          groupItems: state[constants.NAME].get('groupItems')
+  return {navbar: state[constants.NAME].present
   }
 })
 export default class Navbar extends React.Component {
@@ -20,6 +18,7 @@ export default class Navbar extends React.Component {
 
 
   handleSelectionChanged = (path, groupID, itemID) => {
+    console.log("SELECTION CHANGED")
     this.props.dispatch(App.actions.changeAppPath(path))
   }
 
@@ -53,7 +52,7 @@ export default class Navbar extends React.Component {
   render() {
     let navgroups = null
     if(this.props.navbar.has('groupItems')) 
-    navgroups = this.props.groupItems.toJS().map(this.createNavGroups)
+    navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroups)
     return(
       <div className="nav-bar">
         {navgroups}

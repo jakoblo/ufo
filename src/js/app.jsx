@@ -31,7 +31,7 @@ const store = storeSetup();
 // INIT APP PATH
 store.dispatch(App.actions.changeAppPath(os.homedir()))
 store.dispatch(Config.actions.loadPreviousState())
-
+window.store = store
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
 
 ReactDOM.render(

@@ -1,12 +1,12 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { toggleEditMode } from '../config/config-actions'
+import Config from '../config/config-index'
 import { List } from 'immutable'
 import classnames from 'classnames'
 
 @connect((state) => {
-  return {editMode: state.config.get('editMode')}
+  return {editMode: state.config.present.editMode}
 })
 export default class ToggleBar extends React.Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export default class ToggleBar extends React.Component {
   }
 
   handleReadOnlyToggle = () => {
-    this.props.dispatch(toggleEditMode(!this.props.editMode))
+    this.props.dispatch(Config.actions.toggleEditMode())
   }
 
   render() {

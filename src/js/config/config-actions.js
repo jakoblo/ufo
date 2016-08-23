@@ -3,6 +3,7 @@ import App from '../app/app-index'
 import Navbar from '../navbar/navbar-index'
 import Utils from '../utils/utils-index'
 import { List, Map } from 'immutable'
+import { ActionCreators } from 'redux-undo';
 
 export function loadPreviousState() {
 
@@ -10,9 +11,9 @@ export function loadPreviousState() {
     Utils.storage.loadStatefromStorage(function(data) {
       // if(data.navbar)
       data.navbar.groupItems.forEach((item, index) => {
-        console.log(item)
         dispatch(Navbar.actions.addNavGroup(item.title, item.items))
       })
+      dispatch(ActionCreators.clearHistory())
 
     })
 
@@ -24,3 +25,9 @@ export function loadPreviousState() {
 
 }
 
+export function toggleEditMode(editMode) { // Action Creator
+  return { // action
+    type: t.APP_TOGGLE_EDIT_MODE,
+    payload: {editMode : editMode}
+  };
+}
