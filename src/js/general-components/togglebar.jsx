@@ -6,7 +6,7 @@ import { List } from 'immutable'
 import classnames from 'classnames'
 
 @connect((state) => {
-  return {editMode: state.config.present.editMode}
+  return {editMode: state.config.present.get('editMode')}
 })
 export default class ToggleBar extends React.Component {
   constructor(props) {
@@ -14,10 +14,11 @@ export default class ToggleBar extends React.Component {
   }
 
   handleReadOnlyToggle = () => {
-    this.props.dispatch(Config.actions.toggleEditMode())
+    this.props.dispatch(Config.actions.toggleEditMode(!this.props.editMode))
   }
 
   render() {
+    console.log(this.props.editMode)
     let readOnlyButtonClass = classnames(
     'edit-mode-switch',
     'switch',
