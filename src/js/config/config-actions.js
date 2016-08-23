@@ -5,17 +5,23 @@ import Utils from '../utils/utils-index'
 import { List, Map } from 'immutable'
 import { ActionCreators } from 'redux-undo';
 
-export function loadPreviousState() {
+export function loadPreviousState(windowID) {
 
   return dispatch => {
-    Utils.storage.loadStatefromStorage(function(data) {
+    Utils.storage.loadStatefromStorage(windowID, function(data) {
+  
       // if(data.navbar)
-      data.navbar.groupItems.forEach((item, index) => {
+    if(data.navbar !== undefined) {
+      data.navbar.present.groupItems.forEach((item, index) => {
         dispatch(Navbar.actions.addNavGroup(item.title, item.items))
       })
-      dispatch(ActionCreators.clearHistory())
+    }
+    if(data.fs !== undefined) {
+      
+    }
 
-    })
+      dispatch(ActionCreators.clearHistory())
+  })
 
 
     // dispatch(App.actions.changeAppPath())

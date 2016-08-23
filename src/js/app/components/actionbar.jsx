@@ -30,7 +30,6 @@ export default class ActionBar extends React.Component {
   }
 
   render() {
-    console.log(this.props.navbar.past.length)
     let canUndo = this.props.navbar.past.length > 0
     let canRedo = this.props.navbar.future.length > 0
     return (

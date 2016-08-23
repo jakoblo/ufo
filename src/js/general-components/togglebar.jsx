@@ -18,7 +18,6 @@ export default class ToggleBar extends React.Component {
   }
 
   render() {
-    console.log(this.props.editMode)
     let readOnlyButtonClass = classnames(
     'edit-mode-switch',
     'switch',

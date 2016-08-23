@@ -31,6 +31,7 @@ function createNewBrowserWindow() {
     allBrowserWindows.splice(allBrowserWindows.indexOf(browserWindow), 1)
     // Dereference the window object, usually you would store windows in an array if your app supports multi windows, this is the time when you should delete the corresponding element.
     browserWindow = null; // does that work?
+    
   })
 
   allBrowserWindows.push(browserWindow)
@@ -40,17 +41,24 @@ app.on('window-all-closed', function() {
     app.quit()
 });
 
+app.on('before-quit', function(e) {
+  if(allBrowserWindows.length > 0) {
+    e.preventDefault()
+    for (let index = 0; index < allBrowserWindows.length; index++) {
+      let bw = allBrowserWindows[index];
+      bw.webContents.send('saveState')
+    }
+  }
+});
 
 app.on('ready', function() {
   loadApplicationMenu()
   createNewBrowserWindow()
 });
 
-ipcMain.on('global-favbar-changed', function(event) {
-  allBrowserWindows.forEach(window => {
-    console.log("UPDATE FAVBAR FOR WINDOW")
-    window.webContents.send('reload-favbar');
-  });
+ipcMain.on('closeWindow', function(event, bwid) {
+    let bw = BrowserWindow.fromId(bwid)
+    bw.close()
 })
 
 ipcMain.on('writeFile', function(event, path, content) {

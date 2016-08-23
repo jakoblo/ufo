@@ -8,10 +8,10 @@ import { List, Map } from 'immutable'
 import os from 'os'
 import App from './app/app-index'
 import Config from './config/config-index'
+import { ipcRenderer, eapp, remote  } from 'electron'
 /* React Components */
 import {Foundation} from './general-components/foundation'
 import Sidebar from './general-components/sidebar'
-// import {Navbar} from './components/navbar'
 import Navbar from './navbar/navbar-index'
 import ViewContainer from './viewcontainer/vc-index'
 import FileSystem from './filesystem/fs-index'
@@ -25,14 +25,20 @@ if (process.env.NODE_ENV !== 'production') {
   window.devToolsSetup = DevToolsSetup
   require('electron-connect').client.create()
 }
-
+const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 
 // INIT APP PATH
 store.dispatch(App.actions.changeAppPath(os.homedir()))
-store.dispatch(Config.actions.loadPreviousState())
+store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
+
+ipcRenderer.on('saveState', function(event) {
+  Utils.storage.saveStatetoStorage(store.getState(), windowID, function() {
+    ipcRenderer.send('closeWindow', windowID)
+  })
+})
 
 ReactDOM.render(
       <Provider store={ store }>
