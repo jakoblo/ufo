@@ -1,44 +1,24 @@
 import React from 'react'
-import { changeAppPath } from '../../app/app-actions'
-import { connect } from 'react-redux'
+import ResizeSensor from './resize-sensor'
 
-@connect((store) => {
-  return {fs: store.fs}
-})
 export default class View extends React.Component {
   constructor(props) {
     super(props)
   }
 
-  addPath(path) {
-    this.props.dispatch(changeAppPath(null, path) )
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('props change', nextProps, nextProps.fs.toJS(), this.props.path)
-  }
-
   render() {
-
     let styles = {
-      left: this.props.leftDistance
+      left: this.props.cssLeft
     }
-
-    console.log('render', this.props.fs.toJS(), this.props.path)
-    console.log('loading', this.props.loading)
-
-    let fileList = ""
-    if(this.props.loading === false && this.props.fs.get(this.props.path)) {
-      
-      fileList = this.props.fs.get(this.props.path).toList().map((file, index) => {
-        return ( <li onClick={this.addPath.bind(this, file.path)} key={index}>{file.base}</li> )
-      })
-    }
-
     return(
-      <div className="view" style={styles}>
-        {fileList}
+      <div className="view" ref={(c) => this.refView = c}  style={styles}>
+        {this.props.children}
+        <ResizeSensor onResize={this.resizeHandle} />
       </div>
     )
+  }
+
+  resizeHandle = () => {
+    this.props.onResize(this.props.id, this.refView.offsetWidth)
   }
 }

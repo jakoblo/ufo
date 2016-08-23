@@ -3,7 +3,10 @@ import FileSystem from '../filesystem/fs-index'
 import Immutable from 'immutable'
 import { List, Map } from 'immutable'
 
-const INITIAL_STATE = List([])
+const INITIAL_STATE = Map({
+  displayType: 'list',
+  views: List([])
+})
 
 export default function viewContainerReducer(state = INITIAL_STATE, action = { type: '' }) {
   switch (action.type) {
@@ -14,13 +17,13 @@ export default function viewContainerReducer(state = INITIAL_STATE, action = { t
           loading: false
         })
       })
-      return List(listTemplate)
+      return state.set('views', List(listTemplate))
 
-    case FileSystem.actionTypes.WATCHER_READING:
-      return _setLoadingForPath(state, action.payload.path, true)
+    // case FileSystem.actionTypes.WATCHER_READING:
+    //   return _setLoadingForPath(state, action.payload.path, true)
 
-    case FileSystem.actionTypes.WATCHER_READY:
-      return _setLoadingForPath(state, action.payload.path, false)
+    // case FileSystem.actionTypes.WATCHER_READY:
+    //   return _setLoadingForPath(state, action.payload.path, false)
 
     default:
       return state;
