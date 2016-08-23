@@ -26,7 +26,7 @@ export default class NavGroup extends React.Component {
       <NavGroupItem
         key={itemID}
         onClick={this.props.onSelectionChanged.bind(this, path)}
-        onItemRemove={this.props.onItemRemove.bind(this,this.props.groupID, itemID)}
+        onItemRemove={this.props.onItemRemove.bind(this, this.props.groupID, itemID)}
         title={basePath}
         active={active}
         glyph={glyph}
@@ -71,9 +71,9 @@ class NavGroupItem extends React.Component {
     let className = classnames(this.props.className, "nav-group-item", {"active": this.props.active})
 
     return (
-      <a onClick={this.props.onClick} className={className}>
+      <a  className={className}>
         <Icon glyph={this.props.glyph} />
-        <span className="text">{this.props.title}</span>
+        <span onClick={this.props.onClick} className="text">{this.props.title}</span>
         <Button className="remove" onClick={this.props.onItemRemove}></Button>
       </a>
     )

@@ -1,4 +1,5 @@
 import * as t from './navbar-actiontypes'
+import { List, Map } from 'immutable'
 
 export function changeGroupName(groupID, newName) {
   return {
@@ -27,5 +28,12 @@ export function removeGroupItem(groupID, itemID) { // Action Creator
     payload: {
       groupID: groupID,
       itemID: itemID}
+  };
+}
+
+export function addNavGroup(title, items) { 
+  return { // action
+    type: t.ADD_NAVGROUP,
+    payload: {title: title, items: List(items)}
   };
 }
