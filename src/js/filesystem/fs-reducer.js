@@ -15,6 +15,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
       return state.deleteIn([action.payload.path])
 
     case t.WATCHER_READY:
+      console.log('fs ready', action.payload.path)
       return state.setIn([action.payload.path], Map(action.payload.files))
 
     case t.FILE_ADD:

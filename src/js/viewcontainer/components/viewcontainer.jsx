@@ -1,12 +1,12 @@
-"use strict"
 import React from 'react'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
+import { NAME } from '../vc-constants'
+import View from './view'
 
 @connect((store) => {
-  // console.log("STORE ", store.toJS())
   return {
-    viewcontainer: store.viewcontainer
+    viewList: store[NAME]
   }
 })
 export default class ViewContainer extends React.Component {
@@ -15,9 +15,15 @@ export default class ViewContainer extends React.Component {
   }
 
   render() {
+
+    let views = this.props.viewList.map((viewObj, index) => {
+      let leftDistance = index * 250
+      return ( <View key={index} path={viewObj.get('path')} loading={viewObj.get('loading')} leftDistance={leftDistance} /> )
+    })
+
     return(
       <section className="viewContainer">
-        ViewContainer
+        {views}
         {this.props.children}
       </section>
     )
