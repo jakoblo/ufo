@@ -21,7 +21,7 @@ function createNewBrowserWindow() {
   windowID = browserWindow.id
 
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
-
+  
   // TEST
   browserWindow.toggleDevTools()
   browserWindow.maximize()
@@ -35,7 +35,6 @@ function createNewBrowserWindow() {
 
   allBrowserWindows.push(browserWindow)
 }
-
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
     app.quit()

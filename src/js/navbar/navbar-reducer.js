@@ -2,14 +2,16 @@
 import * as t from './navbar-actiontypes'
 import App from '../app/app-index'
 import Immutable from 'immutable'
-import { List } from 'immutable'
+import { Map, List } from 'immutable'
 
-const INITIAL_STATE = Immutable.fromJS({groupItems: [
-    {title: "FavGroup 1", hidden: false, items: ["/", "/Users/jakoblo/Desktop"]},
-    {title: "FavGroup 2", hidden: false, items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads", "/Users/jakoblo/Applications"]}
-  ],
-  activeItem: ''
-})
+// const INITIAL_STATE = Immutable.fromJS({groupItems: [
+//     {title: "FavGroup 1", hidden: false, items: ["/", "/Users/jakoblo/Desktop"]},
+//     {title: "FavGroup 2", hidden: false, items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads", "/Users/jakoblo/Applications"]}
+//   ],
+//   activeItem: ''
+// })
+
+const INITIAL_STATE = Map({groupItems: List(), activeItem: ''})
 
 export default function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
 
@@ -26,7 +28,8 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
       break;
     case t.NAVBAR_CHANGE_GROUP_TITLE:
       return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newTitle)
-      break;
+    case t.ADD_NAVGROUP:
+      return state.set('groupItems', state.get('groupItems').push(Map({title: action.payload.title, hidden: false, items: action.payload.items})))
     default:
       return state;
   }

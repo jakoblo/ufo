@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
 import App from '../../app/app-index'
 import * as constants from '../navbar-constants'
-import { List } from 'immutable'
+import { List, Map } from 'immutable'
 import NavGroup from './navgroup'
 
 @connect((state) => {
@@ -35,9 +35,8 @@ export default class Navbar extends React.Component {
     this.props.dispatch(changeGroupTitle(groupID, newTitle))
   }
 
-  render() {
-    let groups = this.props.groupItems.toJS().map((item, index) => {
-      return <NavGroup
+  createNavGroups = (item, index) => {
+    return (<NavGroup
         key={index}
         groupID={index}
         activeItem={this.props.navbar.get("activeItem")}
@@ -48,11 +47,16 @@ export default class Navbar extends React.Component {
         onItemRemove={this.handleOnItemRemove}
         onGroupTitleChange={this.handleOnGroupTitleChange}
         onHideGroup={this.handleOnHideGroup}>
-      </NavGroup>
-    })
+      </NavGroup>)
+  }
+
+  render() {
+    let navgroups = null
+    if(this.props.navbar.has('groupItems')) 
+    navgroups = this.props.groupItems.toJS().map(this.createNavGroups)
     return(
       <div className="nav-bar">
-        {groups}
+        {navgroups}
       </div>
     )
   }
