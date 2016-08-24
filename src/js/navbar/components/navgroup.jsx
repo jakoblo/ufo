@@ -46,7 +46,7 @@ export default class NavGroup extends React.Component {
     });
     return(
       <div className="nav-group">
-        <NavGroupTitle title={this.props.title} groupID={this.props.groupID} onGroupTitleChange={this.props.onGroupTitleChange} hideButtonText={hideButtonText} onClick={this.props.onHideGroup.bind(this, this.props.groupID)}/>
+        <NavGroupTitle title={this.props.title} groupID={this.props.groupID} onGroupTitleChange={this.props.onGroupTitleChange} hideButtonText={hideButtonText} onClick={this.props.onToggleGroup.bind(this, this.props.groupID)}/>
         <div className={itemWrapperClasses}>
           {this.props.items.map(this.createGroupItem)}
         </div>
@@ -121,7 +121,7 @@ class NavGroupTitle extends React.Component {
     this.changeTitle(e)
   }
 
-  handleHideGroup = () => {
+  handleToggleGroup = () => {
     this.set
   }
 
