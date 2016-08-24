@@ -29,7 +29,7 @@ const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 
 // INIT APP PATH
-store.dispatch(App.actions.changeAppPath(os.homedir()))
+
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);

@@ -28,7 +28,7 @@ export function saveStatetoStorage(data, bwid, callback) {
   });
 }
 
-export function loadDefaultUserFolders() {
+function loadDefaultUserFolders() {
   const app = remote.app
   let navgroup = {
     title: "Favourites",
