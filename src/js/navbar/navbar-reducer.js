@@ -18,18 +18,20 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
   switch (action.type) {
     case App.actiontypes.APP_CHANGE_PATH:
       return state.set('activeItem', action.payload.pathRoute[0])
-      break;
-    case t.NAVBAR_HIDE_GROUP:
+
+    case t.NAVBAR_TOGGLE_GROUP:
       let hidden = state.getIn(['groupItems', action.payload.groupID, 'hidden'])
       return state.setIn(['groupItems', action.payload.groupID, 'hidden'], !hidden)
-      break;
+
     case t.NAVBAR_REMOVE_GROUP_ITEM:
       return state.deleteIn(['groupItems', action.payload.groupID, 'items', action.payload.itemID])
-      break;
+
     case t.NAVBAR_CHANGE_GROUP_TITLE:
       return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newTitle)
+
     case t.ADD_NAVGROUP:
       return state.set('groupItems', state.get('groupItems').push(Map({title: action.payload.title, hidden: false, items: action.payload.items})))
+
     default:
       return state;
   }

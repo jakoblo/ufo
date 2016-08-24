@@ -159,16 +159,16 @@
         }
       }
 
+      &.hide .nav-group-item-wrapper {
+        display: none;
+      }
+
       .nav-group-item-wrapper {
 
         overflow: hidden;
         padding: 2px 0; // keep shadow
         transition: height 0.2s ease-in-out;
         box-sizing: content-box;
-
-        &.hide {
-          height:0 !important;
-        }
 
 
         .nav-group-item {
