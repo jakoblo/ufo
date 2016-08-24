@@ -1,13 +1,6 @@
 import * as t from './navbar-actiontypes'
 import { List, Map } from 'immutable'
 
-export function changeGroupName(groupID, newName) {
-  return {
-    type: t.NAVBAR_CHANGE_GROUP_TITLE,
-    payload: {groupID: groupID, newName: newName}
-  };
-}
-
 export function hideGroup(groupID) { // Action Creator
   return { // action
     type: t.NAVBAR_HIDE_GROUP,

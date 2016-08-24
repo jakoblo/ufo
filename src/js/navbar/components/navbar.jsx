@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { changeGroupName, hideGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
+import { hideGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
 import App from '../../app/app-index'
 import * as constants from '../navbar-constants'
 import { List, Map } from 'immutable'
@@ -15,7 +15,6 @@ export default class Navbar extends React.Component {
   constructor(props) {
     super(props)
   }
-
 
   handleSelectionChanged = (path, groupID, itemID) => {
     console.log("SELECTION CHANGED")
