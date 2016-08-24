@@ -8,25 +8,16 @@ import { ActionCreators } from 'redux-undo';
 export function loadPreviousState(windowID) {
 
   return dispatch => {
-    Utils.storage.loadStatefromStorage(windowID, function(data) {
-  
-      // if(data.navbar)
-    if(data.navbar !== undefined) {
-      data.navbar.present.groupItems.forEach((item, index) => {
+    Utils.storage.loadNavbarfromStorage(function(data) {
+    if(data.groupItems !== undefined) {
+      data.groupItems.forEach((item, index) => {
         dispatch(Navbar.actions.addNavGroup(item.title, item.items))
       })
     }
-    if(data.fs !== undefined) {
-      
-    }
-
-      dispatch(ActionCreators.clearHistory())
-  })
-
+   })
+  dispatch(ActionCreators.clearHistory())
 
     // dispatch(App.actions.changeAppPath())
-
-    // dispatch(Navbar.actions.addNavGroup())
   }
 
 }
