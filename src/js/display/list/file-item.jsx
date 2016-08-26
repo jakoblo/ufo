@@ -4,6 +4,7 @@ import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
 import Icon from '../../general-components/icon'
 import classNames from 'classnames'
+import {ipcRenderer} from 'electron'
 
 export default class FileItemDisplay extends React.Component {
 
@@ -26,7 +27,7 @@ export default class FileItemDisplay extends React.Component {
     let fileBase = this.state.base || this.state.fileName;
     let fileSuffix = this.state.suffix || null;
     let suffixIconClass
-    let draggable = false
+    let draggable = true
       
     let classes = classNames({
       'file-item': true,
@@ -51,6 +52,7 @@ export default class FileItemDisplay extends React.Component {
         onMouseUp={this.mouseup.bind(this)}
         onDoubleClick={this.dbclick.bind(this)}
         onContextMenu={this.contextmenu.bind(this)}
+        onDragStart={this.onDragStart.bind(this)}
       >
         <span className="flex-box">
           <Icon glyph={prefixIconClass}/>
@@ -71,6 +73,14 @@ export default class FileItemDisplay extends React.Component {
         </span>
       </span>
     )
+  }
+
+  onDragStart(e) {
+
+    console.log('drag start')
+
+    e.preventDefault()
+    ipcRenderer.send('ondragstart', this.props.path)
   }
 
   renameSave(event) {

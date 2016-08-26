@@ -12,6 +12,8 @@ var allBrowserWindows = []
 function createNewBrowserWindow() {
   let windowID = null
 
+  console.log(appBasePath + '/../themes/default/img/multiDragPlaceholder.png')
+
   let browserWindow = new BrowserWindow({
           width : 800,
           height: 600,
@@ -55,6 +57,13 @@ app.on('ready', function() {
   loadApplicationMenu()
   createNewBrowserWindow()
 });
+
+ipcMain.on('ondragstart', (event, filePath) => {
+  event.sender.startDrag({
+    file: filePath,
+    icon: appBasePath + '/../themes/default/img/multiDragPlaceholder.png'
+  })
+})
 
 ipcMain.on('closeWindow', function(event, bwid) {
     let bw = BrowserWindow.fromId(bwid)
