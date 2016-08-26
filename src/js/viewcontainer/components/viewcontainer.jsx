@@ -7,7 +7,7 @@ import DisplayList from '../../display/list/display-list'
 
 @connect((state) => {
   return {
-    fm: state.fm
+    fs: state.fs
   }
 })
 export default class ViewContainer extends React.Component {
@@ -22,12 +22,12 @@ export default class ViewContainer extends React.Component {
 
     let views = null
     
-    if(this.props.fm.size > 0) {
+    if(this.props.fs.size > 0) {
 
       let cssLeft = 0
       let prevFolder = null
 
-      views = this.props.fm.map((folder, path) => {
+      views = this.props.fs.map((folder, path) => {
         cssLeft = cssLeft + this.state.widthStorage[prevFolder] || 0
         prevFolder = path
 

@@ -1,11 +1,13 @@
 import { createSelector } from 'reselect'
 import nodePath from 'path'
 
-const getIndexedDirs = (state, props) => state.fm.keySeq().toJS()
+const getIndexedDirs = (state, props) => state.fs.keySeq().toJS()
 const getCurrentPath = (state, props) => props.path
-const getDirFromFS = (state, props) => state.fm.get(props.path).get('files')
+const getDirFromFS = (state, props) => state.fs.get(props.path).get('files')
 
-
+/**
+ * @returns {string} nextPath /Users/User/Desktop
+ */
 export const makeGetNextDir = () => {
   return createSelector(
     [getIndexedDirs, getCurrentPath],
@@ -19,11 +21,11 @@ export const makeGetNextDir = () => {
   )
 }
 
-
+/**
+ * @returns {string} activeFileName hey.txt
+ */
 export const makeGetActiveFile = () => {
-
   let getNextDir = makeGetNextDir()
-
   return createSelector(
     getNextDir,
     (nextPath) => {

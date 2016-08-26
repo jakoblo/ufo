@@ -15,10 +15,20 @@ export default class View extends React.Component {
     let classes = classnames('view', {
       ready: this.props.ready
     })
+    let loading
+    if(!this.props.ready) {
+      loading = <div className="loading-cube">
+                  <div className="sk-cube1 sk-cube"></div>
+                  <div className="sk-cube2 sk-cube"></div>
+                  <div className="sk-cube4 sk-cube"></div>
+                  <div className="sk-cube3 sk-cube"></div>
+                </div>
+    }
     return(
       <div className={classes} ref={(c) => this.refView = c}  style={styles}>
         {this.props.ready}
         {this.props.children}
+        {loading}
         <ResizeSensor onResize={this.resizeHandle} />
       </div>
     )

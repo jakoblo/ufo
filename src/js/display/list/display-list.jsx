@@ -1,11 +1,11 @@
 import React from 'react'
 import { changeAppPath } from '../../app/app-actions'
 import { connect } from 'react-redux'
-import {makeGetFolderWithActive} from '../../filemanager/fm-selectors'
+import FS from '../../filesystem/fs-index'
 import FileItem from './file-item'
 
 @connect(() => {
-  const getFolderWithActive = makeGetFolderWithActive()
+  const getFolderWithActive = FS.selectors.makeGetFolderWithActive()
   return (state, props) => {
     return {
       folder: getFolderWithActive(state, props)
@@ -40,5 +40,5 @@ export default class DisplayList extends React.Component {
         {fileList}
       </div>
     )
-  }
+  } 
 }

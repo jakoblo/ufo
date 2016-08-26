@@ -27,11 +27,12 @@ $view-bottom-space: 10px;
 $view-toolbar-height: 45px;
 $button-height: 25px;
 
-@import 'reset';
-@import 'foundation';
+@import 'reset'; 
+@import 'foundation'; 
 @import 'sidebar';
 @import 'viewContainer';
 @import 'view'; 
 @import 'file-item'; 
 @import 'display-list'; 
-@import 'icons';
+@import 'icons'; 
+@import 'loading-cube';
