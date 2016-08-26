@@ -3,7 +3,7 @@ import nodePath from 'path'
 
 const getIndexedDirs = (state, props) => state.fm.keySeq().toJS()
 const getCurrentPath = (state, props) => props.path
-const getDirFromFS = (state, props) => state.fm.get(props.path)
+const getDirFromFS = (state, props) => state.fm.get(props.path).get('files')
 
 
 export const makeGetNextDir = () => {
@@ -40,10 +40,9 @@ export const makeGetFolderWithActive = () => {
   return createSelector(
     [ getDirFromFS, getActiveFile],
     (folderContent, activeFile) => {
-      console.log('rebuild folder with active Item', folderContent.toJS())
       if(folderContent && activeFile) {
-        folderContent = folderContent.setIn(['files', activeFile, 'active'], true)
+        folderContent = folderContent.setIn([activeFile, 'active'], true)
       }
-      return folderContent.sortBy(file => file.base)
-    })
+      return folderContent.sortBy(file => file.get('base')).sortBy(file => file.get('type'))
+  })
 }

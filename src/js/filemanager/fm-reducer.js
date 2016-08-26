@@ -24,7 +24,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
       return state.setIn([action.payload.path], fromJS(
         {
           ready: false,
-          files: []
+          files: {}
         }))
 
     case FS.actiontypes.WATCHER_READY:

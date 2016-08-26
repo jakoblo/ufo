@@ -2,6 +2,7 @@ import React from 'react'
 import { changeAppPath } from '../../app/app-actions'
 import { connect } from 'react-redux'
 import {makeGetFolderWithActive} from '../../filemanager/fm-selectors'
+import FileItem from './file-item'
 
 @connect(() => {
   const getFolderWithActive = makeGetFolderWithActive()
@@ -24,22 +25,20 @@ export default class DisplayList extends React.Component {
 
     let fileList = ""
     if(this.props.folder) {
-      fileList = this.props.folder.get('files').map((file, index) => {
-        let styles = {}
-        if(file.get('active')) {
-          styles = {
-            fontWeight: 'bold'
-          }
-        }
-
-        return ( <li style={styles} onClick={this.addPath.bind(this, file.get('path'))} key={index}>{file.get('base')}</li> )
+      fileList = this.props.folder.map((file, index) => {
+        file = file.toJS()
+        return ( <FileItem
+          {...file}
+          key={index} 
+          onClick={this.addPath.bind(this, file.path)} 
+        /> )
       })
     }
 
     return(
-      <ul>
+      <div className="display-list">
         {fileList}
-      </ul>
+      </div>
     )
   }
 }
