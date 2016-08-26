@@ -1,9 +1,16 @@
 import React from 'react'
 import { changeAppPath } from '../../app/app-actions'
 import { connect } from 'react-redux'
+import FS from '../../filesystem/fs-index'
+import FileItem from './file-item'
 
-@connect((store) => {
-  return {fm: store.fm}
+@connect(() => {
+  const getFolderWithActive = FS.selectors.makeGetFolderWithActive()
+  return (state, props) => {
+    return {
+      folder: getFolderWithActive(state, props)
+    }
+  }
 })
 export default class DisplayList extends React.Component {
   constructor(props) {
@@ -15,24 +22,23 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
+
     let fileList = ""
-    let active = this.props.fm.getIn([this.props.path, 'active'])
-    if(this.props.loading === false && this.props.fm.getIn([this.props.path, 'files'])) {
-      fileList = this.props.fm.getIn([this.props.path, 'files']).map((file, index) => {
-        let styles = {}
-        if(active && file.base == active) {
-          styles = {
-            fontWeight: 'bold'
-          }
-        }
-        return ( <li style={styles} onClick={this.addPath.bind(this, file.path)} key={index}>{file.base}</li> )
+    if(this.props.folder) {
+      fileList = this.props.folder.map((file, index) => {
+        file = file.toJS()
+        return ( <FileItem
+          {...file}
+          key={index} 
+          onClick={this.addPath.bind(this, file.path)} 
+        /> )
       })
     }
 
     return(
-      <ul>
+      <div className="display-list">
         {fileList}
-      </ul>
+      </div>
     )
-  }
+  } 
 }
