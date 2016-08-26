@@ -5,22 +5,30 @@ import { remote } from 'electron'
 export function loadStatefromStorage(windowID, callback) {
   storage.get('lastState'+windowID, function(error, data) {
   if (error) throw error;
-  let lastState = data
-  if(data.navbar == undefined) {
-    lastState = loadDefaultUserFolders(data)
-  }
-  callback(lastState)
+  callback(data)
   });
 }
 
+export function loadNavbarfromStorage(callback) {
+  storage.get('navbar', function(error, data) {
+    if (error) throw error
+    if(data.groupItems == undefined)
+    data = loadDefaultUserFolders()
+    callback(data)
+  })
+}
+
 export function saveStatetoStorage(data, bwid, callback) {
+  storage.set('navbar', data.navbar.present, function(error) {
+    if (error) throw error
+  })
   storage.set('lastState'+bwid, data, function(error) {
     if (error) throw error;
     callback()
   });
 }
 
-export function loadDefaultUserFolders(lastState) {
+function loadDefaultUserFolders() {
   const app = remote.app
   let navgroup = {
     title: "Favourites",
@@ -34,9 +42,6 @@ export function loadDefaultUserFolders(lastState) {
       app.getPath('videos')
     ]
   }
-  let present = {present: {
-    groupItems: [navgroup]
-  }}
-  lastState.navbar = present
-  return lastState
+  let navbar = {groupItems: [navgroup]}
+  return navbar
 }

@@ -8,7 +8,7 @@ import { List, Map } from 'immutable'
 import os from 'os'
 import App from './app/app-index'
 import Config from './config/config-index'
-import { ipcRenderer, eapp, remote  } from 'electron'
+import { ipcRenderer, remote  } from 'electron'
 /* React Components */
 import {Foundation} from './general-components/foundation'
 import Sidebar from './general-components/sidebar'
@@ -29,7 +29,7 @@ const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 
 // INIT APP PATH
-store.dispatch(App.actions.changeAppPath(os.homedir()))
+
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
