@@ -1,42 +1,50 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
-import { NAME } from '../vc-constants'
+import { NAME, DEFAULT_VIEW_WIDTH } from '../vc-constants'
 import View from './view'
 import DisplayList from '../../display/list/display-list'
 
 @connect((state) => {
   return {
-    store: state[NAME]
+    fm: state.fm
   }
 })
 export default class ViewContainer extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      viewWidth: [] 
+      widthStorage: [] 
     }
   }
 
-  /**
-   * Set width for every View
-   */
-  componentWillReceiveProps(nextProps) {
-    this.state.viewWidth = this.props.store.get('views').toJS().map((v, index) => {
-      return this.state.viewWidth[index] || 250
-    })
-  }
-
   render() {
-    let cssLeft = 0
-    let views = this.props.store.get('views').map((viewObj, index) => {
-      cssLeft = cssLeft + this.state.viewWidth[index-1] || 0 
-      return ( 
-        <View key={index} id={index} cssLeft={cssLeft} onResize={this.resizeHandle}>
-          <DisplayList path={viewObj.get('path')} loading={viewObj.get('loading')} />
-        </View>
-      )
-    })
+
+    let views = null
+    
+    if(this.props.fm.size > 0) {
+
+      let cssLeft = 0
+      let prevFolder = null
+
+      views = this.props.fm.map((folder, path) => {
+        cssLeft = cssLeft + this.state.widthStorage[prevFolder] || 0
+        prevFolder = path
+
+        return (
+          <View 
+            key={path} 
+            path={path} 
+            initWidth={this.state.widthStorage[path] || DEFAULT_VIEW_WIDTH} 
+            cssLeft={cssLeft} 
+            onResize={this.resizeHandle}
+            ready={folder.get('ready')}
+          >
+            <DisplayList path={path} />
+          </View>
+        )
+      })
+    }
 
     return(
       <section className="viewContainer">{views}</section>
@@ -47,10 +55,10 @@ export default class ViewContainer extends React.Component {
    * View Child changes Size
    * Store that Size to the State
    */
-  resizeHandle = (id, width) => {
-    this.state.viewWidth[id] = width
+  resizeHandle = (path, width) => {
+    this.state.widthStorage[path] = width
     this.setState({
-      viewWith: this.state.viewWith
+      widthStorage: this.state.widthStorage
     })
   }
 }

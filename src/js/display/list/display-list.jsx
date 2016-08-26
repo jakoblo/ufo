@@ -1,9 +1,15 @@
 import React from 'react'
 import { changeAppPath } from '../../app/app-actions'
 import { connect } from 'react-redux'
+import {makeGetFolderWithActive} from '../../filemanager/fm-selectors'
 
-@connect((store) => {
-  return {fm: store.fm}
+@connect(() => {
+  const getFolderWithActive = makeGetFolderWithActive()
+  return (state, props) => {
+    return {
+      folder: getFolderWithActive(state, props)
+    }
+  }
 })
 export default class DisplayList extends React.Component {
   constructor(props) {
@@ -15,17 +21,18 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
+
     let fileList = ""
-    let active = this.props.fm.getIn([this.props.path, 'active'])
-    if(this.props.loading === false && this.props.fm.getIn([this.props.path, 'files'])) {
-      fileList = this.props.fm.getIn([this.props.path, 'files']).map((file, index) => {
+    if(this.props.folder) {
+      fileList = this.props.folder.get('files').map((file, index) => {
         let styles = {}
-        if(active && file.base == active) {
+        if(file.get('active')) {
           styles = {
             fontWeight: 'bold'
           }
         }
-        return ( <li style={styles} onClick={this.addPath.bind(this, file.path)} key={index}>{file.base}</li> )
+
+        return ( <li style={styles} onClick={this.addPath.bind(this, file.get('path'))} key={index}>{file.get('base')}</li> )
       })
     }
 

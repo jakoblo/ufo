@@ -14,16 +14,16 @@ export default function viewContainerReducer(state = INITIAL_STATE, action = { t
       let listTemplate = action.payload.pathRoute.map((path, index) => {
         return Map({
           path: path,
-          loading: false
+          loading: state.getIn('views', path, 'loading') || true
         })
       })
       return state.set('views', List(listTemplate))
 
-    // case FileSystem.actionTypes.WATCHER_READING:
+    // case FileSystem.actiontypes.WATCHER_READING:
     //   return _setLoadingForPath(state, action.payload.path, true)
 
-    // case FileSystem.actionTypes.WATCHER_READY:
-    //   return _setLoadingForPath(state, action.payload.path, false)
+    case FileSystem.actiontypes.WATCHER_READY:
+      return _setLoadingForPath(state, action.payload.path, false)
 
     default:
       return state;
@@ -37,11 +37,11 @@ export default function viewContainerReducer(state = INITIAL_STATE, action = { t
  * @return {Object} state
  */
 function _setLoadingForPath(state, path, loadingValue) {
-  let index = state.findKey((viewObj, key) => {
+  let index = state.get('views').findKey((viewObj, key) => {
     return (viewObj.get('path') == path)
   })
   if(index > -1) {
-    return state.setIn([index, 'loading'], loadingValue)
+    return state.setIn(['views', index, 'loading'], loadingValue)
   } else {
     return state
   }
