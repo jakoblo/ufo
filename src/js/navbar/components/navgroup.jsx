@@ -3,8 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
 import classnames from 'classnames'
-import Icon from '../../general-components/icon'
-import Button from '../../general-components/button'
+import NavGroupItem from './navgroup-item'
+import NavGroupTitle from './navgroup-title'
 
 export default class NavGroup extends React.Component {
   constructor(props) {
@@ -17,6 +17,9 @@ export default class NavGroup extends React.Component {
     if(path === this.props.activeItem)
     active = true
     let glyph = "folder"
+    if(this.props.isDefault)
+    glyph = 'device'
+    
     // if(path.ext) {
     //   let res = path.ext.replace(".", "")
     //   glyph = "file " + res
@@ -28,6 +31,7 @@ export default class NavGroup extends React.Component {
         onClick={this.props.onSelectionChanged.bind(this, path)}
         onItemRemove={this.props.onItemRemove.bind(this, this.props.groupID, itemID)}
         title={basePath}
+        isDeletable={this.props.isDefault}
         active={active}
         glyph={glyph}
         >
@@ -44,6 +48,7 @@ export default class NavGroup extends React.Component {
       'nav-group': true,
       'hide': this.props.hidden
     });
+
     return(
       <div className={groupClasses}>
         <NavGroupTitle 
@@ -59,90 +64,4 @@ export default class NavGroup extends React.Component {
       </div>
     )
   }
-}
-
-/*
-*
-* NAVGROUP ITEM
-*
-*/
-
-class NavGroupItem extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
- render() {
-    // let icon = this.getIconComponent()
-    let className = classnames(this.props.className, "nav-group-item", {"active": this.props.active})
-
-    return (
-      <a  className={className}>
-        <Icon glyph={this.props.glyph} />
-        <span onClick={this.props.onClick} className="text">{this.props.title}</span>
-        <Button className="remove" onClick={this.props.onItemRemove}></Button>
-      </a>
-    )
-  }
-}
-
-/*
-*
-* NAVGROUP TITLE
-*
-*/
-
-class NavGroupTitle extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {editGroupTitle: false}
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return true
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    this.refs.input && this.refs.input.focus();
-  }
-
-  handleDoubleClick = () => {
-    this.setState({editGroupTitle: true})
-  }
-
-  changeTitle(e) {
-    if(e.keyCode === 13 || e.type === 'blur') {
-      if(this.props.title != e.target.value && e.target.value != '') {
-      this.props.onGroupTitleChange(this.props.groupID, e.target.value)
-      }
-      this.setState({editGroupTitle: false})
-    }
-  }
-
-  handleKeyDown = (e) => {
-    this.changeTitle(e)
-  }
-
-  handleOnBlur = (e) => {
-    this.changeTitle(e)
-  }
-
-  handleToggleGroup = () => {
-    this.set
-  }
-
- render() {
-   let title = <span className="nav-group-text" onDoubleClick={this.handleDoubleClick}>{this.props.title}</span>
-   if(this.state.editGroupTitle) {
-     title = <input ref="input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
-   }
-
-  return (
-      <div className="nav-group-title">
-        {title}
-        <Button className="nav-group-hide" onClick={this.props.onClick} text={this.props.hideButtonText}/>
-      </div>
-    )
-  }
-  // <Button className="nav-group-hide" text={this.props.hideButtonText} onClick={this.props.onHide}/>
 }

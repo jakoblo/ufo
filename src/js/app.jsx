@@ -32,6 +32,7 @@ const store = storeSetup();
 
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
+window.utils = Utils.storage
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
 
 ipcRenderer.on('saveState', function(event) {

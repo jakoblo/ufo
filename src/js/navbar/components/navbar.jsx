@@ -17,7 +17,6 @@ export default class Navbar extends React.Component {
   }
 
   handleSelectionChanged = (path, groupID, itemID) => {
-    console.log("SELECTION CHANGED")
     this.props.dispatch(App.actions.changeAppPath(path))
   }
 
@@ -25,8 +24,9 @@ export default class Navbar extends React.Component {
     this.props.dispatch(toggleGroup(groupID))
   }
 
-  handleOnItemRemove = (groupID, itemID) => {
-    this.props.dispatch(removeGroupItem(groupID, itemID))
+  handleOnItemRemove = (groupIndex, itemID) => {
+    // const groupIndex = this.props.navbar.get('groupItems').findIndex(group => group.get('title') === groupTitle)
+    this.props.dispatch(removeGroupItem(groupIndex, itemID))
   }
 
   handleOnGroupTitleChange = (groupID, newTitle) => {
@@ -34,6 +34,7 @@ export default class Navbar extends React.Component {
   }
 
   createNavGroups = (item, index) => {
+   
     return (<NavGroup
         key={index}
         groupID={index}
@@ -41,6 +42,7 @@ export default class Navbar extends React.Component {
         title={item.title}
         items={item.items}
         hidden={item.hidden}
+        isDefault={item.title === constants.DISKS_GROUP_NAME ? true : false}
         onSelectionChanged={this.handleSelectionChanged}
         onItemRemove={this.handleOnItemRemove}
         onGroupTitleChange={this.handleOnGroupTitleChange}
