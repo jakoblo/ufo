@@ -49,9 +49,42 @@ function loadDefaultUserFolders() {
   return navbar
 }
 
-export function loadDriveList() {
-  if(process.platform == 'darwin') {
+/**
+ * 
+ * Returns an Array of Path Strings
+ * @export
+ * @param {callback} fileUnlink
+ * @param {callback} fileAdd
+ * @param {callback} fileChange
+ * @param {callback} watcherReady
+ */
+export function loadSystemVolumes(fileAdd, fileUnlink, fileChange, watcherReady) {
+  const watcherSettings = {
+    ignored: /[\/\\]\./,
+    persistent: true,
+    depth: 0,
+    alwaysStat: true
+  }
 
+  if(process.platform == 'darwin') {
+    fs.watchhandler.watch('/volumes/', watcherSettings,
+    fileAdd,
+    fileUnlink,
+    fileChange,
+    wready
+    )
+
+    function wready(path, files) {
+      let items = []
+      for (var key in files) {
+        // skip loop if the property is from prototype
+        if (!files.hasOwnProperty(key)) continue;
+        var obj = files[key];
+          items.push(obj.path)
+        }
+        watcherReady('Volumes', items)
+      }
+    
   }
   drivelist.list(function(error, disks) {
       if (error) throw error;

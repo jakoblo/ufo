@@ -15,11 +15,11 @@ export function changeGroupTitle(groupID, newTitle) { // Action Creator
   };
 }
 
-export function removeGroupItem(groupID, itemID) { // Action Creator
+export function removeGroupItem(group, itemID) { // Action Creator
   return { // action
     type: t.NAVBAR_REMOVE_GROUP_ITEM,
     payload: {
-      groupID: groupID,
+      groupID: group,
       itemID: itemID}
   };
 }
@@ -29,4 +29,14 @@ export function addNavGroup(title, items) {
     type: t.ADD_NAVGROUP,
     payload: {title: title, items: List(items)}
   };
+}
+
+export function addGroupItem(groupTitle, item) {
+  return {
+    type: t.ADD_GROUP_ITEM,
+    payload: {
+      groupTitle: groupTitle,
+      item: item.path
+    }
+  }
 }

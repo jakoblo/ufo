@@ -18,6 +18,13 @@ export function loadPreviousState(windowID) {
         })
       }
     })
+
+    Utils.storage.loadSystemVolumes(
+      (fileObj) => {dispatch(Navbar.actions.addGroupItem('Volumes', fileObj))},
+      (fileObj, activeWatcher) => {},
+      (fileObj) => {},
+      (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items))}
+      )
     /**
      * Loads the last Redux STATE from Storage
      */
