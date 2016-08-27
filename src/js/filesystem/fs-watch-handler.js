@@ -88,7 +88,7 @@ class ChokidarHandler {
   _handleReady(readyCallback, root) {
     readyCallback(root, this.watcherStack[root].holdingLine)
     this.watcherStack[root].ready = true
-    delete this.watcherStack[root].holdingLine
+    // delete this.watcherStack[root].holdingLine
   }
 
   _verify = (path, settings) => {
