@@ -45,6 +45,6 @@ export const makeGetFolderWithActive = () => {
       if(folderContent && activeFile) {
         folderContent = folderContent.setIn([activeFile, 'active'], true)
       }
-      return folderContent.sortBy(file => file.get('base')).sortBy(file => file.get('type'))
+      return folderContent
   })
 }
