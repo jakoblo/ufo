@@ -4,6 +4,7 @@ import { remote } from 'electron'
 import drivelist from 'drivelist'
 import process from 'process'
 import fs from '../filesystem/fs-index'
+import Navbar from '../navbar/navbar-index'
 
 export function loadStatefromStorage(windowID, callback) {
   storage.get('lastState'+windowID, function(error, data) {
@@ -82,12 +83,12 @@ export function loadSystemVolumes(fileAdd, fileUnlink, fileChange, watcherReady)
         var obj = files[key];
           items.push(obj.path)
         }
-        watcherReady('Volumes', items)
+        watcherReady(Navbar.constants.DISKS_GROUP_NAME, items)
       }
     
   }
   drivelist.list(function(error, disks) {
       if (error) throw error;
-      console.log(disks);
+      // console.log(disks);
   })
 }
