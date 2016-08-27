@@ -1,6 +1,9 @@
 import storage from 'electron-json-storage'
 import Immutable, { Map, List } from 'immutable'
 import { remote } from 'electron'
+import drivelist from 'drivelist'
+import process from 'process'
+import fs from '../filesystem/fs-index'
 
 export function loadStatefromStorage(windowID, callback) {
   storage.get('lastState'+windowID, function(error, data) {
@@ -44,4 +47,14 @@ function loadDefaultUserFolders() {
   }
   let navbar = {groupItems: [navgroup]}
   return navbar
+}
+
+export function loadDriveList() {
+  if(process.platform == 'darwin') {
+
+  }
+  drivelist.list(function(error, disks) {
+      if (error) throw error;
+      console.log(disks);
+  })
 }

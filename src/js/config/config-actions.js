@@ -24,7 +24,7 @@ export function loadPreviousState(windowID) {
     Utils.storage.loadStatefromStorage(windowID, function (data) {
       console.log(data);
       // if(data.fs)
-      dispatch(App.actions.changeAppPath(os.homedir()))
+      dispatch(App.actions.changeAppPath('//dev/disk1'))
     })
     dispatch(ActionCreators.clearHistory())
   }
