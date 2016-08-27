@@ -1,0 +1,96 @@
+
+.file-item {
+  
+  $height: 19px;
+  display:inline-block;
+  height: $height;
+  
+  /* Full Width, but keep Content alinged (100% / 0.95 * 0.05) */
+  margin:0 calc((100% / (1 - 2 * #{$view-padding-horiz-number})) * -#{$view-padding-horiz-number});
+  padding:1px calc((100% / (1 - 2 * #{$view-padding-horiz-number})) * #{$view-padding-horiz-number});
+  
+  box-sizing: content-box;
+  width:100%;
+  vertical-align: bottom; /* Fix cm line possition */
+  font-family: $font-default;
+  font-size: 13.3px;
+  color:#000;
+  
+  &.display-image {
+    height:auto;
+    
+    .flex-box{
+      background: rgba(255,255,255,0.4);
+      margin-top:-24px;
+      position: relative;
+    }
+  }
+  
+  img {
+    width:100%;
+    border-radius:2px;
+  }
+  
+  .flex-box{
+    display:flex;
+    
+    .icon {
+      margin-right:10px;
+      min-width:17px;
+      flex-grow: 0;
+    }
+      
+    input, label {
+      width:100%;
+      background: transparent;
+      border:0;
+      overflow:hidden;
+      line-height: calc(#{$height} + 1px);
+      height:$height;
+    }
+    
+    label {
+      display: flex;
+      
+      span.base {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      span.suffix {
+        white-space: nowrap;
+      }
+    }
+    
+    input {
+      display:none;
+      background:#fff;
+    }
+  }
+  
+  &.edit .flex-box input { 
+    display: block;
+  }
+  &.edit .flex-box label { 
+    display: none;
+  }
+  
+  &.dragging,
+  &.dragging label {
+    background:#ccc !important;
+    color:#000  !important;
+  }
+  
+  &:hover {
+    box-shadow: $shadow-mouse-over;
+  }
+  
+  &.selected {
+    background-color: $color-background-active;
+  }
+}
+
+.CodeMirror-focused .file-item.selected {
+  background-color: $color-background-selected;
+}

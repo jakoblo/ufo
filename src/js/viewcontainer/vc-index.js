@@ -1,10 +1,11 @@
 // import * as actions from './viewcontainer-actions'
 import ViewContainer from './components/viewcontainer'
-import reducer from './vc-reducer'
+import View from './components/view'
 import * as constants from './vc-constants'
 
 const components = {
-  parent: ViewContainer
+  parent: ViewContainer,
+  child: View
 }
 
-export default { components, constants, reducer };
+export default { components, constants };

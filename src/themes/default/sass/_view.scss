@@ -55,7 +55,7 @@
     }
   }
 }
-
+   
 .view {
   position:absolute;
   width:250px;
@@ -69,21 +69,6 @@
   resize: horizontal;
   overflow:auto;
   padding-bottom: $view-bottom-space;
-  
-  .loading-cube {
-    display:none
-  }
-  
-  &.loading {
-    .loading-cube {
-      display:block;
-    }
-    
-    .view-toolbar,
-    .view-content {
-      display:none;
-    }
-  } 
  
   &:hover .view-toolbar {
     opacity: 1 !important;
