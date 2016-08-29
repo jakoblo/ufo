@@ -5,7 +5,7 @@ import FS from '../../filesystem/fs-index'
 import FileItem from './file-item'
 
 @connect(() => {
-  const getFolderWithActive = FS.selectors.makeGetFolderWithActive()
+  const getFolderWithActive = FS.selectors.getFolderWithActiveFactory()
   return (state, props) => {
     return {
       folder: getFolderWithActive(state, props)
