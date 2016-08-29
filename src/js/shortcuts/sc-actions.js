@@ -5,8 +5,8 @@ export function navigateFileUp() {
   return function (dispatch, getState) {
 
     // have to know to much about the store...
-    let state = getState() 
-    let props = { path: '/Users/Wolf' }
+    let state = getState()
+    let props = { path: FS.selectors.getDirectorySeq(state)[0] }
     let indexedFiles = FS.selectors.getFilesSeq(state, props)
 
     let activeIndex = FS.selectors.getActiveFileIndex(state, props)
