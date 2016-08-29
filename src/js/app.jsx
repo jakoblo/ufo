@@ -17,6 +17,7 @@ import ViewContainer from './viewcontainer/vc-index'
 import FileSystem from './filesystem/fs-index'
 import ToggleBar from './general-components/togglebar'
 import Utils from './utils/utils-index'
+import setupShortcuts from './shortcuts/sc-renderer'
 
 window.fs = FileSystem
 
@@ -34,6 +35,7 @@ store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 window.utils = Utils.storage
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
+setupShortcuts(store)
 
 ipcRenderer.on('saveState', function(event) {
   Utils.storage.saveStatetoStorage(store.getState(), windowID, function() {

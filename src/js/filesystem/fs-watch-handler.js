@@ -101,8 +101,11 @@ class ChokidarHandler {
   }
 
   _createFileObj(callback, root, type, path, stats) {
+    let pathObj = nodePath.parse(path)
     return {
-      base: nodePath.basename(path),
+      base: pathObj.base,
+      suffix: pathObj.ext,
+      name: pathObj.name,
       root: root,
       path: path,
       type: type,

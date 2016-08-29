@@ -12,23 +12,12 @@ export default class FileItemDisplay extends React.Component {
     super(props)
     this.dragOverTimeout = null
     this.state = {
-      fileName: this.props.displayName,
+      fileName: this.props.base,
       editing: false
     }
-    
-    this.state = {
-      base: this.props.base,
-      suffix: ''
-    } 
   }
 
   render() {
-    
-    let fileBase = this.state.base || this.state.fileName;
-    let fileSuffix = this.state.suffix || null;
-    let suffixIconClass
-    let draggable = true
-      
     let classes = classNames({
       'file-item': true,
       'processed': true,
@@ -47,7 +36,7 @@ export default class FileItemDisplay extends React.Component {
     return (
       <span
         className={classes}
-        draggable={draggable}
+        draggable={true}
         onMouseDown={this.mousedown.bind(this)}
         onMouseUp={this.mouseup.bind(this)}
         onDoubleClick={this.dbclick.bind(this)}
@@ -57,8 +46,8 @@ export default class FileItemDisplay extends React.Component {
         <span className="flex-box">
           <Icon glyph={prefixIconClass}/>
           <label>
-            <span className="base">{fileBase}</span>
-            <span className="suffix">{fileSuffix}</span>
+            <span className="base">{this.props.name}</span>
+            <span className="suffix">{this.props.suffix}</span>
           </label>
           <input
             ref="editField"
@@ -76,9 +65,6 @@ export default class FileItemDisplay extends React.Component {
   }
 
   onDragStart(e) {
-
-    console.log('drag start')
-
     e.preventDefault()
     ipcRenderer.send('ondragstart', this.props.path)
   }
@@ -98,9 +84,9 @@ export default class FileItemDisplay extends React.Component {
 
   renameCancel() {
     this.setState({
-        fileName: this.props.displayName,
-        editing: false
-      });
+      fileName: this.props.displayName,
+      editing: false
+    });
   }
 
   renameStart() {

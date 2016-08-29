@@ -1,18 +1,13 @@
 "use strict"
 import { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } from 'electron'
 import { fs } from 'fs'
+import setupShortcuts from './shortcuts/sc-main.js'
 
-// electron.crashReporter.start()
-// const Menu = require('menu')
-// const MenuItem = require('menu-item')
-
-const appBasePath = __dirname //Brauchts das?
+const appBasePath = __dirname
 var allBrowserWindows = []
 
 function createNewBrowserWindow() {
   let windowID = null
-
-  console.log(appBasePath + '/../themes/default/img/multiDragPlaceholder.png')
 
   let browserWindow = new BrowserWindow({
           width : 800,
@@ -23,8 +18,9 @@ function createNewBrowserWindow() {
   windowID = browserWindow.id
 
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
+  setupShortcuts(browserWindow)
   
-  // TEST
+  // Develop Help
   browserWindow.toggleDevTools()
   browserWindow.maximize()
 
