@@ -4,7 +4,7 @@ import Navbar from '../navbar/navbar-index'
 import Utils from '../utils/utils-index'
 import { List, Map } from 'immutable'
 import { ActionCreators } from 'redux-undo';
-import os from 'os'
+import os from 'os' 
 
 export function loadPreviousState(windowID) {
   return dispatch => {
@@ -14,17 +14,24 @@ export function loadPreviousState(windowID) {
     Utils.storage.loadNavbarfromStorage(function (data) {
       if (data.groupItems !== undefined) {
         data.groupItems.forEach((item, index) => {
+          if(item.title != Navbar.constants.DISKS_GROUP_NAME)
           dispatch(Navbar.actions.addNavGroup(item.title, item.items))
         })
       }
     })
+
+    Utils.storage.loadSystemVolumes(
+      (fileObj) => {dispatch(Navbar.actions.addGroupItem(Navbar.constants.DISKS_GROUP_NAME, fileObj))},
+      (fileObj, activeWatcher) => {dispatch(Navbar.actions.removeGroupItemfromDeviceGroup(Navbar.constants.DISKS_GROUP_NAME, fileObj))},
+      (fileObj) => {},
+      (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items))}
+      )
     /**
      * Loads the last Redux STATE from Storage
      */
     Utils.storage.loadStatefromStorage(windowID, function (data) {
-      console.log(data);
       // if(data.fs)
-      dispatch(App.actions.changeAppPath(os.homedir()))
+      dispatch(App.actions.changeAppPath('//dev/disk1'))
     })
     dispatch(ActionCreators.clearHistory())
   }
