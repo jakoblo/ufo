@@ -1,9 +1,31 @@
 import { createSelector } from 'reselect'
 import nodePath from 'path'
 
-const getIndexedDirs = (state, props) => state.fs.keySeq().toJS()
-const getCurrentPath = (state, props) => props.path
-const getDirFromFS = (state, props) => state.fs.get(props.path).get('files')
+
+export const getCurrentPath = (state, props) => props.path
+export const getFilesFromDir = (state, props) => state.fs.get(props.path).get('files')
+
+
+export const getIndexedDirs = (state) => state.fs.keySeq().toJS()
+export const getIndexedFiles = createSelector(
+    [getFilesFromDir],
+    (files) => files.keySeq().toJS()
+  )
+
+export const makeGetActiveFileIndex = () => {
+  const getActiveFile = makeGetActiveFile()
+
+  return createSelector(
+    [getIndexedFiles, getActiveFile],
+    (fileIndex, activeFile) => {
+      let activeIndex = indexedFiles.findIndex((filename) => {
+        return filename == activeFile
+      })
+      return activeIndex
+    }
+  )
+}
+
 
 /**
  * @returns {string} nextPath /Users/User/Desktop
@@ -40,7 +62,7 @@ export const makeGetFolderWithActive = () => {
   let getActiveFile = makeGetActiveFile()
 
   return createSelector(
-    [ getDirFromFS, getActiveFile],
+    [ getFilesFromDir, getActiveFile],
     (folderContent, activeFile) => {
       if(folderContent && activeFile) {
         folderContent = folderContent.setIn([activeFile, 'active'], true)
