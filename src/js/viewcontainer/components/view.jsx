@@ -16,7 +16,7 @@ export default class View extends React.Component {
       ready: this.props.ready
     })
     let loading
-    if(!this.props.ready) {
+    if(!this.props.ready && !this.props.error) {
       loading = <div className="loading-cube">
                   <div className="sk-cube1 sk-cube"></div>
                   <div className="sk-cube2 sk-cube"></div>

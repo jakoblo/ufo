@@ -1,5 +1,6 @@
 import chokidar from 'chokidar'
 import nodePath from 'path'
+import fs from 'fs'
 import {TYPE_FILE, TYPE_DIR} from './fs-constants'
 
 const logging = true
@@ -19,9 +20,18 @@ class ChokidarHandler {
    * @param  {Function} unlinkCallback
    * @param  {Function} changeCallback
    * @param  {Function} readyCallback
+   * @param  {Function} errorCallback
    * @returns {Object}
    */
-  watch = (path, settings, addCallback, unlinkCallback, changeCallback, readyCallback ) => {
+  watch = (
+      path, 
+      settings, 
+      addCallback, 
+      unlinkCallback, 
+      changeCallback, 
+      readyCallback, 
+      errorCallback
+    ) => {
 
     this._verify(path, settings)
 
@@ -32,6 +42,14 @@ class ChokidarHandler {
       ready: false
     }
     let root = path
+
+    // Check if folder exists and is readable / chokidar doesn't do that
+    fs.access(path, fs.constants.R_OK | fs.constants.W_OK, (err) => {
+      if(err) {
+        if(errorCallback) { errorCallback(err, root) }
+        this.unwatch(root)
+      }
+    })
 
     if(addCallback) {
       watcher.on('add', this._handleEventAdd.bind(this, addCallback, root, TYPE_FILE))
@@ -46,6 +64,9 @@ class ChokidarHandler {
     }
     if(readyCallback) {
       watcher.on('ready', this._handleReady.bind(this, readyCallback, root))
+    }
+    if(errorCallback) {
+      watcher.on('error', errorCallback.bind(this, root))
     }
     if(logging) {
       watcher.on('ready', this._logging.bind(this, watcher, root))

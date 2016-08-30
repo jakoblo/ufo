@@ -5,6 +5,13 @@ export const getCurrentPath =   (state, props)  => props.path
 export const getFiles =         (state, props)  => state.fs.get(props.path).get('files')
 export const getDirectorySeq =  (state)         => state.fs.keySeq().toJS()
 export const getFilesSeq =      (state, props)  => getFiles(state, props).keySeq().toJS()
+export const getDirState =      (state, props)  => { 
+  return {
+    path: props.path,
+    ready: state.fs.get(props.path).get('ready'),
+    error: state.fs.get(props.path).get('error')
+  }
+}
 
 export function getNextDir(stats, props) {
   let directorySeq = getDirectorySeq(stats)
