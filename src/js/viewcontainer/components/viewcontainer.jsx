@@ -3,11 +3,16 @@ import { connect } from 'react-redux'
 import { List } from 'immutable'
 import { NAME, DEFAULT_VIEW_WIDTH } from '../vc-constants'
 import View from './view'
+import Error from '../../general-components/error'
 import DisplayList from '../../display/list/display-list'
+import FS from '../../filesystem/fs-index'
 
 @connect((state) => {
+  let dirs = FS.selectors.getDirectorySeq(state)
   return {
-    fs: state.fs
+    fsList: dirs.map((dir, index) => {
+      return FS.selectors.getDirState(state, {path: dir})
+    })
   }
 })
 export default class ViewContainer extends React.Component {
@@ -22,25 +27,34 @@ export default class ViewContainer extends React.Component {
 
     let views = null
     
-    if(this.props.fs.size > 0) {
+    if(this.props.fsList.length > 0) {
 
       let cssLeft = 0
       let prevFolder = null
 
-      views = this.props.fs.map((folder, path) => {
+      views = this.props.fsList.map((dirState, index) => {
         cssLeft = cssLeft + this.state.widthStorage[prevFolder] || 0
-        prevFolder = path
+        prevFolder = dirState.path
+        
+        let display = (dirState) => {
+          if(dirState.error) {
+            return <Error error={dirState.error} />
+          } else {
+            return <DisplayList path={dirState.path} />
+          }
+        }
 
         return (
           <View 
-            key={path} 
-            path={path} 
-            initWidth={this.state.widthStorage[path] || DEFAULT_VIEW_WIDTH} 
+            key={dirState.path} 
+            path={dirState.path} 
+            initWidth={this.state.widthStorage[dirState.path] || DEFAULT_VIEW_WIDTH} 
             cssLeft={cssLeft} 
             onResize={this.resizeHandle}
-            ready={folder.get('ready')}
+            ready={dirState.ready}
+            error={dirState.error}
           >
-            <DisplayList path={path} />
+            {display(dirState)}
           </View>
         )
       })

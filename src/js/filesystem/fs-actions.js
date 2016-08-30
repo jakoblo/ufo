@@ -24,7 +24,8 @@ export function watcherRequest(path) {
       (fileObj)     => {dispatch( fileAdd(fileObj) )},
       (fileObj, activeWatcher) => {dispatch( fileUnlink(fileObj, activeWatcher) )},
       (fileObj)     => {dispatch( fileChange(fileObj) )},
-      (path, files) => {dispatch( watcherReady(path, files) )}
+      (path, files) => {dispatch( watcherReady(path, files) )},
+      (err, path) => {dispatch( watcherError(err, path) )}
     )
   }
 }
@@ -74,6 +75,17 @@ function watcherReady(path, files) {
   }
 }
 
+function watcherError(error, path) {
+  console.log(error, path)
+  return {
+    type: t.WATCHER_ERROR,
+    payload: {
+      error: error,
+      path: path
+    }
+  }
+}
+
 /**
  * Action Creator
  * @param  {Object} fileObj
@@ -119,3 +131,4 @@ function fileChange(fileObj) {
     payload: fileObj
   }
 }
+

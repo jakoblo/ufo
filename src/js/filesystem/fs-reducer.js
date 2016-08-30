@@ -9,15 +9,13 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
   switch (action.type) {
 
     case t.WATCHER_READING:
-      return state.setIn([action.payload.path], fromJS(
-        {
+      return state.setIn([action.payload.path], fromJS({
           ready: false,
           files: null
         }))
 
     case t.WATCHER_READY:
-      state = state.setIn([action.payload.path], Map(
-        {
+      state = state.setIn([action.payload.path], Map({
           ready: true,
           files: _sort( _fromJSOrdered( action.payload.files ) )
         }))
@@ -25,6 +23,13 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
 
     case t.WATCHER_CLOSE:
       return state.deleteIn([action.payload.path])
+
+    case t.WATCHER_ERROR:
+      return state.setIn([action.payload.path], fromJS({
+          ready: false,
+          files: null,
+          error: action.payload.error
+        }))
 
     case t.FILE_ADD:
       let files = state.getIn([action.payload.root, 'files'])
