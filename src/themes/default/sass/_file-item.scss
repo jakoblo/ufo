@@ -86,11 +86,12 @@
     box-shadow: $shadow-mouse-over;
   }
   
-  &.selected {
+  &.active {
     background-color: $color-background-active;
+  }
+
+  &.selected {
+    background-color: $color-background-selected;
   }
 }
 
-.CodeMirror-focused .file-item.selected {
-  background-color: $color-background-selected;
-}
