@@ -24,7 +24,8 @@ export default class FileItemDisplay extends React.Component {
       'edit': this.state.editing,
       'folder': this.props.type == "DIR",
       'file': this.props.type == "FILE",
-      'selected': this.props.selected || this.props.active,
+      'active': this.props.active,
+      'selected': this.props.selected,
       'dragging': this.props.dragging
     })
 
@@ -37,8 +38,8 @@ export default class FileItemDisplay extends React.Component {
       <span
         className={classes}
         draggable={true}
-        onMouseDown={this.mousedown.bind(this)}
-        onMouseUp={this.mouseup.bind(this)}
+        onMouseDown={this.props.onMouseDown}
+        onMouseUp={this.props.onMouseUp}
         onDoubleClick={this.dbclick.bind(this)}
         onContextMenu={this.contextmenu.bind(this)}
         onDragStart={this.onDragStart.bind(this)}
