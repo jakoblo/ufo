@@ -38,9 +38,8 @@ export default class ViewContainer extends React.Component {
 
   renderPreview = () => {
     if(this.props.preview.get('path')) {
-      debugger
       let PreviewComp = Preview.components.preview
-      return <aside><PreviewComp path={this.props.preview.get('path')} /></aside>
+      return <aside className="view"><PreviewComp path={this.props.preview.get('path')} /></aside>
     }
   }
 
