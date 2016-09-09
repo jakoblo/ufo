@@ -42,7 +42,7 @@ export default class FileItemDisplay extends React.Component {
         onMouseUp={this.props.onMouseUp}
         onDoubleClick={this.dbclick.bind(this)}
         onContextMenu={this.contextmenu.bind(this)}
-        onDragStart={this.onDragStart.bind(this)}
+        onDragStart={this.props.onDragStart.bind(this, this.props.selected, this.props.path)}
       >
         <span className="flex-box">
           <Icon glyph={prefixIconClass}/>
@@ -63,11 +63,6 @@ export default class FileItemDisplay extends React.Component {
         </span>
       </span>
     )
-  }
-
-  onDragStart(e) {
-    e.preventDefault()
-    ipcRenderer.send('ondragstart', this.props.path)
   }
 
   renameSave(event) {

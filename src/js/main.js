@@ -56,7 +56,7 @@ app.on('ready', function() {
 
 ipcMain.on('ondragstart', (event, filePath) => {
   event.sender.startDrag({
-    file: filePath,
+    files: filePath,
     icon: appBasePath + '/../themes/default/img/multiDragPlaceholder.png'
   })
 })

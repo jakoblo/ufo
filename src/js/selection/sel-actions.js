@@ -5,6 +5,7 @@ import FS from '../filesystem/fs-index'
 import App from '../app/app-index'
 import nodePath from 'path'
 import * as _ from 'lodash'
+import {ipcRenderer} from 'electron'
 
 /**
  * Sets set selection to the given file
@@ -159,5 +160,15 @@ export function selectAll() {
       return nodePath.join(root, filename)
     })
     dispatch( setSelection( allFiles ) )
+  }
+}
+
+export function startDragSelection() {
+  return function (dispatch, getState) {
+    let selection = selectors.getSelection(getState())
+    let selectedFiles = selection.get('files').toJS().map((filename) => {
+      return nodePath.join(selection.get('root'), filename)
+    })
+    ipcRenderer.send('ondragstart', selectedFiles)
   }
 }
