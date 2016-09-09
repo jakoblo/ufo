@@ -1,8 +1,7 @@
-/// <reference path="../typings/typings.d.ts" />
 "use strict"
 import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
-import Icon from '../../general-components/icon'
+import Icon from '../../../general-components/icon'
 import classNames from 'classnames'
 import {ipcRenderer} from 'electron'
 
@@ -22,16 +21,16 @@ export default class FileItemDisplay extends React.Component {
       'file-item': true,
       'processed': true,
       'edit': this.state.editing,
-      'folder': this.props.type == "DIR",
-      'file': this.props.type == "FILE",
+      'folder': this.props.type == "DIR", //@todo constant
+      'file': this.props.type == "FILE", //@todo constant
       'active': this.props.active,
       'selected': this.props.selected,
       'dragging': this.props.dragging
     })
 
     let prefixIconClass = classNames({
-      'folder': this.props.type == "DIR",
-      'file': this.props.type == "FILE"
+      'folder': this.props.type == "DIR", //@todo constant
+      'file': this.props.type == "FILE" //@todo constant
     })
 
     return (
@@ -40,9 +39,9 @@ export default class FileItemDisplay extends React.Component {
         draggable={true}
         onMouseDown={this.props.onMouseDown}
         onMouseUp={this.props.onMouseUp}
-        onDoubleClick={this.dbclick.bind(this)}
-        onContextMenu={this.contextmenu.bind(this)}
-        onDragStart={this.props.onDragStart.bind(this, this.props.selected, this.props.path)}
+        onDoubleClick={this.dbclick}
+        onContextMenu={this.contextmenu}
+        onDragStart={this.props.onDragStart}
       >
         <span className="flex-box">
           <Icon glyph={prefixIconClass}/>

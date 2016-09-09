@@ -1,6 +1,6 @@
 // import * as actions from './viewcontainer-actions'
-import ViewContainer from './components/viewcontainer'
-import View from './components/view'
+import ViewContainer from './vc-component'
+import View from './vc-view'
 import * as constants from './vc-constants'
 
 const components = {

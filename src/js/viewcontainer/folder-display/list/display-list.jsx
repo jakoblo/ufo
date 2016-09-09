@@ -1,10 +1,11 @@
 import React from 'react'
-import { changeAppPath } from '../../app/app-actions'
 import { connect } from 'react-redux'
-import FS from '../../filesystem/fs-index'
-import Selection from '../../selection/sel-index'
-import FileItem from './file-item'
 import {ipcRenderer} from 'electron' //@todo try to remove that
+import App from '../../../app/app-index'
+import FS from  '../../../filesystem/fs-index'
+import Selection from '../../../selection/sel-index'
+import Preview from '../../file-preview/pv-index'
+import FileItem from './file-item'
 
 @connect(() => {
   const getFolderCombined = FS.selectors.getFolderCombinedFactory()
@@ -29,8 +30,8 @@ export default class DisplayList extends React.Component {
           {...file}
           key={index} 
           onMouseDown={this.handleOnMouseDown.bind(this, file.path)}
-          onMouseUp={this.handleOnMouseUp.bind(this, file.path)}
-          onDragStart={this.handleOnDragStart}
+          onMouseUp={this.handleOnMouseUp.bind(this, file.path, file.type)}
+          onDragStart={this.handleOnDragStart.bind(this, file.selected, file.path)}
         /> )
       })
     }
@@ -50,9 +51,14 @@ export default class DisplayList extends React.Component {
     }
   }
 
-  handleOnMouseUp = (path, event) => {
+  handleOnMouseUp = (path, type, event) => {
     if(!event.ctrlKey && !event.metaKey && !event.shiftKey) {
-      this.props.dispatch( changeAppPath(null, path) )
+      // No Selection
+      if(type == 'DIR') {  //@todo constant
+        this.props.dispatch( App.actions.changeAppPath(null, path) )
+      } else {
+        this.props.dispatch( Preview.actions.showPreview(path) )
+      }
     }
   }
 
