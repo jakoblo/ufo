@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom'
 import {ipcRenderer} from 'electron'
 import nodePath from 'path'
 
-import CodeMirror from 'codemirror'
+// import CodeMirror from 'codemirror'
 
-require("codemirror/addon/mode/loadmode")
-require("codemirror/mode/meta")
-require("codemirror/addon/mode/overlay") // Important for mdfile.js
-require("codemirror/addon/hint/show-hint"); // Important for mdfile.js
+// require("codemirror/addon/mode/loadmode")
+// require("codemirror/mode/meta")
+// require("codemirror/addon/mode/overlay") // Important for mdfile.js
+// require("codemirror/addon/hint/show-hint"); // Important for mdfile.js
+
 
 /**
  * Creates the TextCodeMirror which is able to Display and handle Files
@@ -28,8 +29,8 @@ export default class Editor extends React.Component {
         theme: "mdn-like"
       }
     }
-    CodeMirror.modeURL = "codemirror/mode/%N/%N.js";
-    this.loadMode(nodePath.basename(this.props.path))
+    // CodeMirror.modeURL = "codemirror/mode/%N/%N.js";
+    // this.loadMode(nodePath.basename(this.props.path))
   }
   
   render() {
@@ -45,12 +46,12 @@ export default class Editor extends React.Component {
   }
   
   componentDidMount() {
-    this.codemirror = CodeMirror.fromTextArea(this.refTextarea, this.state.conf);
-    this.codemirror.setOption("mode", this.state.spec);
-    CodeMirror.autoLoadMode(this.codemirror, this.state.mode);
-    setTimeout(() => {
-      this.codemirror.refresh();
-    },1);
+    // this.codemirror = CodeMirror.fromTextArea(this.refTextarea, this.state.conf);
+    // this.codemirror.setOption("mode", this.state.spec);
+    // CodeMirror.autoLoadMode(this.codemirror, this.state.mode);
+    // setTimeout(() => {
+    //   this.codemirror.refresh();
+    // },1);
   }
   
   shouldComponentUpdate(nextProps, nextState) {
