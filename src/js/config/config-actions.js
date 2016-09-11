@@ -15,7 +15,7 @@ export function loadPreviousState(windowID) {
       if (data.groupItems !== undefined) {
         data.groupItems.forEach((item, index) => {
           if(item.title != Navbar.constants.DISKS_GROUP_NAME)
-          dispatch(Navbar.actions.addNavGroup(item.title, item.items))
+          dispatch(Navbar.actions.addNavGroup(item.title, item.items, true))
         })
       }
     })
@@ -24,7 +24,7 @@ export function loadPreviousState(windowID) {
       (fileObj) => {dispatch(Navbar.actions.addGroupItem(Navbar.constants.DISKS_GROUP_NAME, fileObj))},
       (fileObj, activeWatcher) => {dispatch(Navbar.actions.removeGroupItemfromDeviceGroup(Navbar.constants.DISKS_GROUP_NAME, fileObj))},
       (fileObj) => {},
-      (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items))}
+      (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items, true))}
       )
     /**
      * Loads the last Redux STATE from Storage

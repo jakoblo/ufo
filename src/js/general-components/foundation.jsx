@@ -7,9 +7,22 @@ export class Foundation extends React.Component {
     super(props)
   }
 
+  handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   render() {
     return(
-      <div className="foundation">{this.props.children}</div>
+      <div className="foundation" 
+      onDrop={this.handleDrop}
+      onDragOver={this.handleDragOver}
+      >{this.props.children}</div>
     )
   }
 }

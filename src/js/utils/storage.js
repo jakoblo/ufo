@@ -22,14 +22,21 @@ export function loadNavbarfromStorage(callback) {
   })
 }
 
-export function saveStatetoStorage(data, bwid, callback) {
-  storage.set('navbar', data.navbar.present, function(error) {
+export function saveStatetoStorage(currentState, bwid, callback) {
+  storage.set('navbar', currentState.navbar.present, function(error) {
     if (error) throw error
   })
-  storage.set('lastState'+bwid, data, function(error) {
+  storage.set('lastState'+bwid, currentState, function(error) {
     if (error) throw error;
     callback()
   });
+}
+
+export function saveFavbartoStorage(currentState) {
+  console.log(currentState)
+  storage.set('navbar', currentState.navbar.present, function(error) {
+    if (error) throw error
+  })
 }
 
 function loadDefaultUserFolders() {
