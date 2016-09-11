@@ -23,9 +23,7 @@ export function loadNavbarfromStorage(callback) {
 }
 
 export function saveStatetoStorage(currentState, bwid, callback) {
-  storage.set('navbar', currentState.navbar.present, function(error) {
-    if (error) throw error
-  })
+  saveFavbartoStorage(currentState)
   storage.set('lastState'+bwid, currentState, function(error) {
     if (error) throw error;
     callback()
@@ -33,7 +31,7 @@ export function saveStatetoStorage(currentState, bwid, callback) {
 }
 
 export function saveFavbartoStorage(currentState) {
-  console.log(currentState)
+  console.log("SAVEFAVBAR")
   storage.set('navbar', currentState.navbar.present, function(error) {
     if (error) throw error
   })

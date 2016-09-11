@@ -10,19 +10,24 @@ export function toggleGroup(groupID) { // Action Creator
 }
 
 export function changeGroupTitle(groupID, newTitle) { // Action Creator
-  return { // action
+  return function (dispatch, getState) {
+    dispatch({
     type: t.NAVBAR_CHANGE_GROUP_TITLE,
     payload: {groupID: groupID, newTitle: newTitle}
-  };
+    })
+    Utils.storage.saveFavbartoStorage(getState())
+  }
 }
 
 export function removeGroupItem(groupIndex, itemID) { // Action Creator
   return function(dispatch, getState) {
-      dispatch( {type: t.NAVBAR_REMOVE_GROUP_ITEM,
-    payload: {
-      groupIndex: groupIndex,
-      itemID: itemID}
-    })
+    dispatch( 
+      {type: t.NAVBAR_REMOVE_GROUP_ITEM,
+      payload: {
+        groupIndex: groupIndex,
+        itemID: itemID}
+      }
+    )
     Utils.storage.saveFavbartoStorage(getState())
   }
 }
@@ -38,32 +43,28 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
 }
 
 export function addNavGroup(title, items, loading) { 
-  
+  console.log("ADd NAvgroup")
   return function(dispatch, getState) {
-  dispatch({ // action
-    type: t.ADD_NAVGROUP,
-    payload: {title: title, items: List(items)}
-  })
-    
-  if(loading == undefined)
-    Utils.storage.saveFavbartoStorage(getState())
-  }
-  
+    dispatch({ // action
+      type: t.ADD_NAVGROUP,
+      payload: {title: title, items: List(items)}
+    })
+      
+    if(loading == undefined)
+      Utils.storage.saveFavbartoStorage(getState())
+  } 
 }
 
-export function addGroupItem(groupTitle, item) {
+export function addGroupItems(groupIndex, items) {
   return function(dispatch, state) {
-    dispatch({type: t.ADD_GROUP_ITEM,
-    payload: {
-      groupTitle: groupTitle,
-      item: item.path
-    }})
+    dispatch(
+      {type: t.ADD_GROUP_ITEM,
+      payload: {
+          groupIndex: groupIndex,
+          items: items
+        }
+      }
+    )
   }
 
-}
-
-export function saveFavbartoStorage() {
-  return function(dispatch, getState) {
-    Utils.storage.saveFavbartoStorage(getState())
-  }
 }

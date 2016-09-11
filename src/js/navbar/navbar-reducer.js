@@ -34,13 +34,13 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
     case t.NAVBAR_CHANGE_GROUP_TITLE:
       return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newTitle)
 
-    case t.ADD_NAVGROUP:  
+    case t.ADD_NAVGROUP:
       return state.set('groupItems', state.get('groupItems').push(Map({title: action.payload.title, hidden: false, items: action.payload.items})))
     
     case t.ADD_GROUP_ITEM:
-      const groupIndex = state.get('groupItems').findIndex(group => group.get('title') === action.payload.groupTitle)
-      let newItems = state.getIn(['groupItems', groupIndex, 'items']).push(action.payload.item)
-      return state.setIn(['groupItems', groupIndex, 'items'], newItems)
+      console.log(action.payload.items)
+      let newItems = state.getIn(['groupItems', action.payload.groupIndex, 'items']).push(action.payload.items)
+      return state.setIn(['groupItems', action.payload.groupIndex, 'items'], newItems)
 
     default:
       return state;

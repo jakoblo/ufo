@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { toggleGroup, removeGroupItem, changeGroupTitle, addNavGroup, saveFavbartoStorage } from '../navbar-actions'
+import { toggleGroup, removeGroupItem, changeGroupTitle, addNavGroup, saveFavbartoStorage, addGroupItems } from '../navbar-actions'
 import App from '../../app/app-index'
 import * as constants from '../navbar-constants'
 import { List, Map } from 'immutable'
@@ -39,14 +39,25 @@ export default class Navbar extends React.Component {
 
   handleDrop = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     let selection = Selection.selectors.getSelection(this.props.state)
     let selectedFiles = selection.get('files').toJS().map((filename) => {
       return nodePath.join(selection.get('root'), filename)
     })
-    this.props.dispatch(addNavGroup("Favb", selectedFiles))
+    this.props.dispatch(addNavGroup("New Group", selectedFiles))
+  } 
+
+  handleNavGroupDrop(groupID, e) {
+    console.log(e, groupID)
+    e.preventDefault()
+    let selection = Selection.selectors.getSelection(this.props.state)
+    let selectedFiles = selection.get('files').toJS().map((filename) => {
+      return nodePath.join(selection.get('root'), filename)
+    })
+    this.props.dispatch(addGroupItems(groupID, selectedFiles))
     
     console.log(selectedFiles)
-  } 
+  }
 
   createNavGroup = (item, index) => {
    
@@ -61,7 +72,8 @@ export default class Navbar extends React.Component {
         onSelectionChanged={this.handleSelectionChanged}
         onItemRemove={this.handleOnItemRemove}
         onGroupTitleChange={this.handleOnGroupTitleChange}
-        onToggleGroup={this.handleOnToggleGroup}>
+        onToggleGroup={this.handleOnToggleGroup}
+        onDrop={this.handleNavGroupDrop.bind(this, index)}>
       </NavGroup>)
   }
 

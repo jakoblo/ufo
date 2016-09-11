@@ -50,7 +50,7 @@ export default class NavGroup extends React.Component {
     });
 
     return(
-      <div className={groupClasses}>
+      <div className={groupClasses} onDrop={this.props.onDrop}>
         <NavGroupTitle 
           title={this.props.title} 
           groupID={this.props.groupID} 
