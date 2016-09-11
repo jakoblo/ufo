@@ -1,10 +1,9 @@
 "use strict"
 import React from 'react'
-import FileObj from '../file'
 import classnames from 'classnames'
 import mammoth from 'mammoth'
 
-export class DisplayDocx extends React.Component {
+export default class DisplayDocx extends React.Component {
 
   constructor(props) {
     super(props)
@@ -16,7 +15,7 @@ export class DisplayDocx extends React.Component {
   
   docxtohtml() {
     var self = this
-    mammoth.convertToHtml({path: this.props.baseFileObj.path.packed})
+    mammoth.convertToHtml({path: this.props.path})
     .then(function(result){
         self.setState({html: result.value})
         var messages = result.messages; // Any messages, such as warnings during conversion

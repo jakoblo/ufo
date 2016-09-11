@@ -1,9 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
-import Utils from '../utils'
 import Calendar from 'calendar'
 
-export class PreviewCalendar extends React.Component{
+export default class PreviewCalendar extends React.Component{
   
   constructor(props) {
     super(props)

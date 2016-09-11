@@ -1,8 +1,7 @@
 import React from 'react'
-import FileObj from '../file'
 import classnames from 'classnames'
 
-export class DisplayPDF extends React.Component {
+export default class DisplayPDF extends React.Component {
 
   constructor(props) {
     super(props)
@@ -14,7 +13,7 @@ export class DisplayPDF extends React.Component {
     
     return(
       <div className={classes}>
-        <iframe src={'__dirname/../../../library/pdfjs-gh-pages/web/viewer.html?file='+this.props.baseFileObj.path.packed} />
+        <iframe src={'__dirname/../../../library/pdfjs-gh-pages/web/viewer.html?file='+this.props.path} />
       </div>
     )
   }

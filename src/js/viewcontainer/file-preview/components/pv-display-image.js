@@ -1,5 +1,4 @@
 import React from 'react'
-// import FileObj from '../file'
 import classnames from 'classnames'
 
 export default class DisplayImage extends React.Component {

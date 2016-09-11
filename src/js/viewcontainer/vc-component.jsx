@@ -29,17 +29,18 @@ export default class ViewContainer extends React.Component {
     return(
       <section className="viewContainer">
         {this.renderViews()}
-        <div>
-          {this.renderPreview()}
-        </div>
+        {this.renderPreview()}
       </section>
     )
   }
 
   renderPreview = () => {
     if(this.props.preview.get('path')) {
-      let PreviewComp = Preview.components.preview
-      return <aside className="view"><PreviewComp path={this.props.preview.get('path')} /></aside>
+      let styles = {left: 0}
+      this.props.fsList.forEach((dirState) => {
+        styles.left = styles.left + this.state.widthStorage[dirState.path]
+      })
+      return <Preview.components.preview styles={styles} path={this.props.preview.get('path')} />
     }
   }
 

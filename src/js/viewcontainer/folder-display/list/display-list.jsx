@@ -6,6 +6,7 @@ import FS from  '../../../filesystem/fs-index'
 import Selection from '../../../selection/sel-index'
 import Preview from '../../file-preview/pv-index'
 import FileItem from './file-item'
+import nodePath from 'path'
 
 @connect(() => {
   const getFolderCombined = FS.selectors.getFolderCombinedFactory()
@@ -57,6 +58,9 @@ export default class DisplayList extends React.Component {
       if(type == 'DIR') {  //@todo constant
         this.props.dispatch( App.actions.changeAppPath(null, path) )
       } else {
+
+        //@todo two actions? bad?
+        this.props.dispatch( App.actions.changeAppPath(null, nodePath.dirname(path)) )
         this.props.dispatch( Preview.actions.showPreview(path) )
       }
     }

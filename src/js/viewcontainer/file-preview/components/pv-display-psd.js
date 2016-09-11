@@ -1,11 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import FileObj from '../file'
 import classnames from 'classnames'
-import PsdJs from '../../../../library/psd.min'
+import PsdJs from '../../../../../library/psd.min'
 var PSD = PsdJs('psd')
 
-export class DisplayPSD extends React.Component {
+export default class DisplayPSD extends React.Component {
 
   constructor(props) {
     super(props)

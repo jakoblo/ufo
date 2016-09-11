@@ -1,7 +1,6 @@
 import React from 'react'
-import FileObj from '../../file'
 
-export class DisplayUnavailable extends React.Component {
+export default class DisplayUnavailable extends React.Component {
 
   constructor(props) {
     super(props)

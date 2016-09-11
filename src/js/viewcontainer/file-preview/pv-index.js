@@ -7,8 +7,6 @@ import previewComponent from './components/pv-component'
  
 let components = {
   preview: previewComponent
-} 
-
-console.log(previewComponent)
+}
 
 export default {actions, actiontypes, selectors, reducer, constants, components}

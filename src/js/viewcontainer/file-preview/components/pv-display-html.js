@@ -1,8 +1,7 @@
 import React from 'react'
-import FileObj from '../file'
 import classnames from 'classnames'
 
-export class DisplayHTML extends React.Component {
+export default class DisplayHTML extends React.Component {
 
   constructor(props) {
     super(props)

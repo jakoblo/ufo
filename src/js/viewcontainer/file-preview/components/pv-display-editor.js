@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Utils from '../../utils'
 import {ipcRenderer} from 'electron'
-import FileObj from '../../file'
+import nodePath from 'path'
 
 import CodeMirror from 'codemirror'
 
@@ -16,7 +15,7 @@ require("codemirror/addon/hint/show-hint"); // Important for mdfile.js
  * Using SimpleMDE and Codemirror
  */
 
-export class Editor extends React.Component {
+export default class Editor extends React.Component {
   
   constructor(props) {
     super(props)
@@ -30,7 +29,7 @@ export class Editor extends React.Component {
       }
     }
     CodeMirror.modeURL = "codemirror/mode/%N/%N.js";
-    this.loadMode(this.props.baseFileObj.path.base)
+    this.loadMode(nodePath.basename(this.props.path))
   }
   
   render() {
