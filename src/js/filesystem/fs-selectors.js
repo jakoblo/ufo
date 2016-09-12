@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import nodePath from 'path'
 import Selection from '../selection/sel-index'
-import Preview from '../viewcontainer/file-preview/pv-index'
+import ViewFile from '../view-file/vf-index'
 
 /**
  * Main Selector to get all Files with all Information 
@@ -77,7 +77,7 @@ export function getActiveFile(state, props) {
   let nextDir = getNextDir(state, props)
   if(!nextDir) {
     // @todo fs selection has to know things about preview, not nice
-    let previewPath = Preview.selectors.getPreview(state, props).get('path')
+    let previewPath = ViewFile.selectors.getViewFilePath(state, props)
     if(previewPath && nodePath.dirname(previewPath) == props.path) {
       return nodePath.basename(previewPath)
     }

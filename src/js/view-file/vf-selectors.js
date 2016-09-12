@@ -1,2 +1,2 @@
 
-export const getPreview = (state) => state.preview
+export const getViewFilePath = (state) => state.preview.get('path')

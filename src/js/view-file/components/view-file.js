@@ -9,7 +9,6 @@ import filesize from 'filesize' // https://www.npmjs.com/package/filesize
 import Calendar from './calendar'
 import classnames from 'classnames'
 import Tooltip from 'rc-tooltip'
-import fs from 'fs'
 import getRenderer from '../render/get-renderer'
 
 @connect(() => {
@@ -30,7 +29,7 @@ export default class ViewFile extends React.Component {
 
   render() {
     let file = this.props.file
-    let Display = getRenderer( nodePath.extname(this.props.path) )
+    let FileRenderer = getRenderer( nodePath.extname(this.props.path) )
 
     return(
       <div className="preview file" style={this.props.styles}>
@@ -47,7 +46,7 @@ export default class ViewFile extends React.Component {
             <h3 className="file-size">{ filesize( file.get('stats').size ) }</h3>
           </div>
         </div>
-        <Display path={this.props.path} />
+        <FileRenderer path={this.props.path} />
         <div className="file-times-wrapper">
           <div className="file-times-header">
             {this.getFileTime( file.get('stats').mtime, "Modified" )}
@@ -74,7 +73,7 @@ export default class ViewFile extends React.Component {
       <Tooltip 
         placement="top" 
         overlay={tooltipContent}
-        trigger="hover"
+        trigger={['hover']}
       >
         <div className={classes}>
           <h4>{title}</h4>

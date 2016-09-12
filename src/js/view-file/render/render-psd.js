@@ -20,7 +20,7 @@ export default class DisplayPSD extends React.Component {
   }
   
   componentDidMount() {
-    PSD.fromURL(this.props.baseFileObj.path.packed).then((psd) => {
+    PSD.fromURL(this.props.path).then((psd) => {
       ReactDOM.findDOMNode(this.refs['imageContainer']).appendChild( psd.image.toPng() );
     });
   }

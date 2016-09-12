@@ -11,10 +11,10 @@ import FS from '../../filesystem/fs-index'
 @connect((state) => {
   let dirs = FS.selectors.getDirectorySeq(state)
   return {
-    fsList: dirs.map((dir, index) => {
+    viewFolderList: dirs.map((dir, index) => {
       return FS.selectors.getDirState(state, {path: dir})
     }),
-    viewFile: ViewFile.selectors.getPreview(state)
+    viewFilePath: ViewFile.selectors.getViewFilePath(state)
   }
 })
 export default class ViewContainer extends React.Component {
@@ -35,24 +35,24 @@ export default class ViewContainer extends React.Component {
   }
 
   renderViewFile = () => {
-    if(this.props.viewFile.get('path')) {
+    if(this.props.viewFilePath) {
       let styles = {left: 0}
-      this.props.fsList.forEach((dirState) => {
+      this.props.viewFolderList.forEach((dirState) => {
         styles.left = styles.left + this.state.widthStorage[dirState.path]
       })
-      return <ViewFile.components.ViewFile styles={styles} path={this.props.viewFile.get('path')} />
+      return <ViewFile.components.ViewFile styles={styles} path={this.props.viewFilePath} />
     }
   }
 
   renderViewFolders = () => {
     let views = null
     
-    if(this.props.fsList.length > 0) {
+    if(this.props.viewFolderList.length > 0) {
 
       let cssLeft = 0
       let prevFolder = null
 
-      views = this.props.fsList.map((dirState, index) => {
+      views = this.props.viewFolderList.map((dirState, index) => {
         cssLeft = cssLeft + this.state.widthStorage[prevFolder] || 0
         prevFolder = dirState.path
         
