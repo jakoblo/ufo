@@ -1,5 +1,6 @@
 import FS from '../filesystem/fs-index'
 import Selection from '../selection/sel-index'
+import Preview from '../viewcontainer/file-preview/pv-index'
 import App from '../app/app-index'
 import nodePath from 'path'
 
@@ -21,7 +22,16 @@ function navigateDirection(direction) {
     let indexedFiles = FS.selectors.getFilesSeq(state, props)
     let currentFileIndex = Selection.selectors.getCurrentFileIndex(state, props)
     let newActiveName = indexedFiles[currentFileIndex + direction]
-    if(newActiveName) dispatch( App.actions.changeAppPath(null, nodePath.join(props.path, newActiveName)) )
+    if(newActiveName) {
+      // @todo not nice here... find a better way
+      let file = FS.selectors.getFile(state, {path: nodePath.join(props.path, newActiveName)})
+      if(file.get('stats').isFile()) {
+        dispatch( App.actions.changeAppPath(null, props.path) )
+        dispatch( Preview.actions.showPreview(nodePath.join(props.path, newActiveName)) )
+      } else {
+        dispatch( App.actions.changeAppPath(null, nodePath.join(props.path, newActiveName)) )
+      }
+    }
   }
 }
 

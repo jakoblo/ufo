@@ -1,18 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
-import { NAME, DEFAULT_VIEW_WIDTH } from '../vc-constants'
-import View from './view'
+import { NAME, DEFAULT_VIEW_WIDTH } from '../vp-constants'
+import ViewWrapper from './view-wrapper'
 import Error from '../../general-components/error'
-import DisplayList from '../../display/list/display-list'
+import ViewFolderList from '../../view-folder/view-folder-list'
+import ViewFile from '../../view-file/vf-index'
 import FS from '../../filesystem/fs-index'
 
 @connect((state) => {
   let dirs = FS.selectors.getDirectorySeq(state)
   return {
-    fsList: dirs.map((dir, index) => {
+    viewFolderList: dirs.map((dir, index) => {
       return FS.selectors.getDirState(state, {path: dir})
-    })
+    }),
+    viewFilePath: ViewFile.selectors.getViewFilePath(state)
   }
 })
 export default class ViewContainer extends React.Component {
@@ -24,28 +26,46 @@ export default class ViewContainer extends React.Component {
   }
 
   render() {
+    return(
+      <section className="viewContainer">
+        {this.renderViewFolders()}
+        {this.renderViewFile()}
+      </section>
+    )
+  }
 
+  renderViewFile = () => {
+    if(this.props.viewFilePath) {
+      let styles = {left: 0}
+      this.props.viewFolderList.forEach((dirState) => {
+        styles.left = styles.left + this.state.widthStorage[dirState.path]
+      })
+      return <ViewFile.components.ViewFile styles={styles} path={this.props.viewFilePath} />
+    }
+  }
+
+  renderViewFolders = () => {
     let views = null
     
-    if(this.props.fsList.length > 0) {
+    if(this.props.viewFolderList.length > 0) {
 
       let cssLeft = 0
       let prevFolder = null
 
-      views = this.props.fsList.map((dirState, index) => {
+      views = this.props.viewFolderList.map((dirState, index) => {
         cssLeft = cssLeft + this.state.widthStorage[prevFolder] || 0
         prevFolder = dirState.path
         
-        let display = (dirState) => {
+        let view = (dirState) => {
           if(dirState.error) {
             return <Error error={dirState.error} />
           } else {
-            return <DisplayList path={dirState.path} />
+            return <ViewFolderList path={dirState.path} />
           }
         }
 
         return (
-          <View 
+          <ViewWrapper 
             key={dirState.path} 
             path={dirState.path} 
             initWidth={this.state.widthStorage[dirState.path] || DEFAULT_VIEW_WIDTH} 
@@ -54,15 +74,13 @@ export default class ViewContainer extends React.Component {
             ready={dirState.ready}
             error={dirState.error}
           >
-            {display(dirState)}
-          </View>
+            {view(dirState)}
+          </ViewWrapper>
         )
       })
     }
 
-    return(
-      <section className="viewContainer">{views}</section>
-    )
+    return views
   }
 
   /**

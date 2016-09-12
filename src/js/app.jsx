@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store-setup'
-import {DevToolsSetup} from './tools/devtools-setup'
+import {DevToolsSetup} from './utils/devtools-setup'
 import Immutable from 'immutable'
 import { List, Map } from 'immutable'
 import os from 'os'
@@ -13,7 +13,7 @@ import { ipcRenderer, remote  } from 'electron'
 import {Foundation} from './general-components/foundation'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
-import ViewContainer from './viewcontainer/vc-index'
+import ViewPlacer from './view-placer/vp-index'
 import FileSystem from './filesystem/fs-index'
 import ToggleBar from './general-components/togglebar'
 import Utils from './utils/utils-index'
@@ -51,7 +51,7 @@ ReactDOM.render(
           <Navbar.components.parent></Navbar.components.parent>
           <ToggleBar></ToggleBar>
         </Sidebar>
-        <ViewContainer.components.parent/>
+        <ViewPlacer.components.parent/>
       </Foundation>
     </Provider>
   ,
