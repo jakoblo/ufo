@@ -16,7 +16,7 @@ export default class DisplayHTML extends React.Component {
     
     return(
       <div className={classes}>
-        <iframe src={this.props.baseFileObj.path.packed} />
+        <iframe src={this.props.path} />
       </div>
     )
   }

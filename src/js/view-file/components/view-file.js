@@ -22,36 +22,26 @@ export default class ViewFile extends React.Component {
   
   constructor(props) {
     super(props)
-    this.monthNames = ["January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
+    this.monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   }
 
   render() {
-    let file = this.props.file
     let FileRenderer = getRenderer( nodePath.extname(this.props.path) )
 
     return(
       <div className="preview file" style={this.props.styles}>
-        <div className="view-toolbar">
-          <ButtonGroup>
-            <Button className="icon open" text="Open File"/>
-            <Button className="icon finder" text="Show in Finder"/>
-            <Button className="icon clipboard" text="Copy Path"/>
-          </ButtonGroup>
-        </div>
         <div className="file-title-wrapper">
           <div className="file-title">
             <h1 className="title"><Icon glyph="file" />{ this.props.file.get('base') }</h1>
-            <h3 className="file-size">{ filesize( file.get('stats').size ) }</h3>
+            <h3 className="file-size">{ filesize( this.props.file.get('stats').size ) }</h3>
           </div>
         </div>
         <FileRenderer path={this.props.path} />
         <div className="file-times-wrapper">
           <div className="file-times-header">
-            {this.getFileTime( file.get('stats').mtime, "Modified" )}
-            {this.getFileTime( file.get('stats').birthtime, "Created" )}
-            {this.getFileTime( file.get('stats').atime, "Accessed" )}
+            {this.getFileTime( this.props.file.get('stats').mtime, "Modified" )}
+            {this.getFileTime( this.props.file.get('stats').birthtime, "Created" )}
+            {this.getFileTime( this.props.file.get('stats').atime, "Accessed" )}
           </div>
         </div>
       </div>
@@ -59,11 +49,9 @@ export default class ViewFile extends React.Component {
   }
   
   getFileTime(date, title) {
-    
     let classes = classnames({
       'file-time': true
     })
-    
     let tooltipContent =  <div className="file-times-tooltip">
                             <h4>{this.monthNames[date.getMonth()]} {date.getFullYear()}</h4>
                             <Calendar date={date} />
