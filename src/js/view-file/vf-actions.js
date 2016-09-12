@@ -1,4 +1,4 @@
-import * as t from './pv-actiontypes'
+import * as t from './vf-actiontypes'
 
 export function showPreview(filePath) {
   return {

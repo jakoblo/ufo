@@ -1,16 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
-import FS from '../../../filesystem/fs-index'
-import ButtonGroup from '../../../general-components/button-group'
-import Button from '../../../general-components/button'
-import Icon from '../../../general-components/icon'
+import FS from '../../filesystem/fs-index'
+import ButtonGroup from '../../general-components/button-group'
+import Button from '../../general-components/button'
+import Icon from '../../general-components/icon'
 import filesize from 'filesize' // https://www.npmjs.com/package/filesize
-import Calendar from './pv-calendar'
+import Calendar from './calendar'
 import classnames from 'classnames'
 import Tooltip from 'rc-tooltip'
 import fs from 'fs'
-import getDisplay from './pv-get-display'
+import getRenderer from '../render/get-renderer'
 
 @connect(() => {
   return (state, props) => {
@@ -19,7 +19,7 @@ import getDisplay from './pv-get-display'
     }
   }
 })
-export default class Preview extends React.Component {
+export default class ViewFile extends React.Component {
   
   constructor(props) {
     super(props)
@@ -30,7 +30,7 @@ export default class Preview extends React.Component {
 
   render() {
     let file = this.props.file
-    let Display = getDisplay( nodePath.extname(this.props.path) )
+    let Display = getRenderer( nodePath.extname(this.props.path) )
 
     return(
       <div className="preview file" style={this.props.styles}>

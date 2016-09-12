@@ -1,7 +1,7 @@
 "use strict"
 import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
-import Icon from '../../../general-components/icon'
+import Icon from '../general-components/icon'
 import classNames from 'classnames'
 import {ipcRenderer} from 'electron'
 

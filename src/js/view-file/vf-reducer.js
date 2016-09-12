@@ -1,7 +1,7 @@
 "use strict"
-import App from '../../app/app-index'
+import App from '../app/app-index'
 import { Map } from 'immutable'
-import * as t from './pv-actiontypes'
+import * as t from './vf-actiontypes'
 
 const INITIAL_STATE = Map({
   path: null

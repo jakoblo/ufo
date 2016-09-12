@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {ipcRenderer} from 'electron' //@todo try to remove that
-import App from '../../../app/app-index'
-import FS from  '../../../filesystem/fs-index'
-import Selection from '../../../selection/sel-index'
-import Preview from '../../file-preview/pv-index'
-import FileItem from './file-item'
+import App from '../app/app-index'
+import FS from  '../filesystem/fs-index'
+import Selection from '../selection/sel-index'
+import ViewFile from '../view-file/vf-index'
+import FileItem from '../file-item/file-item-component'
 import nodePath from 'path'
 
 @connect(() => {
@@ -61,7 +61,7 @@ export default class DisplayList extends React.Component {
 
         //@todo two actions? bad?
         this.props.dispatch( App.actions.changeAppPath(null, nodePath.dirname(path)) )
-        this.props.dispatch( Preview.actions.showPreview(path) )
+        this.props.dispatch( ViewFile.actions.showPreview(path) )
       }
     }
   }
