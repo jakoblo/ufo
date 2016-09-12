@@ -5,7 +5,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link rel="stylesheet" href="../themes/default/css/styles.css">
   </head>
-
   <body>
     <div id="app"></div>
   </body>
@@ -15,4 +14,13 @@
 <!-- end:build -->
 <script type="text/javascript">
   var App = require('../js-dist/app.js')
+
+  document.addEventListener("drop", preventDefault);
+  document.addEventListener("dragover", preventDefault);
+
+  function preventDefault(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
 </script>
