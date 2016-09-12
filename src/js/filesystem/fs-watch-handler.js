@@ -44,7 +44,7 @@ class ChokidarHandler {
     let root = path
 
     // Check if folder exists and is readable / chokidar doesn't do that
-    fs.access(path, fs.constants.R_OK | fs.constants.W_OK, (err) => {
+    fs.access(path, fs.constants.R_OK || fs.constants.W_OK, (err) => {
       if(err) {
         if(errorCallback) { errorCallback(err, root) }
         this.unwatch(root)
