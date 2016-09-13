@@ -33,13 +33,6 @@ export default class ViewFile extends React.Component {
 
     return(
       <div className="preview file" style={this.props.styles}>
-        <div className="view-toolbar">
-          <ButtonGroup>
-            <Button className="icon open" text="Open File"/>
-            <Button className="icon finder" text="Show in Finder"/>
-            <Button className="icon clipboard" text="Copy Path"/>
-          </ButtonGroup>
-        </div>
         <div className="file-title-wrapper">
           <div className="file-title">
             <h1 className="title"><Icon glyph="file" />{ this.props.file.get('base') }</h1>
