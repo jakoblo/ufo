@@ -15,4 +15,11 @@
 <!-- end:build -->
 <script type="text/javascript">
   var App = require('../js-dist/app.js')
+
+  window.addEventListener("dragover",function(e){
+    e.preventDefault();
+  },false);
+  window.addEventListener("drop",function(e){
+    e.preventDefault();
+  },false);
 </script>
