@@ -1,7 +1,10 @@
 "use strict"
 import * as t from './fs-actiontypes'
+import App from '../app/app-index'
+import FileItem from '../file-item/file-item-index'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
 import fs from 'fs'
+import nodePath from 'path'
 
 const INITIAL_STATE = OrderedMap({})
 
@@ -43,6 +46,16 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
 
     case t.FILE_CHANGE:
       return state.updateIn([action.payload.root, 'files', action.payload.base], OrderedMap(action.payload))
+    
+    case FileItem.actiontypes.FILE_DRAG_ENTER:
+      let dir = nodePath.dirname( action.payload.file )
+      let base = nodePath.basename( action.payload.file )
+      return state.setIn([dir, 'files', base, 'dragTarget'], true)
+
+    case FileItem.actiontypes.FILE_DRAG_LEAVE:
+      let dir2 = nodePath.dirname( action.payload.file )
+      let base2 = nodePath.basename( action.payload.file )
+      return state.setIn([dir2, 'files', base2, 'dragTarget'], false)
 
     default:
       return state;

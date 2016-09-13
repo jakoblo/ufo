@@ -17,51 +17,44 @@ export default class FileItemDisplay extends React.Component {
   }
 
   render() {
-    let classes = classNames({
-      'file-item': true,
-      'processed': true,
-      'edit': this.state.editing,
-      'folder': this.props.file.get('type') == "DIR", //@todo constant
-      'file': this.props.file.get('type') == "FILE", //@todo constant
-      'active': this.props.file.get('active'),
-      'selected': this.props.file.get('selected'),
-      'dragging': this.props.file.get('dragging')
-    })
-
-    let prefixIconClass = classNames({
-      'folder': this.props.file.get('type') == "DIR", //@todo constant
-      'file': this.props.file.get('type') == "FILE" //@todo constant
-    })
-
     return (
       <span
-        className={classes}
-        draggable={true}
-        onMouseDown={this.props.onMouseDown}
-        onMouseUp={this.props.onMouseUp}
-        onDoubleClick={this.dbclick}
-        onContextMenu={this.contextmenu}
-        onDragStart={this.props.onDragStart}
+        className={classNames({
+          'file-item': true,
+          'edit': this.state.editing,
+          'folder': this.props.file.get('type') == "DIR", //@todo constant
+          'file': this.props.file.get('type') == "FILE", //@todo constant
+          'active': this.props.file.get('active'),
+          'selected': this.props.file.get('selected'),
+          'drag-target': this.props.file.get('dragTarget')
+        })}
       >
         <span className="flex-box">
-          <Icon glyph={prefixIconClass}/>
+          <Icon glyph={classNames({
+            'folder': this.props.file.get('type') == "DIR", //@todo constant
+            'file': this.props.file.get('type') == "FILE" //@todo constant
+          })}/>
           <label>
             <span className="base">{this.props.file.get('name')}</span>
             <span className="suffix">{this.props.file.get('suffix')}</span>
           </label>
-          <input
-            ref="editField"
-            className="edit"
-            onMouseDown={this.stopEvent} // prevent select function: cm focus = blur
-            onMouseUp={this.stopEvent}   // prevent select function: cm focus = blur
-            value={this.state.fileName}
-            onChange={ e => this.renameChange(e) }
-            onBlur={ e => this.renameSave(e) }
-            onKeyDown={ e => this.renameKeyDown(e) }
-          />
         </span>
+        <span className="eventCatcher" 
+          draggable={true}
+          onContextMenu={this.contextmenu}
+          onMouseDown={this.props.onMouseDown}
+          onMouseUp={this.props.onMouseUp}
+          onDoubleClick={this.dbclick}
+          onDragStart={this.props.onDragStart}
+          onDragEnter={this.props.onDragEnter}
+          onDragLeave={this.props.onDragLeave}
+        />
       </span>
     )
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return nextProps.file !== this.props.file;
   }
 
   renameSave(event) {
@@ -106,48 +99,6 @@ export default class FileItemDisplay extends React.Component {
 
   renameChange(event) {
     this.setState({fileName: event.target.value});
-  }
-
-  /**
-   * Open View
-   */
-  mouseup(event) {
-    if(event.button === 0 && !this.state.editing) {
-      if(!event.metaKey && !event.shiftKey && !event.crtlKey) {
-        
-      }
-    }
-  }
-
-  /**
-   * Select
-   */
-  mousedown(event) {
-    
-    if(event.button === 0) { // Left Mouse Button
-      let reset
-      if(this.props.selected === false && !event.metaKey && !event.shiftKey && !event.crtlKey) {
-        // Not already a part of the selection an no modifier key, clear selection
-        reset = true
-      } else {
-        reset = false
-      }
-      this.props.onClick()
-    }
-  }
-
-  /**
-   * Open File/Folder
-   */
-  dbclick(event) {
-    if(this.props.fileObj && !this.state.editing) {
-      // this.props.fileObj.open()
-    }
-  }
-
-  addToFavBar(path) {
-    // let config = Configuration
-    // config.saveSettings('favbar',path)
   }
 
   contextmenu(event) {

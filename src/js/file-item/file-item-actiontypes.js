@@ -1,0 +1,2 @@
+export const FILE_DRAG_ENTER = 'FILE_DRAG_ENTER'
+export const FILE_DRAG_LEAVE = 'FILE_DRAG_LEAVE'

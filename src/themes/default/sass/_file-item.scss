@@ -2,6 +2,7 @@
 .file-item {
   
   $height: 19px;
+  position: relative;
   display:inline-block;
   height: $height;
   
@@ -15,7 +16,29 @@
   font-family: $font-default;
   font-size: 13.3px;
   color:#000;
-  
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    opacity: 0;
+    width: 0;
+    background: #2286FF;
+    transition: width 1s, opacity 1s;
+    z-index: -1;
+    border-radius: 4px;
+  }
+  &.drag-target {
+    &:before {
+      content: "";
+      width: 100%;
+      opacity: 1;
+      right: 4px;
+    }
+  }
+
   &.display-image {
     height:auto;
     
@@ -68,6 +91,31 @@
       background:#fff;
     }
   }
+
+  .eventCatcher {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+  }
+  &.drag-target {
+    .eventCatcher {
+      border-color: rgb(34, 134, 250);
+      background: rgba(34, 134, 250, 0.2);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+      
+    }
+  }
   
   &.edit .flex-box input { 
     display: block;
@@ -80,6 +128,7 @@
   &.dragging label {
     background:#ccc !important;
     color:#000  !important;
+    opacity: 0.3 !important;
   }
   
   &:hover {

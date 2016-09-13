@@ -1,6 +1,7 @@
 import App from '../app/app-index'
 import ViewFile from '../view-file/vf-index'
 import Selection from '../selection/sel-index'
+import * as t from './file-item-actiontypes'
 import nodePath from 'path'
 import {ipcRenderer} from 'electron'
 
@@ -37,3 +38,21 @@ export function startDrag(file) {
     }
   }
 }
+
+export function dragEnter(path) {
+  return {
+    type: t.FILE_DRAG_ENTER,
+    payload: {
+      file: path
+    }
+  }
+}
+
+export function dragLeave(path) {
+  return {
+    type: t.FILE_DRAG_LEAVE,
+    payload: {
+      file: path
+    }
+  }
+}  

@@ -1,7 +1,7 @@
 import FS from '../filesystem/fs-index'
 import Selection from '../selection/sel-index'
 import * as FileActions from '../file-item/file-item-actions'
-import Preview from '../viewcontainer/file-preview/pv-index'
+import Preview from '../view-file/vf-index'
 import App from '../app/app-index'
 import nodePath from 'path'
 

@@ -2,7 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-export class Foundation extends React.Component {
+export default class Foundation extends React.Component {
   constructor(props) {
     super(props)
   }
