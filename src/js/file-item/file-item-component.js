@@ -11,7 +11,7 @@ export default class FileItemDisplay extends React.Component {
     super(props)
     this.dragOverTimeout = null
     this.state = {
-      fileName: this.props.base,
+      fileName: this.props.file.get('base'),
       editing: false
     }
   }
@@ -21,16 +21,16 @@ export default class FileItemDisplay extends React.Component {
       'file-item': true,
       'processed': true,
       'edit': this.state.editing,
-      'folder': this.props.type == "DIR", //@todo constant
-      'file': this.props.type == "FILE", //@todo constant
-      'active': this.props.active,
-      'selected': this.props.selected,
-      'dragging': this.props.dragging
+      'folder': this.props.file.get('type') == "DIR", //@todo constant
+      'file': this.props.file.get('type') == "FILE", //@todo constant
+      'active': this.props.file.get('active'),
+      'selected': this.props.file.get('selected'),
+      'dragging': this.props.file.get('dragging')
     })
 
     let prefixIconClass = classNames({
-      'folder': this.props.type == "DIR", //@todo constant
-      'file': this.props.type == "FILE" //@todo constant
+      'folder': this.props.file.get('type') == "DIR", //@todo constant
+      'file': this.props.file.get('type') == "FILE" //@todo constant
     })
 
     return (
@@ -46,8 +46,8 @@ export default class FileItemDisplay extends React.Component {
         <span className="flex-box">
           <Icon glyph={prefixIconClass}/>
           <label>
-            <span className="base">{this.props.name}</span>
-            <span className="suffix">{this.props.suffix}</span>
+            <span className="base">{this.props.file.get('name')}</span>
+            <span className="suffix">{this.props.file.get('suffix')}</span>
           </label>
           <input
             ref="editField"
@@ -66,8 +66,8 @@ export default class FileItemDisplay extends React.Component {
 
   renameSave(event) {
     if(this.state.editing) {
-      var val = this.state.fileName.trim()
-      if (val != this.props.displayName) {
+      var val = this.state.file.get('fileName').trim()
+      if (val != this.props.file.get('displayName')) {
         this.setState({fileName: val, editing: false})
         alert('do rename')
         this.props.onRename(val)
@@ -79,14 +79,14 @@ export default class FileItemDisplay extends React.Component {
 
   renameCancel() {
     this.setState({
-      fileName: this.props.displayName,
+      fileName: this.props.file.get('displayName'),
       editing: false
     });
   }
 
   renameStart() {
     this.setState({
-      fileName: this.props.displayName,
+      fileName: this.props.file.get('displayName'),
       editing: true
     })
 
