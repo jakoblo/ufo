@@ -1,7 +1,7 @@
 import * as t from './config-actiontypes'
 import App from '../app/app-index'
 import Navbar from '../navbar/navbar-index'
-import Utils from '../utils/utils-index'
+import * as Utils from '../utils/utils-index'
 import { List, Map } from 'immutable'
 import { ActionCreators } from 'redux-undo';
 import os from 'os' 

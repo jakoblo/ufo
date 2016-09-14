@@ -1,7 +1,7 @@
 "use strict"
 import { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } from 'electron'
 import { fs } from 'fs'
-import setupShortcuts from './shortcuts/sc-main.js'
+import setupShortcuts from './shortcuts/sc-init-main.js'
 
 const appBasePath = __dirname
 var allBrowserWindows = []

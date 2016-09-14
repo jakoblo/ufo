@@ -2,6 +2,7 @@ import * as t from './fs-actiontypes'
 import watchHandler from './fs-watch-handler'
 import nodePath from 'path'
 import App from '../app/app-index'
+
 const watcherSettings = {
   ignored: /[\/\\]\./,
   persistent: true,
@@ -131,4 +132,3 @@ function fileChange(fileObj) {
     payload: fileObj
   }
 }
-

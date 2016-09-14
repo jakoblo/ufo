@@ -52,7 +52,7 @@ export function changeAppPath(fromPath, toPath) {
 }
 
 /**
- * pure helper function that takes to paths and creates every "path step" between them
+ * helper function that takes to paths and creates every "path step" between them
  * @param  {string} fromPath
  * @param  {string} toPath
  * @returns {[string]}

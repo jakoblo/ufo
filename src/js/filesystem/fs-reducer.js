@@ -1,7 +1,9 @@
 "use strict"
 import * as t from './fs-actiontypes'
+import App from '../app/app-index'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
 import fs from 'fs'
+import nodePath from 'path'
 
 const INITIAL_STATE = OrderedMap({})
 

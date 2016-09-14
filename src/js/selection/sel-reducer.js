@@ -1,7 +1,7 @@
 "use strict"
 import * as t from './sel-actiontypes'
 import App from '../app/app-index'
-import Preview from '../viewcontainer/file-preview/pv-index'
+import Preview from '../view-file/vf-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
 import {Map, List, Seq, fromJS} from 'immutable'
@@ -17,11 +17,6 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
 
     case t.SET_SELECTION:
       return fromJS(action.payload)
-
-
-
-    //@todo selection has to know things about preview and App change path
-    // better way?
 
     case App.actiontypes.APP_CHANGE_PATH:
       // Set Selection to last folder in pathRoute
