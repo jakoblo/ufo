@@ -126,12 +126,19 @@
     }
   }
   
-  &.edit .flex-box input { 
-    display: block;
-  }
-  &.edit .flex-box label { 
-    display: none;
-  }
+  &.edit {
+    .flex-box input { 
+      display: block;
+    }
+
+    .flex-box label { 
+      display: none;
+    }
+
+    .eventCatcher {
+      display: none
+    }
+  } 
   
   &.dragging,
   &.dragging label {

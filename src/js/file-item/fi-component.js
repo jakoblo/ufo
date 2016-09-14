@@ -1,6 +1,7 @@
 "use strict"
 import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Icon from '../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
@@ -23,16 +24,21 @@ export default class FileItemDisplay extends React.Component {
     }
     this.clickHandler = eventHandler.getClick(this)
     this.dragndropHandler = eventHandler.getDragnDrop(this)
+    this.renameHandler = eventHandler.getRename(this)
+    console.log(this.renameHandler)
   }
 
   render() {
+
+    console.log('render', this.state.data.get('editing'))
+    
     return (
       <span
         className={classNames({
           'file-item': true,
-          'edit': this.state.editing,
-          'folder': this.props.file.get('type') == "DIR", //@todo constant
-          'file': this.props.file.get('type') == "FILE", //@todo constant
+          'edit': this.state.data.get('editing'),
+          'folder': this.props.file.get('stats').isDirectory(),
+          'file': this.props.file.get('stats').isFile(),
           'active': this.props.file.get('active'),
           'selected': this.props.file.get('selected'),
           'drag-target': this.state.data.get('dropTarget'),
@@ -42,13 +48,20 @@ export default class FileItemDisplay extends React.Component {
       >
         <span className="flex-box">
           <Icon glyph={classNames({
-            'folder': this.props.file.get('type') == "DIR", //@todo constant
-            'file': this.props.file.get('type') == "FILE" //@todo constant
+            'folder': this.props.file.get('stats').isDirectory(),
+            'file': this.props.file.get('stats').isFile()
           })}/>
           <label>
             <span className="base">{this.props.file.get('name')}</span>
             <span className="suffix">{this.props.file.get('suffix')}</span>
           </label>
+          <input
+            ref="editField"
+            className="edit"
+            value={this.state.data.get('fileName')}
+            {...this.renameHandler}
+          />
+
         </span>
         <span className="eventCatcher" 
           draggable={true}
@@ -68,5 +81,14 @@ export default class FileItemDisplay extends React.Component {
 
   shouldComponentUpdate (nextProps, nextState) {
     return nextProps.file !== this.props.file || nextState.data !== this.state.data;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(!prevState.data.get('editing') && this.state.data.get('editing')) {
+      // Focus rename input
+      var node = ReactDOM.findDOMNode(this.refs["editField"]);
+      node.focus();
+      node.setSelectionRange(0, node.value.length);
+    }
   }
 }

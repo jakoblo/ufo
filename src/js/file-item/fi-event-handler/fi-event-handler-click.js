@@ -51,8 +51,11 @@ export function onContextMenu(event) {
   event.stopPropagation()
 
   let menu = new Menu();
-  menu.append(new MenuItem({ label: 'Open "' + file.get('base') + '"', click: null }))
-  menu.append(new MenuItem({ label: 'Rename', click: null }))
+  menu.append(new MenuItem({ label: 'Open "' + this.props.file.get('base') + '"', click: null }))
+  menu.append(new MenuItem({ 
+    label: 'Rename', 
+    click: this.setImmState((state) => (state.set('editing', true)))
+  }))
   
   menu.append(new MenuItem({ type: 'separator' }));
   menu.append(new MenuItem({ label: 'Move to Trash', click: null }));
