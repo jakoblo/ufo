@@ -92,6 +92,7 @@
 
   .eventCatcher {
     position: absolute;
+<<<<<<< HEAD
     display: block;
     top: 0;
     bottom: 0;
@@ -128,10 +129,52 @@
   
   &.edit .flex-box input { 
     display: block;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    border: 2px solid transparent;
   }
-  &.edit .flex-box label { 
-    display: none;
+  &.drag-target {
+    .eventCatcher {
+      border-color: rgb(34, 134, 250);
+      background: rgba(34, 134, 250, 0.2);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+    }
   }
+
+  &.drag-blocked {
+    .eventCatcher {
+      background: rgba(250, 70, 0, 0.4);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+    }
+  }
+  
+  &.edit {
+    .flex-box input { 
+      display: block;
+    }
+
+    .flex-box label { 
+      display: none;
+    }
+
+    .eventCatcher {
+      display: none
+    }
+  } 
   
   &.dragging,
   &.dragging label {
