@@ -1,7 +1,7 @@
 import App from '../app/app-index'
 import ViewFile from '../view-file/vf-index'
 import Selection from '../selection/sel-index'
-import * as t from './file-item-actiontypes'
+import * as t from './fi-actiontypes'
 import nodePath from 'path'
 import {ipcRenderer} from 'electron'
 
@@ -32,27 +32,10 @@ export function expandSelection(file) {
 export function startDrag(file) {
   return (dispatch) => {
     if(file.get('selected')) {
+      console.log('drag selection')
       dispatch( Selection.actions.startDragSelection() )
     } else {
       ipcRenderer.send('ondragstart', [file.get('path')] )
     }
   }
 }
-
-export function dragEnter(path) {
-  return {
-    type: t.FILE_DRAG_ENTER,
-    payload: {
-      file: path
-    }
-  }
-}
-
-export function dragLeave(path) {
-  return {
-    type: t.FILE_DRAG_LEAVE,
-    payload: {
-      file: path
-    }
-  }
-}  

@@ -113,7 +113,18 @@
         width: 100%;
         opacity: 1;
       }
-      
+    }
+  }
+
+  &.drag-blocked {
+    .eventCatcher {
+      background: rgba(250, 70, 0, 0.4);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
     }
   }
   

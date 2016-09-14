@@ -51,24 +51,6 @@ export function changeAppPath(fromPath, toPath) {
   }
 }
 
-export function dragFileStart(files) {
-  return {
-    type: t.APP_DRAG_START,
-    payload: {
-      files: files
-    }
-  }
-}
-
-export function dragFileEnd(files) {
-  return {
-    type: t.APP_DRAG_END,
-    payload: {
-      files: files
-    }
-  }
-}
-
 /**
  * helper function that takes to paths and creates every "path step" between them
  * @param  {string} fromPath

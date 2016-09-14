@@ -12,7 +12,7 @@ import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
 import ToggleBar from './general-components/togglebar'
-import Utils from './utils/utils-index'
+import * as Utils from './utils/utils-index'
 import setupShortcuts from './shortcuts/sc-init-renderer'
 
 if (process.env.NODE_ENV !== 'production') {
@@ -51,9 +51,3 @@ ReactDOM.render(
   ,
   document.getElementById('app')
 );
-
-// Prevent Open Dropped File in Renderer
-window.ondragenter =  window.ondragover = window.ondrop = (e) => {
-  e.preventDefault()
-  e.dataTransfer.dropEffect = "none"
-}
