@@ -25,7 +25,6 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
-    console.log('renderr')
     let fileList = ""
     if(this.props.folder) {
       fileList = this.props.folder.map((file, index) => {
@@ -66,7 +65,6 @@ export default class DisplayList extends React.Component {
 
 
   onDragOver = (event) => {
-    console.log('drag over')
     event.preventDefault()
     event.stopPropagation()
     event.dataTransfer.dropEffect = "copy"

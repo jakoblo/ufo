@@ -9,7 +9,7 @@ export function onDragStart (event) {
   this.props.dispatch( FileActions.startDrag(this.props.file) )
 }
 
-/**
+/** 
  * Set DropHover State
  * Start show Timeout
  */
@@ -79,10 +79,16 @@ export function onDrop (event) {
   }
 }
 
+/**
+ * Is a file in Drag & is the target a directory?
+ */
 function shouldHandleDrop(event, file) {
   return (dragndrop.isFileDrag(event) && file.get('stats').isDirectory())
 }
 
+/**
+ * Prevent Drop on Itself
+ */
 function dropAllowed(event, file) {
   let allowed = true
   for (let dropFile of event.dataTransfer.files) {

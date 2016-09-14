@@ -17,9 +17,10 @@ export default class FileItemDisplay extends React.Component {
         fileName: this.props.file.get('base'),
         editing: false,
         dropTarget: false,
-        dropBlocked: false
+        dropBlocked: false,
+        openAnimation: false
       })
-    } 
+    }
     this.clickHandler = eventHandler.getClick(this)
     this.dragndropHandler = eventHandler.getDragnDrop(this)
   }
@@ -35,7 +36,8 @@ export default class FileItemDisplay extends React.Component {
           'active': this.props.file.get('active'),
           'selected': this.props.file.get('selected'),
           'drag-target': this.state.data.get('dropTarget'),
-          'drag-blocked': this.state.data.get('dropBlocked')
+          'drag-blocked': this.state.data.get('dropBlocked'),
+          'open-animation': this.state.data.get('openAnimation')
         })}
       >
         <span className="flex-box">
@@ -67,5 +69,4 @@ export default class FileItemDisplay extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return nextProps.file !== this.props.file || nextState.data !== this.state.data;
   }
-
 }

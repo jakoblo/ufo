@@ -1,8 +1,16 @@
 import { createSelector } from 'reselect'
 import FS from '../filesystem/fs-index'
-
+import nodePath from 'path'
 
 export const getSelection = (state) => state.selection
+export const getSelectionPathArray = (state) => {
+  let root = state.selection.get('root')
+  let files = state.selection.get('files')
+  return files.map((base) => {
+    return nodePath.join(root, base)
+  })
+}
+
 
 /**
  * get Selection for the given path
