@@ -2,24 +2,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store-setup'
-import {DevToolsSetup} from './tools/devtools-setup'
-import Immutable from 'immutable'
-import { List, Map } from 'immutable'
-import os from 'os'
+import {DevToolsSetup} from './utils/devtools-setup'
 import App from './app/app-index'
 import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 /* React Components */
-import {Foundation} from './general-components/foundation'
+import Foundation from './general-components/foundation'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
-import ViewContainer from './viewcontainer/vc-index'
-import FileSystem from './filesystem/fs-index'
+import ViewPlacer from './view-placer/vp-index'
 import ToggleBar from './general-components/togglebar'
-import Utils from './utils/utils-index'
-import setupShortcuts from './shortcuts/sc-renderer'
-
-window.fs = FileSystem
+import * as Utils from './utils/utils-index'
+import setupShortcuts from './shortcuts/sc-init-renderer'
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -44,14 +38,14 @@ ipcRenderer.on('saveState', function(event) {
 })
 
 ReactDOM.render(
-      <Provider store={ store }>
+    <Provider store={ store }>
       <Foundation>
         <Sidebar>
           <App.components.actionbar></App.components.actionbar>
           <Navbar.components.parent></Navbar.components.parent>
           <ToggleBar></ToggleBar>
         </Sidebar>
-        <ViewContainer.components.parent/>
+        <ViewPlacer.components.parent/>
       </Foundation>
     </Provider>
   ,

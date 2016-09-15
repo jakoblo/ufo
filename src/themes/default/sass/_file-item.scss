@@ -1,21 +1,42 @@
 
 .file-item {
   
-  $height: 19px;
+  $height: 21px;
+  position: relative;
   display:inline-block;
   height: $height;
+  padding:1px 10px;
   
-  /* Full Width, but keep Content alinged (100% / 0.95 * 0.05) */
-  margin:0 calc((100% / (1 - 2 * #{$view-padding-horiz-number})) * -#{$view-padding-horiz-number});
-  padding:1px calc((100% / (1 - 2 * #{$view-padding-horiz-number})) * #{$view-padding-horiz-number});
-  
-  box-sizing: content-box;
+  box-sizing: border-box;
   width:100%;
   vertical-align: bottom; /* Fix cm line possition */
   font-family: $font-default;
   font-size: 13.3px;
   color:#000;
   
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    opacity: 0;
+    width: 0;
+    background: #2286FF;
+    transition: width 1s, opacity 1s;
+    z-index: -1;
+    border-radius: 4px;
+  }
+  &.drag-target {
+    &:before {
+      content: "";
+      width: 100%;
+      opacity: 1;
+      right: 4px;
+    }
+  }
+
   &.display-image {
     height:auto;
     
@@ -68,18 +89,97 @@
       background:#fff;
     }
   }
+
+  .eventCatcher {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+  }
+  &.drag-target {
+    .eventCatcher {
+      border-color: rgb(34, 134, 250);
+      background: rgba(34, 134, 250, 0.2);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+    }
+  }
+
+  &.drag-blocked {
+    .eventCatcher {
+      background: rgba(250, 70, 0, 0.4);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+    }
+  }
   
   &.edit .flex-box input { 
     display: block;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    border: 2px solid transparent;
   }
-  &.edit .flex-box label { 
-    display: none;
+  &.drag-target {
+    .eventCatcher {
+      border-color: rgb(34, 134, 250);
+      background: rgba(34, 134, 250, 0.2);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+    }
   }
+
+  &.drag-blocked {
+    .eventCatcher {
+      background: rgba(250, 70, 0, 0.4);
+
+      &:before {
+        content: "";
+        width: 100%;
+        opacity: 1;
+      }
+    }
+  }
+  
+  &.edit {
+    .flex-box input { 
+      display: block;
+    }
+
+    .flex-box label { 
+      display: none;
+    }
+
+    .eventCatcher {
+      display: none
+    }
+  } 
   
   &.dragging,
   &.dragging label {
     background:#ccc !important;
     color:#000  !important;
+    opacity: 0.3 !important;
   }
   
   &:hover {
@@ -93,5 +193,27 @@
   &.selected {
     background-color: $color-background-selected;
   }
+
+  &.open-animation {
+    animation: zoom 0.3s 1;
+  }
 }
 
+
+@keyframes zoom {
+  0% { 
+    transform: scale(1, 1);
+    transform-origin: 10% 50%;
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.7, 1.7);
+    transform-origin: 10% 50%;
+    opacity: .3;
+  }
+  100% {
+    transform: scale(1);
+    transform-origin: 10% 50%;
+    opacity: 1;
+  }
+}

@@ -1,6 +1,7 @@
 "use strict"
 import * as t from './sel-actiontypes'
-import App from '../app/app-index.js'
+import App from '../app/app-index'
+import Preview from '../view-file/vf-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
 import {Map, List, Seq, fromJS} from 'immutable'
@@ -24,6 +25,12 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       return fromJS({
         root: root,
         files: [selected]
+      })
+
+    case Preview.actiontypes.SHOW_PREVIEW:
+      return fromJS({
+        root: nodePath.dirname(action.payload.path),
+        files: [ nodePath.basename(action.payload.path) ]
       })
 
     default:

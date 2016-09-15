@@ -1,6 +1,9 @@
 "use strict"
 import * as t from './fs-actiontypes'
+import App from '../app/app-index'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
+import fs from 'fs'
+import nodePath from 'path'
 
 const INITIAL_STATE = OrderedMap({})
 
@@ -52,10 +55,26 @@ function _sort(orderedFiles) {
   return orderedFiles.sortBy(file => file.get('base')).sortBy(file => file.get('type'))
 }
 
-// https://github.com/facebook/immutable-js/wiki/Converting-from-JS-objects#custom-conversion
+
+
+/**
+ * as fromJS() but creats an orderedMap
+ * https://github.com/facebook/immutable-js/wiki/Converting-from-JS-objects#custom-conversion
+ * @param  {object} js
+ * @returns {Immutable OrderedMap}
+ */
 function _fromJSOrdered(js) {
-  return typeof js !== 'object' || js === null ? js :
-    Array.isArray(js) ? 
-      Seq(js).map(_fromJSOrdered).toList() :
-      Seq(js).map(_fromJSOrdered).toOrderedMap();
+  if(
+    typeof js !== 'object' || 
+    js === null || 
+    js instanceof fs.Stats // nodeFS.stats should not be convertet
+  ) {
+    return js
+  } else {
+    if(Array.isArray(js)) {
+      return Seq(js).map(_fromJSOrdered).toList()
+    } else {
+      return Seq(js).map(_fromJSOrdered).toOrderedMap()
+    }
+  }
 }
