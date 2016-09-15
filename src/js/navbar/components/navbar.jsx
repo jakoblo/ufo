@@ -37,17 +37,21 @@ export default class Navbar extends React.Component {
     this.props.dispatch(changeGroupTitle(groupID, newTitle))
   }
 
+  handledragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "copy"
+  }
+
   handleDrop = (e) => {
     console.log("nav")
     
     e.preventDefault()
     e.stopPropagation()
     
-    let selection = Selection.selectors.getSelection(this.props.state)
-    let selectedFiles = selection.get('files').toJS().map((filename) => {
-      return nodePath.join(selection.get('root'), filename)
-    })
-    this.props.dispatch(addNavGroup("New Group", selectedFiles))
+    console.log(e.dataTransfer.files)
+
+    //this.props.dispatch(addNavGroup("New Group", selectedFiles))
   } 
 
   handleNavGroupDrop(groupID, e) {
@@ -85,11 +89,12 @@ export default class Navbar extends React.Component {
     if(this.props.navbar.has('groupItems')) 
     navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
     return(
-      <div className="nav-bar" onDrop={this.handleDrop}>
+      <div className="nav-bar" onDrop={this.handleDrop} onDragOver={this.handledragOver}>
         {navgroups}
       </div>
     )
   }
+
 
 
 }

@@ -18,7 +18,6 @@ export default class Foundation extends React.Component {
   }
 
   stopEvent (e) {
-    console.log("STOP")
     e.preventDefault()
     e.dataTransfer.dropEffect = "none"
   }
