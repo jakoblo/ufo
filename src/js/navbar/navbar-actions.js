@@ -43,7 +43,6 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
 }
 
 export function addNavGroup(title, items, loading) { 
-  console.log("ADd NAvgroup")
   return function(dispatch, getState) {
     dispatch({ // action
       type: t.ADD_NAVGROUP,

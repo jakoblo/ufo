@@ -38,8 +38,11 @@ export default class Navbar extends React.Component {
   }
 
   handleDrop = (e) => {
+    console.log("nav")
+    
     e.preventDefault()
     e.stopPropagation()
+    
     let selection = Selection.selectors.getSelection(this.props.state)
     let selectedFiles = selection.get('files').toJS().map((filename) => {
       return nodePath.join(selection.get('root'), filename)

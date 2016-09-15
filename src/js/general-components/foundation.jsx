@@ -7,33 +7,18 @@ export default class Foundation extends React.Component {
     super(props)
   }
 
-  handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
   render() {
     return(
-<<<<<<< HEAD
-      <div className="foundation" 
-      onDrop={this.handleDrop}
-      onDragOver={this.handleDragOver}
-=======
       <div className="foundation"
         onDragEnter={this.stopEvent}
         onDragOver={this.stopEvent}
         onDrop={this.stopEvent}
->>>>>>> master
       >{this.props.children}</div>
     )
   }
 
   stopEvent (e) {
+    console.log("STOP")
     e.preventDefault()
     e.dataTransfer.dropEffect = "none"
   }
