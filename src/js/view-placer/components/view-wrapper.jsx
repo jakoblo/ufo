@@ -35,6 +35,8 @@ export default class ViewWrapper extends React.Component {
   }
 
   resizeHandle = () => {
-    this.props.onResize(this.props.path, this.refView.offsetWidth)
+    if(this.refView) {
+      this.props.onResize(this.props.path, this.refView.offsetWidth)
+    }
   }
 }

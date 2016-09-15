@@ -24,6 +24,7 @@ export default class FileItemDisplay extends React.Component {
     }
     this.clickHandler = eventHandler.getClick(this)
     this.dragndropHandler = eventHandler.getDragnDrop(this)
+    this.renameHandler = eventHandler.getRename(this)
   }
 
 
