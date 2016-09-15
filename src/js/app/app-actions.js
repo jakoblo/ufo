@@ -33,7 +33,7 @@ export function changeAppPath(fromPath, toPath) {
     })
 
     let closeFsWatcher = _.difference(pathRoute, newPathRoute)
-    closeFsWatcher.forEach((path, index) => {
+    closeFsWatcher.reverse().forEach((path, index) => { // reverse is necessary to Keep always the right Order of paths
       dispatch( FileSystem.actions.watcherClose(path) )
       pathRoute.splice( pathRoute.indexOf(path), 1 )
     })

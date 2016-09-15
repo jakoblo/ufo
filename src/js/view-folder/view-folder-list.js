@@ -27,7 +27,7 @@ export default class DisplayList extends React.Component {
   render() {
     let fileList = ""
     if(this.props.folder) {
-      fileList = this.props.folder.map((file, index) => {
+      fileList = this.props.folder.valueSeq().map((file, index) => {
 
         return ( <FileItem
           key={index}
