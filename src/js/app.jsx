@@ -13,7 +13,8 @@ import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
 import ToggleBar from './general-components/togglebar'
 import * as Utils from './utils/utils-index'
-import setupShortcuts from './shortcuts/sc-init-renderer'
+import {HotKeys} from 'react-hotkeys'
+import {keyMap, handlerMapper} from './hotkeys/hotkey-map.js'
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -29,7 +30,6 @@ store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 window.utils = Utils.storage
 // setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
-setupShortcuts(store)
 
 ipcRenderer.on('saveState', function(event) {
   Utils.storage.saveStatetoStorage(store.getState(), windowID, function() {
@@ -38,16 +38,18 @@ ipcRenderer.on('saveState', function(event) {
 })
 
 ReactDOM.render(
-    <Provider store={ store }>
-      <Foundation>
-        <Sidebar>
-          <App.components.actionbar></App.components.actionbar>
-          <Navbar.components.parent></Navbar.components.parent>
-          <ToggleBar></ToggleBar>
-        </Sidebar>
-        <ViewPlacer.components.parent/>
-      </Foundation>
-    </Provider>
+      <Provider store={ store }>
+        <HotKeys keyMap={keyMap} handlers={handlerMapper(store.dispatch)}>
+        <Foundation>
+            <Sidebar>
+              <App.components.actionbar></App.components.actionbar>
+              <Navbar.components.parent></Navbar.components.parent>
+              <ToggleBar></ToggleBar>
+            </Sidebar>
+            <ViewPlacer.components.parent/>
+        </Foundation>
+        </HotKeys>
+      </Provider>
   ,
   document.getElementById('app')
 );
