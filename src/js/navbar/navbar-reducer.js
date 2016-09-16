@@ -36,9 +36,9 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
 
     case t.ADD_NAVGROUP:
     if(action.payload.position != undefined) {
-      return state.set('groupItems', state.get('groupItems').insert(action.payload.position, Map({title: action.payload.title, hidden: false, items: action.payload.items})))
+      return state.set('groupItems', state.get('groupItems').insert(action.payload.position, Map({title: action.payload.title, hidden: action.payload.hidden, items: action.payload.items})))
     } else {
-      return state.set('groupItems', state.get('groupItems').push(Map({title: action.payload.title, hidden: false, items: action.payload.items})))
+      return state.set('groupItems', state.get('groupItems').push(Map({title: action.payload.title, hidden: action.payload.hidden, items: action.payload.items})))
     }    
     
     case t.REMOVE_NAVGROUP:

@@ -18,7 +18,7 @@ export function loadPreviousState(windowID) {
       if (data.groupItems !== undefined) {
         data.groupItems.forEach((item, index) => {
           if(item.title != Navbar.constants.DISKS_GROUP_NAME) {
-          dispatch(Navbar.actions.addNavGroup(item.title, item.items, index, true))
+          dispatch(Navbar.actions.addNavGroup(item.title, item.items, index, item.hidden, true))
           } else {
             diskGroupPosition = index 
           }   
@@ -28,7 +28,7 @@ export function loadPreviousState(windowID) {
         (fileObj) => {dispatch(Navbar.actions.addGroupItems(diskGroupPosition, fileObj.path))},
         (fileObj, activeWatcher) => {dispatch(Navbar.actions.removeGroupItemfromDeviceGroup(Navbar.constants.DISKS_GROUP_NAME, fileObj))},
         (fileObj) => {},
-        (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items, diskGroupPosition, true))}
+        (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items, diskGroupPosition, false, true))}
         )
       }
     })
