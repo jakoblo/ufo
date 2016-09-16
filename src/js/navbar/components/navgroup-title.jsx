@@ -43,7 +43,10 @@ export default class NavGroupTitle extends React.Component {
   }
 
  render() {
-   let title = <span className="nav-group-text" onDoubleClick={this.handleDoubleClick}>{this.props.title}</span>
+   let title = <span className="nav-group-text" 
+   onDoubleClick={!this.props.isDiskGroup && this.handleDoubleClick}
+   onContextMenu={this.props.onContextMenu}
+   >{this.props.title}</span>
    if(this.state.editGroupTitle) {
      title = <input ref="input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
    }
