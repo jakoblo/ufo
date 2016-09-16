@@ -13,6 +13,12 @@ export default class Foundation extends React.Component {
         onDragEnter={this.stopEvent}
         onDragOver={this.stopEvent}
         onDrop={this.stopEvent}
+        tabIndex={1}
+        ref={function(input) {
+          if (input != null) {
+            input.focus();
+          }
+        }}
       >{this.props.children}</div>
     )
   }

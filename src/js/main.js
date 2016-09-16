@@ -1,7 +1,6 @@
 "use strict"
 import { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } from 'electron'
 import { fs } from 'fs'
-import setupShortcuts from './shortcuts/sc-init-main.js'
 
 const appBasePath = __dirname
 var allBrowserWindows = []
@@ -18,7 +17,6 @@ function createNewBrowserWindow() {
   windowID = browserWindow.id
 
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
-  setupShortcuts(browserWindow)
   
   // Develop Help
   browserWindow.toggleDevTools()

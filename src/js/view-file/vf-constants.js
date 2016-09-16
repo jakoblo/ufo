@@ -31,8 +31,5 @@ export const suffixTypes = {
   pdf: [
     '.pdf',
     '.ai'
-  ],
-  psd: [
-    '.psd'
   ]
 }

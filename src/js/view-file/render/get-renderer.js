@@ -4,7 +4,6 @@ import RenderImage from './render-image'
 import RenderHTML from './render-html'
 import RenderDOCX from './render-docx'
 import RenderPDF from './render-pdf'
-import RenderPSD from './render-psd'
 import RenderUnavailable from './render-unavailable'
 /**
  * @param  {string} suffix .html, .txt

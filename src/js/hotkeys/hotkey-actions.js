@@ -15,10 +15,13 @@ export function navigateFileDown() {
 
 function navigateDirection(direction) {
   return function (dispatch, getState) {
-    let props = { path: Selection.selectors.getSelection( getState() ).get('root') }
-    let indexedFiles = FS.selectors.getFilesSeq( getState() , props)
-    let currentFileIndex = Selection.selectors.getCurrentFileIndex( getState() , props)
-    let newActiveName = indexedFiles[currentFileIndex + direction]
+    let props = { 
+      path: Selection.selectors.getSelection( getState() ).get('root') || // selected Folder
+            FS.selectors.getDirectorySeq( getState() )[0] // or First Folder
+    } 
+    let indexedFiles =      FS.selectors.getFilesSeq( getState() , props)
+    let currentFileIndex =  Selection.selectors.getCurrentFileIndex( getState() , props)
+    let newActiveName =     indexedFiles[currentFileIndex + direction]
     if(newActiveName) {
       dispatch( FileActions.show(
         FS.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)})
