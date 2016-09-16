@@ -1,14 +1,19 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { toggleGroup, removeGroupItem, changeGroupTitle } from '../navbar-actions'
+import { toggleGroup, removeGroupItem, changeGroupTitle, addNavGroup, saveFavbartoStorage, addGroupItems } from '../navbar-actions'
 import App from '../../app/app-index'
 import * as constants from '../navbar-constants'
 import { List, Map } from 'immutable'
 import NavGroup from './navgroup'
+import Selection from '../../selection/sel-index'
+import nodePath from 'path'
+import _ from 'lodash'
+
 
 @connect((state) => {
-  return {navbar: state[constants.NAME].present
+  return {navbar: state[constants.NAME].present,
+    state: state
   }
 })
 export default class Navbar extends React.Component {
@@ -33,7 +38,42 @@ export default class Navbar extends React.Component {
     this.props.dispatch(changeGroupTitle(groupID, newTitle))
   }
 
-  createNavGroups = (item, index) => {
+  handledragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "copy"
+  }
+
+  handleDrop = (e) => {
+    console.log("nav-drop")
+    e.preventDefault()
+    e.stopPropagation()
+    
+    let title = _.last(_.split(nodePath.dirname(e.dataTransfer.files[0].path), nodePath.sep))
+    
+    let files = []
+    _.forIn(e.dataTransfer.files, function(value, key) {
+      if(_.hasIn(value, 'path'))
+      files.push(value.path)
+    })
+    this.props.dispatch(addNavGroup(title, files))
+  } 
+
+  handleNavGroupDrop(groupID, e) {
+    console.log(e, groupID)
+    e.preventDefault()
+    e.stopPropagation()
+
+    let files = []
+    _.forIn(e.dataTransfer.files, function(value, key) {
+      if(_.hasIn(value, 'path'))
+      files.push(value.path)
+    })
+
+    this.props.dispatch(addGroupItems(groupID, files))
+  }
+
+  createNavGroup = (item, index) => {
    
     return (<NavGroup
         key={index}
@@ -46,20 +86,22 @@ export default class Navbar extends React.Component {
         onSelectionChanged={this.handleSelectionChanged}
         onItemRemove={this.handleOnItemRemove}
         onGroupTitleChange={this.handleOnGroupTitleChange}
-        onToggleGroup={this.handleOnToggleGroup}>
+        onToggleGroup={this.handleOnToggleGroup}
+        onDrop={this.handleNavGroupDrop.bind(this, index)}>
       </NavGroup>)
   }
 
   render() {
     let navgroups = null
     if(this.props.navbar.has('groupItems')) 
-    navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroups)
+    navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
     return(
-      <div className="nav-bar">
+      <div className="nav-bar" onDrop={this.handleDrop} onDragOver={this.handledragOver}>
         {navgroups}
       </div>
     )
   }
+
 
 
 }
