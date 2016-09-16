@@ -64,6 +64,17 @@ export function addNavGroup(title, items, position, loading) {
   } 
 }
 
+export function removeNavGroup(groupIndex) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: t.REMOVE_NAVGROUP,
+      payload: { groupIndex: groupIndex }
+    })
+
+    Utils.storage.saveFavbartoStorage(getState())
+  }
+}
+
 /**
  * 
  * 
