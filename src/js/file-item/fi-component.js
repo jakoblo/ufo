@@ -27,7 +27,6 @@ export default class FileItemDisplay extends React.Component {
     this.renameHandler = eventHandler.getRename(this)
   }
 
-
   render() {
     
     return (

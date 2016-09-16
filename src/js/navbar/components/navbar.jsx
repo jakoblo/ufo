@@ -8,6 +8,7 @@ import { List, Map } from 'immutable'
 import NavGroup from './navgroup'
 import Selection from '../../selection/sel-index'
 import nodePath from 'path'
+import _ from 'lodash'
 
 
 @connect((state) => {
@@ -44,26 +45,32 @@ export default class Navbar extends React.Component {
   }
 
   handleDrop = (e) => {
-    console.log("nav")
-    
+    console.log("nav-drop")
     e.preventDefault()
     e.stopPropagation()
     
-    console.log(e.dataTransfer.files)
-
-    //this.props.dispatch(addNavGroup("New Group", selectedFiles))
+    let title = _.last(_.split(nodePath.dirname(e.dataTransfer.files[0].path), nodePath.sep))
+    
+    let files = []
+    _.forIn(e.dataTransfer.files, function(value, key) {
+      if(_.hasIn(value, 'path'))
+      files.push(value.path)
+    })
+    this.props.dispatch(addNavGroup(title, files))
   } 
 
   handleNavGroupDrop(groupID, e) {
     console.log(e, groupID)
     e.preventDefault()
-    let selection = Selection.selectors.getSelection(this.props.state)
-    let selectedFiles = selection.get('files').toJS().map((filename) => {
-      return nodePath.join(selection.get('root'), filename)
+    e.stopPropagation()
+
+    let files = []
+    _.forIn(e.dataTransfer.files, function(value, key) {
+      if(_.hasIn(value, 'path'))
+      files.push(value.path)
     })
-    this.props.dispatch(addGroupItems(groupID, selectedFiles))
-    
-    console.log(selectedFiles)
+
+    this.props.dispatch(addGroupItems(groupID, files))
   }
 
   createNavGroup = (item, index) => {

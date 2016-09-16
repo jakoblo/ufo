@@ -1,6 +1,7 @@
 import * as t from './navbar-actiontypes'
 import { List, Map } from 'immutable'
-import Utils from '../utils/utils-index'
+import * as Utils from '../utils/utils-index'
+import _ from 'lodash'
 
 export function toggleGroup(groupID) { // Action Creator
   return { // action
@@ -42,28 +43,51 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
   }
 }
 
-export function addNavGroup(title, items, loading) { 
+/**
+ * 
+ * 
+ * @export
+ * @param {string} title
+ * @param {array} items
+ * @param {boolean} loading
+ * @returns
+ */
+export function addNavGroup(title, items, position, loading) { 
   return function(dispatch, getState) {
     dispatch({ // action
       type: t.ADD_NAVGROUP,
-      payload: {title: title, items: List(items)}
+      payload: {title: title, items: List(items), position: position}
     })
-      
+
     if(loading == undefined)
       Utils.storage.saveFavbartoStorage(getState())
   } 
 }
 
+/**
+ * 
+ * 
+ * @export
+ * @param {number} groupIndex
+ * @param {array, string} items
+ * @returns
+ */
 export function addGroupItems(groupIndex, items) {
-  return function(dispatch, state) {
+  return function(dispatch, getState) {
+    let itemArray = items
+    if(!_.isArray(items))
+      itemArray = [items]
+
     dispatch(
       {type: t.ADD_GROUP_ITEM,
       payload: {
           groupIndex: groupIndex,
-          items: items
+          items: itemArray
         }
       }
     )
+
+    Utils.storage.saveFavbartoStorage(getState())
   }
 
 }
