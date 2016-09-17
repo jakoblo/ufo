@@ -1,5 +1,5 @@
 import * as t from './app-actiontypes'
-import _ from 'underscore'
+import _ from 'lodash'
 import nodePath from 'path'
 import FileSystem from '../filesystem/fs-index'
 
@@ -14,7 +14,7 @@ let pathRoute = []
  * @param  {string} fromPath The first folder of the pathRout that will be displayed is optional
  * @param  {string} toPath   The last folder of the pathRout that will be displayed is optional
  */
-export function changeAppPath(fromPath, toPath) {
+export function changeAppPath(fromPath, toPath, historyJump = false) {
 
   return dispatch => {
 
@@ -23,14 +23,13 @@ export function changeAppPath(fromPath, toPath) {
     toPath =   toPath     ||  _.last(pathRoute)
 
     if(!fromPath || !toPath) { throw "Set 'from' and 'to' at the first call of changeAppPath()"}
+    
+    if(toPath.indexOf(fromPath) < 0) {
+      // Set fromPath to Root
+      fromPath = nodePath.parse(toPath).root
+    }
+    
     let newPathRoute = buildPathRoute(fromPath, toPath)
-
-    dispatch({
-      type: t.APP_CHANGE_PATH,
-      payload: {
-        pathRoute : newPathRoute
-      }
-    })
 
     let closeFsWatcher = _.difference(pathRoute, newPathRoute)
     closeFsWatcher.reverse().forEach((path, index) => { // reverse is necessary to Keep always the right Order of paths
@@ -44,10 +43,24 @@ export function changeAppPath(fromPath, toPath) {
       pathRoute.push(path)
     })
 
-    var testDiff = _.difference(newPathRoute, pathRoute)
-    if(testDiff.length > 0) {
-      throw "missmatch ahhh!"
+    if(closeFsWatcher.length > 0 || createFsWatcher.length > 0) {
+      // There was a change...
+      dispatch({
+        type: t.APP_CHANGE_PATH,
+        payload: {
+          pathRoute : newPathRoute,
+          historyJump: historyJump
+        }
+      })
     }
+  }
+}
+
+export function navigateToParentFolder() {
+  return (dispatch, getState) => {
+    let currentDir = _.last( FileSystem.selectors.getDirectorySeq( getState() ) )
+    let parentDir = nodePath.dirname( currentDir )
+    dispatch( changeAppPath( null, parentDir))
   }
 }
 

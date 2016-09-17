@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import { toggleGroup, removeGroupItem, changeGroupTitle, addNavGroup, saveFavbartoStorage, addGroupItems } from '../navbar-actions'
+import * as Actions from '../navbar-actions'
 import App from '../../app/app-index'
 import * as constants from '../navbar-constants'
 import { List, Map } from 'immutable'
@@ -9,6 +9,7 @@ import NavGroup from './navgroup'
 import Selection from '../../selection/sel-index'
 import nodePath from 'path'
 import _ from 'lodash'
+import {remote} from 'electron'
 
 
 @connect((state) => {
@@ -26,16 +27,20 @@ export default class Navbar extends React.Component {
   }
 
   handleOnToggleGroup = (groupID) => {
-    this.props.dispatch(toggleGroup(groupID))
+    this.props.dispatch(Actions.toggleGroup(groupID))
   }
 
   handleOnItemRemove = (groupIndex, itemID) => {
     // const groupIndex = this.props.navbar.get('groupItems').findIndex(group => group.get('title') === groupTitle)
-    this.props.dispatch(removeGroupItem(groupIndex, itemID))
+    this.props.dispatch(Actions.removeGroupItem(groupIndex, itemID))
+  }
+
+  handleOnRemoveGroup(groupIndex) {
+    this.props.dispatch(Actions.removeNavGroup(groupIndex))
   }
 
   handleOnGroupTitleChange = (groupID, newTitle) => {
-    this.props.dispatch(changeGroupTitle(groupID, newTitle))
+    this.props.dispatch(Actions.changeGroupTitle(groupID, newTitle))
   }
 
   handledragOver = (e) => {
@@ -56,7 +61,7 @@ export default class Navbar extends React.Component {
       if(_.hasIn(value, 'path'))
       files.push(value.path)
     })
-    this.props.dispatch(addNavGroup(title, files))
+    this.props.dispatch(Actions.addNavGroup(title, files))
   } 
 
   handleNavGroupDrop(groupID, e) {
@@ -65,13 +70,19 @@ export default class Navbar extends React.Component {
     e.stopPropagation()
 
     let files = []
+    console.log(_)
     _.forIn(e.dataTransfer.files, function(value, key) {
+
+      console.log(_)
+      debugger
       if(_.hasIn(value, 'path'))
       files.push(value.path)
     })
 
-    this.props.dispatch(addGroupItems(groupID, files))
+    this.props.dispatch(Actions.addGroupItems(groupID, files))
   }
+
+ 
 
   createNavGroup = (item, index) => {
    
@@ -82,13 +93,14 @@ export default class Navbar extends React.Component {
         title={item.title}
         items={item.items}
         hidden={item.hidden}
-        isDefault={item.title === constants.DISKS_GROUP_NAME ? true : false}
+        isDiskGroup={item.title === constants.DISKS_GROUP_NAME ? true : false}
         onSelectionChanged={this.handleSelectionChanged}
         onItemRemove={this.handleOnItemRemove}
+        onRemoveGroup={this.handleOnRemoveGroup.bind(this, index)}
         onGroupTitleChange={this.handleOnGroupTitleChange}
         onToggleGroup={this.handleOnToggleGroup}
-        onDrop={this.handleNavGroupDrop.bind(this, index)}>
-      </NavGroup>)
+        onDrop={this.handleNavGroupDrop.bind(this, index)}
+        />)
   }
 
   render() {

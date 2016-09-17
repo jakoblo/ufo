@@ -73,7 +73,7 @@ export function loadSystemVolumes(fileAdd, fileUnlink, fileChange, watcherReady)
   }
 
   if(process.platform == 'darwin') {
-    fs.watchhandler.watch('/volumes/', watcherSettings,
+    fs.watchhandler.watch('/Volumes/', watcherSettings,
     fileAdd,
     fileUnlink,
     fileChange,

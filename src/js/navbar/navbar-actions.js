@@ -52,16 +52,27 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
  * @param {boolean} loading
  * @returns
  */
-export function addNavGroup(title, items, position, loading) { 
+export function addNavGroup(title, items, position, hidden, loading) { 
   return function(dispatch, getState) {
     dispatch({ // action
       type: t.ADD_NAVGROUP,
-      payload: {title: title, items: List(items), position: position}
+      payload: {title: title, items: List(items), position: position, hidden: hidden}
     })
 
     if(loading == undefined)
       Utils.storage.saveFavbartoStorage(getState())
   } 
+}
+
+export function removeNavGroup(groupIndex) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: t.REMOVE_NAVGROUP,
+      payload: { groupIndex: groupIndex }
+    })
+
+    Utils.storage.saveFavbartoStorage(getState())
+  }
 }
 
 /**

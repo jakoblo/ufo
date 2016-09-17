@@ -1,5 +1,6 @@
 import * as HotKeyActions from './hotkey-actions.js'
 import Selection from '../selection/sel-index'
+import App from '../App/app-index'
 
 /**
  * Map dispatch to the raw handlerMap
@@ -21,6 +22,7 @@ export function handlerMapper(dispatch) {
 export const keyMap = {
   navUp: 'up',
   selectUp: 'shift+up',
+  pathUp: ['ctrl+up', 'command+up'],
   navDown: 'down',
   selectDown: 'shift+down',
   navRight: 'right',
@@ -31,6 +33,7 @@ export const keyMap = {
 const rawHandlerMap = {
   navUp: HotKeyActions.navigateFileUp,
   selectUp: HotKeyActions.addPrevFileToSelection,
+  pathUp: App.actions.navigateToParentFolder,
   navDown: HotKeyActions.navigateFileDown,
   selectDown: HotKeyActions.addNextFileToSelection,
   navRight: Selection.actions.selectNextDir,

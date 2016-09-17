@@ -8,6 +8,7 @@ import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 /* React Components */
 import Foundation from './general-components/foundation'
+import ActionBar from './general-components/actionbar'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
@@ -40,14 +41,14 @@ ipcRenderer.on('saveState', function(event) {
 ReactDOM.render(
       <Provider store={ store }>
         <HotKeys keyMap={keyMap} handlers={handlerMapper(store.dispatch)}>
-        <Foundation>
-            <Sidebar>
-              <App.components.actionbar></App.components.actionbar>
-              <Navbar.components.parent></Navbar.components.parent>
-              <ToggleBar></ToggleBar>
-            </Sidebar>
-            <ViewPlacer.components.parent/>
-        </Foundation>
+          <Foundation>
+              <Sidebar>
+                <ActionBar/>
+                <Navbar.components.parent/>
+                <ToggleBar/>
+              </Sidebar>
+              <ViewPlacer.components.parent/>
+          </Foundation>
         </HotKeys>
       </Provider>
   ,
