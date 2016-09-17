@@ -1,4 +1,3 @@
-import * as Selectors from './history-selectors'
 import App from '../app/app-index'
 
 export function back() {
