@@ -70,7 +70,11 @@ export default class Navbar extends React.Component {
     e.stopPropagation()
 
     let files = []
+    console.log(_)
     _.forIn(e.dataTransfer.files, function(value, key) {
+
+      console.log(_)
+      debugger
       if(_.hasIn(value, 'path'))
       files.push(value.path)
     })
