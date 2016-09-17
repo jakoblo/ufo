@@ -15,9 +15,13 @@ export const getFolderCombinedFactory = () => {
   return createSelector(
     [getFolderWithActive, Selection.selectors.getSelectionFor],
     (files, selection) => {
-      if(selection) {
+      if(files && selection) {
         selection.get('files').forEach((selectedFile, index) => {
-          files = files.setIn([selectedFile, 'selected'], true)
+          if(files.get(selectedFile)) {
+            files = files.setIn([selectedFile, 'selected'], true)
+          } else {
+            console.error('Try to set a File selected which does not exists in the FileSystem', files.toJS(), selectedFile)
+          }
         })
       }
       return files
@@ -135,7 +139,11 @@ const getFolderWithActiveFactory = () => {
     [getFiles, getActiveFile],
     (files, activeFile) => {
       if(files && activeFile) {
-        files = files.setIn([activeFile, 'active'], true)
+        if(files.get(activeFile)) {
+          files = files.setIn([activeFile, 'active'], true)
+        } else {
+          console.error('Try to set a File active which does not exists in the FileSystem', files.toJS(), activeFile) 
+        }
       }
       return files
   })

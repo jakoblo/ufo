@@ -89,6 +89,10 @@ class ChokidarHandler {
   }
 
   _handleEventDelete(callback, root, type, path, stats) {
+    if(path == root) {
+      console.error('chokikar wants to remove "', path, '" which is prevented, should be wrong.')
+      return
+    }
     let fileObj = this._createFileObj(...arguments)
     callback(fileObj, this.watcherStack)
   }

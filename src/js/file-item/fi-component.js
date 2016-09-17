@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom'
 import Icon from '../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
-import {ipcRenderer} from 'electron'
 import eventHandler from './fi-event-handler/fi-event-handler-index'
 
 export default class FileItemDisplay extends React.Component {
@@ -28,7 +27,7 @@ export default class FileItemDisplay extends React.Component {
   }
 
   render() {
-    
+
     return (
       <span
         className={classNames({
