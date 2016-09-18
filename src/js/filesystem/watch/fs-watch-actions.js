@@ -1,7 +1,7 @@
-import * as t from './fs-actiontypes'
-import watchHandler from './fs-watch-handler'
+import * as t from './fs-watch-actiontypes'
+import watchHandler from './fs-watch-watcher'
 import nodePath from 'path'
-import App from '../app/app-index'
+import App from '../../app/app-index'
 
 const watcherSettings = {
   ignored: /[\/\\]\./,

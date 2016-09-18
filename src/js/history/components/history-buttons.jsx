@@ -15,8 +15,6 @@ export default class ActionBar extends React.Component {
     super(props) 
   }
 
-  shouldComp
-
   handleHistoryBack = () => {
     this.props.dispatch( HistoryActions.back() )
   }

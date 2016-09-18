@@ -1,7 +1,7 @@
 import * as FileActions from '../fi-actions'
+import * as fsWriteActions from '../../filesystem/write/fs-write-actions'
 import {remote} from 'electron'
 const {Menu, MenuItem} = remote
-
 
 /**
  * Adding file to Selection
@@ -51,14 +51,14 @@ export function onContextMenu(event) {
   event.stopPropagation()
 
   let menu = new Menu();
-  menu.append(new MenuItem({ label: 'Open "' + this.props.file.get('base') + '"', click: null }))
+  menu.append(new MenuItem({ label: 'Open "' + this.props.file.get('base') + '"', click: null}))
   menu.append(new MenuItem({ 
     label: 'Rename', 
-    click: this.setImmState((state) => (state.set('editing', true)))
+    click: () => { this.setImmState((state) => (state.set('editing', true))) }
   }))
   
   menu.append(new MenuItem({ type: 'separator' }));
-  menu.append(new MenuItem({ label: 'Move to Trash', click: null }));
+  menu.append(new MenuItem({ label: 'Move to Trash', click: () => {fsWriteActions.moveToTrash([this.props.file.get('path')]) } }));
   menu.append(new MenuItem({ type: 'separator' }));
   menu.append(new MenuItem({label: 'Add to FavBar', click: null }))
 

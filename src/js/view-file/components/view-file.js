@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
-import FS from '../../filesystem/fs-index'
+import FS from '../../filesystem/watch/fs-watch-index'
 import ButtonGroup from '../../general-components/button-group'
 import Button from '../../general-components/button'
 import Icon from '../../general-components/icon'

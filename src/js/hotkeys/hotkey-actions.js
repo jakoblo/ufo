@@ -1,4 +1,4 @@
-import FS from '../filesystem/fs-index'
+import FS from '../filesystem/watch/fs-watch-index'
 import Selection from '../selection/sel-index'
 import * as FileActions from '../file-item/fi-actions'
 import Preview from '../view-file/vf-index'
@@ -6,6 +6,8 @@ import App from '../app/app-index'
 import nodePath from 'path'
 
 // Navigate
+// Arrow Up and Down
+// Base on current Selection the "next" file will be selected
 export function navigateFileUp() {
   return navigateDirection(-1)
 }
@@ -31,6 +33,7 @@ function navigateDirection(direction) {
 }
 
 // Select
+// Shift + ArrowUp/Down
 export function addPrevFileToSelection() {
   return selectFileNextToCurrent(-1)
 }

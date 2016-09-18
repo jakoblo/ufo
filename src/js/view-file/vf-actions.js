@@ -8,3 +8,9 @@ export function showPreview(filePath) {
     }
   }
 }
+
+export function closePreview(filePath) {
+  return {
+    type: t.CLOSE_PREVIEW
+  }
+}

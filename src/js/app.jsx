@@ -39,18 +39,18 @@ ipcRenderer.on('saveState', function(event) {
 })
 
 ReactDOM.render(
-      <Provider store={ store }>
-        <HotKeys keyMap={keyMap} handlers={handlerMapper(store.dispatch)}>
-          <Foundation>
-              <Sidebar>
-                <ActionBar/>
-                <Navbar.components.parent/>
-                <ToggleBar/>
-              </Sidebar>
-              <ViewPlacer.components.parent/>
-          </Foundation>
-        </HotKeys>
-      </Provider>
+    <Provider store={ store }>
+      <HotKeys keyMap={keyMap} handlers={handlerMapper(store.dispatch)}>
+        <Foundation>
+            <Sidebar>
+              <ActionBar/>
+              <Navbar.components.parent/>
+              <ToggleBar/>
+            </Sidebar>
+            <ViewPlacer.components.parent/>
+        </Foundation>
+      </HotKeys>
+    </Provider>
   ,
   document.getElementById('app')
 );

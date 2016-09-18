@@ -1,9 +1,9 @@
 import chokidar from 'chokidar'
 import nodePath from 'path'
 import fs from 'fs'
-import {TYPE_FILE, TYPE_DIR} from './fs-constants'
+import {TYPE_FILE, TYPE_DIR} from './fs-watch-constants'
 
-const logging = true
+const logging = false
 
 /* ChokidarHandler - creates usable ChokdiarFilewatcher */
 class ChokidarHandler {
