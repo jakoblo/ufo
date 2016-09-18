@@ -12,14 +12,13 @@ export default class NavGroupItem extends React.Component {
  render() {
     // let icon = this.getIconComponent()
     let className = classnames(this.props.className, "nav-group-item", {"active": this.props.active})
-    let deleteButton = ''
-    if(!this.props.isDeletable) 
-    deleteButton = <Button className="remove" onClick={this.props.onItemRemove}></Button>
+    let deleteButton = <Button className="remove" onClick={this.props.onItemRemove}></Button>
+
     return (
       <a  className={className}>
         <Icon glyph={this.props.glyph} />
         <span onClick={this.props.onClick} className="text">{this.props.title}</span>
-        {deleteButton}
+        {this.props.isDeletable && deleteButton}
       </a>
     )
   }

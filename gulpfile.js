@@ -12,7 +12,7 @@ const electron = require('electron-connect').server.create({
 
 const config = { source: './src' }
 config.js2015 = config.source + '/js-dist/'
-config.jsNext = config.source + '/js/**/*'
+config.jsNext = config.source + '/js/**/*.js*'
 config.sass = config.source + '/themes/default/sass/**/*'
 config.css = config.source + '/themes/default/css/'
 config.fontsList = config.source + '/themes/googlefonts.list'
