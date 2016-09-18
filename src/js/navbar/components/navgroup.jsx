@@ -6,6 +6,8 @@ import classnames from 'classnames'
 import NavGroupItem from './navgroup-item'
 import NavGroupTitle from './navgroup-title'
 import {remote} from 'electron'
+import App from '../../app/app-index'
+import * as Actions from '../navbar-actions'
 const {Menu, MenuItem} = remote
 
 export default class NavGroup extends React.Component {
@@ -13,6 +15,74 @@ export default class NavGroup extends React.Component {
     super(props)
   }
 
+  render() {
+    let hideButtonText = this.props.hidden ? "show" : "hide";
+    let groupClasses = classnames({
+      'nav-group': true,
+      'hide': this.props.hidden
+    })
+    const diskgroup = this.props.isDiskGroup
+    return(
+      <div className={groupClasses} onDrop={this.handleDrop.bind(this)}>
+        <NavGroupTitle 
+          title={this.props.title}
+          isDiskGroup={diskgroup}
+          groupID={this.props.groupID} 
+          onGroupTitleChange={!diskgroup && this.handleGroupTitleChange} 
+          hideButtonText={hideButtonText} 
+          onToggleGroup={this.handleToggleGroup.bind(this, this.props.groupID)}
+          onContextMenu={!diskgroup && this.onContextMenu}
+        />
+        <div className="nav-group-item-wrapper">
+          {this.props.items.map(this.createGroupItem)}
+        </div>
+      </div>
+    )
+  }
+
+  // GROUP EVENTS
+
+  handleToggleGroup = () => {
+    this.props.dispatch(Actions.toggleGroup(this.props.groupID))
+  }  
+
+  handleRemoveGroup = () => {
+    this.props.dispatch(Actions.removeNavGroup(this.props.groupID))
+  }
+
+  handledragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "copy"
+  }
+
+  handleDrop(e) {
+    console.log(e, groupID)
+    e.preventDefault()
+    e.stopPropagation()
+
+    let files = []
+    console.log(_)
+    _.forIn(e.dataTransfer.files, function(value, key) {
+      if(_.hasIn(value, 'path'))
+      files.push(value.path)
+    })
+
+    this.props.dispatch(Actions.addGroupItems(this.props.groupID, files))
+  }
+
+  // GROUP TITLE EVENTS
+
+  handleGroupTitleChange = (newTitle) => {
+    this.props.dispatch(Actions.changeGroupTitle(this.props.groupID, newTitle))
+  }
+
+  /**
+   * 
+   * GROUP ITEM
+   * 
+   * @memberOf NavGroup
+   */
   createGroupItem = (path, itemID) => {
     let basePath = nodePath.basename(path)
     let active = false
@@ -30,8 +100,8 @@ export default class NavGroup extends React.Component {
     return (
       <NavGroupItem
         key={itemID}
-        onClick={this.props.onSelectionChanged.bind(this, path)}
-        onItemRemove={this.props.onItemRemove.bind(this, this.props.groupID, itemID)}
+        onClick={this.handleSelectionChanged.bind(this, path)}
+        onItemRemove={this.handleOnItemRemove.bind(this, itemID)}
         title={basePath}
         isDeletable={this.props.isDiskGroup}
         active={active}
@@ -40,8 +110,17 @@ export default class NavGroup extends React.Component {
       </NavGroupItem>)
   }
 
+  // GROUP ITEM EVENTS
+
+  handleOnItemRemove = (itemID) => {
+    this.props.dispatch(Actions.removeGroupItem(this.props.groupID, itemID))
+  }
+
+  handleSelectionChanged = (path) => {
+    this.props.dispatch(App.actions.changeAppPath(path))
+  }
    /**
-   * Right Click menu
+   * Context Click menu for Title
    */
   onContextMenu = (event) => {
     event.preventDefault()
@@ -51,37 +130,13 @@ export default class NavGroup extends React.Component {
     // menu.append(new MenuItem({ label: 'Open "' + this.props.file.get('base') + '"', click: null }))
     // menu.append(new MenuItem({ label: 'Rename', click: null }))
     // menu.append(new MenuItem({ type: 'separator' }))
-    menu.append(new MenuItem({ label: 'Remove Group', click: this.props.onRemoveGroup }))
+    menu.append(new MenuItem({ label: 'Remove Group', click: this.handleRemoveGroup }))
     menu.append(new MenuItem({ type: 'separator' }))
     let hideButtonText = this.props.hidden ? "show" : "hide"
 
-    menu.append(new MenuItem({label: hideButtonText, click: this.props.onToggleGroup.bind(this, this.props.groupID) }))
+    menu.append(new MenuItem({label: hideButtonText, click: this.handleToggleGroup }))
 
     menu.popup(remote.getCurrentWindow());
   }
 
-  render() {
-    let hideButtonText = this.props.hidden ? "show" : "hide";
-    let groupClasses = classnames({
-      'nav-group': true,
-      'hide': this.props.hidden
-    })
-    const diskgroup = this.props.isDiskGroup
-    return(
-      <div className={groupClasses} onDrop={this.props.onDrop}>
-        <NavGroupTitle 
-          title={this.props.title}
-          isDiskGroup={diskgroup}
-          groupID={this.props.groupID} 
-          onGroupTitleChange={!diskgroup && this.props.onGroupTitleChange} 
-          hideButtonText={hideButtonText} 
-          onClick={this.props.onToggleGroup.bind(this, this.props.groupID)}
-          onContextMenu={!diskgroup && this.onContextMenu}
-        />
-        <div className="nav-group-item-wrapper">
-          {this.props.items.map(this.createGroupItem)}
-        </div>
-      </div>
-    )
-  }
 }

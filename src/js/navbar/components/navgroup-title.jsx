@@ -24,7 +24,7 @@ export default class NavGroupTitle extends React.Component {
   changeTitle(e) {
     if(e.keyCode === 13 || e.type === 'blur') {
       if(this.props.title != e.target.value && e.target.value != '') {
-      this.props.onGroupTitleChange(this.props.groupID, e.target.value)
+      this.props.onGroupTitleChange(e.target.value)
       }
       this.setState({editGroupTitle: false})
     }
@@ -54,7 +54,7 @@ export default class NavGroupTitle extends React.Component {
   return (
       <div className="nav-group-title">
         {title}
-        <Button className="nav-group-hide" onClick={this.props.onClick} text={this.props.hideButtonText}/>
+        <Button className="nav-group-hide" onClick={this.props.onToggleGroup} text={this.props.hideButtonText}/>
       </div>
     )
   }
