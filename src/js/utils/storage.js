@@ -3,7 +3,7 @@ import Immutable, { Map, List } from 'immutable'
 import { remote } from 'electron'
 import drivelist from 'drivelist'
 import process from 'process'
-import fs from '../filesystem/fs-index'
+import fs from '../filesystem/watch/fs-watch-index'
 import Navbar from '../navbar/navbar-index'
 
 export function loadStatefromStorage(windowID, callback) {

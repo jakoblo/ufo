@@ -63,7 +63,7 @@ export function expandSelection(file) {
 
 /**
  * Drag of the Single file or the Selection
- */ 
+ */
 export function startDrag(file) {
   return (dispatch) => {
     if(file.get('selected')) {

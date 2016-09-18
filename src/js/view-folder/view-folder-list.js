@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import FS from  '../filesystem/fs-index'
+import FS from  '../filesystem/watch/fs-watch-index'
 import FileItem from '../file-item/fi-component'
 import classnames from 'classnames'
 import {Map} from 'immutable'
+import {dragndrop} from '../utils/utils-index'
 
 @connect(() => {
   const getFolderCombined = FS.selectors.getFolderCombinedFactory()
@@ -91,6 +92,6 @@ export default class DisplayList extends React.Component {
     event.preventDefault()
     event.stopPropagation()
     this.setImmState((prevState) => (prevState.set('dropTarget', false)))
-    console.log('folder drop')
+    dragndrop.handleFileDrop(event, this.props.path)
   }
 }
