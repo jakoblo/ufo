@@ -17,22 +17,23 @@ export default class NavGroup extends React.Component {
   }
 
   render() {
+    const dg = this.props.isDiskGroup
     let hideButtonText = this.props.hidden ? "show" : "hide";
-    let groupClasses = classnames({
+    let classname = classnames({
       'nav-group': true,
       'hide': this.props.hidden
     })
-    const diskgroup = this.props.isDiskGroup
+
     return(
-      <div className={groupClasses} onDrop={this.handleDrop.bind(this)} onDragOver={this.handleDragOver}>
+      <div className={classname} onDrop={this.handleDrop.bind(this)} onDragOver={this.handleDragOver}>
         <NavGroupTitle 
           title={this.props.title}
-          isDiskGroup={diskgroup}
+          isDiskGroup={dg}
           groupID={this.props.groupID} 
-          onGroupTitleChange={!diskgroup && this.handleGroupTitleChange} 
+          onGroupTitleChange={!dg && this.handleGroupTitleChange} 
           hideButtonText={hideButtonText} 
           onToggleGroup={this.handleToggleGroup.bind(this, this.props.groupID)}
-          onContextMenu={!diskgroup && this.onContextMenu}
+          onContextMenu={!dg && this.onContextMenu}
         />
         <div className="nav-group-item-wrapper">
           {this.props.items.map(this.createGroupItem)}
@@ -103,7 +104,7 @@ export default class NavGroup extends React.Component {
         onClick={this.handleSelectionChanged.bind(this, path)}
         onItemRemove={this.handleOnItemRemove.bind(this, itemID)}
         title={basePath}
-        isDeletable={this.props.isDiskGroup}
+        isDeletable={!this.props.isDiskGroup}
         active={active}
         glyph={glyph}
         >
