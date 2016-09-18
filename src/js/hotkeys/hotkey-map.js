@@ -1,6 +1,6 @@
 import * as HotKeyActions from './hotkey-actions.js'
 import Selection from '../selection/sel-index'
-import App from '../App/app-index'
+import App from '../app/app-index'
 
 /**
  * Map dispatch to the raw handlerMap
