@@ -1,8 +1,9 @@
 import * as t from './sel-actiontypes'
 import * as selectors from './sel-selectors'
 import * as c from './sel-constants'
-import FS from '../filesystem/fs-index'
+import FS from '../filesystem/watch/fs-watch-index'
 import App from '../app/app-index'
+import ViewFile from '../view-file/vf-index'
 import nodePath from 'path'
 import * as _ from 'lodash'
 import {ipcRenderer} from 'electron'
@@ -30,6 +31,7 @@ export function setSelection(pathArray) {
     if(fileList.length > 1) {
       //Close Appending View if multiple files are selected
       dispatch( App.actions.changeAppPath(null, lastRoot) )
+      dispatch( ViewFile.actions.closePreview() )
     }
 
     dispatch({

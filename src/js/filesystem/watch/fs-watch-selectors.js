@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import nodePath from 'path'
-import Selection from '../selection/sel-index'
-import ViewFile from '../view-file/vf-index'
+import Selection from '../../selection/sel-index'
+import ViewFile from '../../view-file/vf-index'
 
 /**
  * Main Selector to get all Files with all Information 
@@ -123,7 +123,15 @@ export function getFile(state, props) {
 // -------------------
 
 const getCurrentPath =   (state, props)  => props.path
-const getFiles =         (state, props)  => state.fs.get(props.path).get('files')
+const getFiles =         (state, props)  => {
+  let dir = state.fs.get(props.path)
+  if(dir) {
+    return dir.get('files')
+  } else {
+    console.log(state.fs.toJS())
+    throw 'Request folder which is not watched: '+props.path
+  }
+}
 
 function getDirDirection(state, props, direction) {
   let directorySeq = getDirectorySeq(state)

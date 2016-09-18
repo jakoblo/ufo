@@ -75,7 +75,7 @@ export function onDrop (event) {
   if( shouldHandleDrop(event, this.props.file) ) {
     event.preventDefault()
     event.stopPropagation()
-    console.log('MOVE FILE DO SOMETHING', event.dataTransfer.dropEffect)
+    dragndrop.handleFileDrop(event, this.props.file.get('path'))
   }
 }
 

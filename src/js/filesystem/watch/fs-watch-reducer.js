@@ -1,6 +1,5 @@
-"use strict"
-import * as t from './fs-actiontypes'
-import App from '../app/app-index'
+import * as t from './fs-watch-actiontypes'
+import App from '../../app/app-index'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
 import fs from 'fs'
 import nodePath from 'path'
@@ -44,7 +43,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
       return state.deleteIn([action.payload.root, 'files', action.payload.base])
 
     case t.FILE_CHANGE:
-      return state.updateIn([action.payload.root, 'files', action.payload.base], OrderedMap(action.payload))
+      return state.setIn([action.payload.root, 'files', action.payload.base], OrderedMap(action.payload))
 
     default:
       return state;

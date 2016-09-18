@@ -1,6 +1,7 @@
 "use strict"
 import { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } from 'electron'
 import { fs } from 'fs'
+import { FsWriteMain } from './filesystem/write/fs-write-main'
 
 const appBasePath = __dirname
 var allBrowserWindows = []

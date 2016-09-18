@@ -6,7 +6,7 @@ import ViewWrapper from './view-wrapper'
 import Error from '../../general-components/error'
 import ViewFolderList from '../../view-folder/view-folder-list'
 import ViewFile from '../../view-file/vf-index'
-import FS from '../../filesystem/fs-index'
+import FS from '../../filesystem/watch/fs-watch-index'
 
 @connect((state) => {
   let dirs = FS.selectors.getDirectorySeq(state)

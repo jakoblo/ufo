@@ -2,6 +2,7 @@
 import * as t from './sel-actiontypes'
 import App from '../app/app-index'
 import Preview from '../view-file/vf-index'
+import FS from '../filesystem/watch/fs-watch-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
 import {Map, List, Seq, fromJS} from 'immutable'
@@ -32,6 +33,15 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
         root: nodePath.dirname(action.payload.path),
         files: [ nodePath.basename(action.payload.path) ]
       })
+
+    case FS.actiontypes.FILE_UNLINK:
+        // a selected file has maybe been delete
+        // If that is the case, it's necessary to remove that
+        // or the easy way, reset the selection....
+        if(state.get('root') && state.get('root').indexOf(nodePath.dirname(action.payload.path)) > -1) {
+          return fromJS(INITIAL_STATE)
+        }
+        return state
 
     default:
       return state;
