@@ -119,9 +119,10 @@ export default class NavGroup extends React.Component {
   handleSelectionChanged = (path) => {
     this.props.dispatch(App.actions.changeAppPath(path))
   }
-   /**
-   * Context Click menu for Title
-   */
+  
+/**
+ * Context Click menu for Title
+ */
   onContextMenu = (event) => {
     event.preventDefault()
     event.stopPropagation()
