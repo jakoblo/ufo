@@ -23,7 +23,7 @@ export default class NavGroup extends React.Component {
     })
     const diskgroup = this.props.isDiskGroup
     return(
-      <div className={groupClasses} onDrop={this.handleDrop.bind(this)}>
+      <div className={groupClasses} onDrop={this.handleDrop.bind(this)} onDragOver={this.handleDragOver}>
         <NavGroupTitle 
           title={this.props.title}
           isDiskGroup={diskgroup}
@@ -50,14 +50,13 @@ export default class NavGroup extends React.Component {
     this.props.dispatch(Actions.removeNavGroup(this.props.groupID))
   }
 
-  handledragOver = (e) => {
+  handleDragOver = (e) => {
     e.preventDefault()
     e.stopPropagation()
     e.dataTransfer.dropEffect = "copy"
   }
 
   handleDrop(e) {
-    console.log(e, groupID)
     e.preventDefault()
     e.stopPropagation()
 

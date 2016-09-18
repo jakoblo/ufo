@@ -27,7 +27,7 @@ export default class Navbar extends React.Component {
     if(this.props.navbar.has('groupItems')) 
     navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
     return(
-      <div className="nav-bar" onDrop={this.handleDrop}>
+      <div className="nav-bar" onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         {navgroups}
       </div>
     )
@@ -44,6 +44,13 @@ export default class Navbar extends React.Component {
       isDiskGroup={item.title === constants.DISKS_GROUP_NAME ? true : false}
       dispatch={this.props.dispatch}
       />)
+  }
+
+
+  handleDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "copy"
   }
 
   handleDrop = (e) => {
