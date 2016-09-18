@@ -62,6 +62,7 @@ export default class NavGroup extends React.Component {
     e.preventDefault()
     e.stopPropagation()
 
+    if(e.dataTransfer.files.length > 0) {
     let files = []
 
     _.forIn(e.dataTransfer.files, function(value, key) {
@@ -70,6 +71,7 @@ export default class NavGroup extends React.Component {
     })
 
     this.props.dispatch(Actions.addGroupItems(this.props.groupID, files))
+    }
   }
 
   // GROUP TITLE EVENTS

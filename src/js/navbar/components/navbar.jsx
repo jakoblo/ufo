@@ -51,10 +51,10 @@ export default class Navbar extends React.Component {
   }
 
   handleDrop = (e) => {
-    console.log("nav-drop")
     e.preventDefault()
     e.stopPropagation()
-    
+
+    if(e.dataTransfer.files.length > 0) {
     let title = _.last(_.split(nodePath.dirname(e.dataTransfer.files[0].path), nodePath.sep))
     
     let files = []
@@ -63,5 +63,6 @@ export default class Navbar extends React.Component {
       files.push(value.path)
     })
     this.props.dispatch(Actions.addNavGroup(title, files))
+    }
   } 
 }

@@ -20,7 +20,7 @@ export default class NavGroupTitle extends React.Component {
    }
 
   return (
-      <div className="nav-group-title">
+      <div className="nav-group-title" draggable={!this.props.isDiskGroup && true}>
         {title}
         <Button className="nav-group-hide" onClick={this.props.onToggleGroup} text={this.props.hideButtonText}/>
       </div>
