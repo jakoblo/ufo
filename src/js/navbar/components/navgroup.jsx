@@ -8,6 +8,7 @@ import NavGroupTitle from './navgroup-title'
 import {remote} from 'electron'
 import App from '../../app/app-index'
 import * as Actions from '../navbar-actions'
+import _ from 'lodash'
 const {Menu, MenuItem} = remote
 
 export default class NavGroup extends React.Component {
@@ -61,7 +62,7 @@ export default class NavGroup extends React.Component {
     e.stopPropagation()
 
     let files = []
-    console.log(_)
+
     _.forIn(e.dataTransfer.files, function(value, key) {
       if(_.hasIn(value, 'path'))
       files.push(value.path)
