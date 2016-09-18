@@ -15,25 +15,32 @@ export function loadStatefromStorage(windowID, callback) {
 
 export function loadNavbarfromStorage(callback) {
   storage.get('navbar', function(error, data) {
-    if (error) throw error
-    if(data.groupItems == undefined)
+    if (error) {
+       data = loadDefaultUserFolders()
+       console.error(error)
+    }
+  
+    if(data == undefined)
     data = loadDefaultUserFolders()
+    
     callback(data)
   })
 }
 
 export function saveStatetoStorage(currentState, bwid, callback) {
-  saveFavbartoStorage(currentState)
-  storage.set('lastState'+bwid, currentState, function(error) {
-    if (error) throw error;
-    callback()
-  });
+  saveFavbartoStorage(currentState, function() {
+    storage.set('lastState'+bwid, currentState, function(error) {
+      if (error) throw error;
+      callback()
+    })
+  })
 }
 
-export function saveFavbartoStorage(currentState) {
+export function saveFavbartoStorage(currentState, callback) {
   console.log("SAVEFAVBAR")
   storage.set('navbar', currentState.navbar.present, function(error) {
     if (error) throw error
+    callback && callback()
   })
 }
 
