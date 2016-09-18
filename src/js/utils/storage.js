@@ -15,14 +15,14 @@ export function loadStatefromStorage(windowID, callback) {
 
 export function loadNavbarfromStorage(callback) {
   storage.get('navbar', function(error, data) {
+   
     if (error) {
        data = loadDefaultUserFolders()
        console.error(error)
+    } else if(data.groupItems == undefined) {
+      data = loadDefaultUserFolders()
     }
   
-    if(data == undefined)
-    data = loadDefaultUserFolders()
-    
     callback(data)
   })
 }
