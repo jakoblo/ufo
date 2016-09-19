@@ -15,9 +15,9 @@ export default class NavGroupItem extends React.Component {
     let deleteButton = <Button className="remove" onClick={this.props.onItemRemove}></Button>
 
     return (
-      <a  className={className}>
+      <a onClick={this.props.onClick} draggable={this.props.draggable} className={className}>
         <Icon glyph={this.props.glyph} />
-        <span onClick={this.props.onClick} className="text">{this.props.title}</span>
+        <span className="text">{this.props.title}</span>
         {this.props.isDeletable && deleteButton}
       </a>
     )

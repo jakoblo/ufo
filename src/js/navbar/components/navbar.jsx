@@ -48,6 +48,8 @@ export default class Navbar extends React.Component {
     e.preventDefault()
     e.stopPropagation()
     e.dataTransfer.dropEffect = "copy"
+
+    
   }
 
   handleDrop = (e) => {

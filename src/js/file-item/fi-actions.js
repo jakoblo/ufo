@@ -31,6 +31,7 @@ export function open(file) {
  * Opens view-folder for directory or view-file for file 
  */
 export function show(file) {
+  console.log("SHOW")
   return (dispatch, getState) => {
     if(file.get('stats').isFile()) {
       //@todo two actions? bad?

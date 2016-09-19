@@ -109,17 +109,22 @@ export default class NavGroup extends React.Component {
         isDeletable={!this.props.isDiskGroup}
         active={active}
         glyph={glyph}
+        draggable={!this.props.isDiskGroup && true}
         >
       </NavGroupItem>)
   }
 
   // GROUP ITEM EVENTS
 
-  handleOnItemRemove = (itemID) => {
+  handleOnItemRemove = (itemID, e) => {
+    e.preventDefault()
+    e.stopPropagation()
     this.props.dispatch(Actions.removeGroupItem(this.props.groupID, itemID))
   }
 
-  handleSelectionChanged = (path) => {
+  handleSelectionChanged = (path, e) => {
+    e.preventDefault()
+    e.stopPropagation()
     this.props.dispatch(App.actions.changeAppPath(path))
   }
   
