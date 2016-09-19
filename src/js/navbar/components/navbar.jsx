@@ -7,8 +7,22 @@ import NavGroup from './navgroup'
 import nodePath from 'path'
 import _ from 'lodash'
 import {remote} from 'electron'
+import { DropTarget } from 'react-dnd'
 
+const NavbarTarget = {
+  drop(props) {
+    console.log(props)
+  }
+};
 
+function collect(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+}
+
+@DropTarget("NAVGROUP", NavbarTarget, collect)
 @connect((state) => {
   return {navbar: state[constants.NAME].present,
     state: state
@@ -48,13 +62,15 @@ export default class Navbar extends React.Component {
     e.preventDefault()
     e.stopPropagation()
     e.dataTransfer.dropEffect = "copy"
+
+    
   }
 
   handleDrop = (e) => {
-    console.log("nav-drop")
     e.preventDefault()
     e.stopPropagation()
-    
+
+    if(e.dataTransfer.files.length > 0) {
     let title = _.last(_.split(nodePath.dirname(e.dataTransfer.files[0].path), nodePath.sep))
     
     let files = []
@@ -63,5 +79,7 @@ export default class Navbar extends React.Component {
       files.push(value.path)
     })
     this.props.dispatch(Actions.addNavGroup(title, files))
+    }
   } 
 }
+

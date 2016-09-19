@@ -62,6 +62,7 @@ export default class NavGroup extends React.Component {
     e.preventDefault()
     e.stopPropagation()
 
+    if(e.dataTransfer.files.length > 0) {
     let files = []
 
     _.forIn(e.dataTransfer.files, function(value, key) {
@@ -70,6 +71,7 @@ export default class NavGroup extends React.Component {
     })
 
     this.props.dispatch(Actions.addGroupItems(this.props.groupID, files))
+    }
   }
 
   // GROUP TITLE EVENTS
@@ -107,17 +109,22 @@ export default class NavGroup extends React.Component {
         isDeletable={!this.props.isDiskGroup}
         active={active}
         glyph={glyph}
+        draggable={!this.props.isDiskGroup && true}
         >
       </NavGroupItem>)
   }
 
   // GROUP ITEM EVENTS
 
-  handleOnItemRemove = (itemID) => {
+  handleOnItemRemove = (itemID, e) => {
+    e.preventDefault()
+    e.stopPropagation()
     this.props.dispatch(Actions.removeGroupItem(this.props.groupID, itemID))
   }
 
-  handleSelectionChanged = (path) => {
+  handleSelectionChanged = (path, e) => {
+    e.preventDefault()
+    e.stopPropagation()
     this.props.dispatch(App.actions.changeAppPath(path))
   }
   
