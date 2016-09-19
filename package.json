@@ -20,7 +20,9 @@
     "immutable": "^3.8.1",
     "lodash": "^4.15.0",
     "mammoth": "^1.2.1",
-    "mv": "^2.1.1",
+    "mz": "^2.4.0",
+    "ncp": "^2.0.0",
+    "progress": "^1.1.8",
     "rc-tooltip": "^3.4.2",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
@@ -30,6 +32,7 @@
     "redux-thunk": "^2.1.0",
     "redux-undo": "^1.0.0-beta9",
     "reselect": "^2.5.3",
+    "rimraf": "^2.5.4",
     "trash": "^3.4.1",
     "underscore": "^1.8.3"
   },
