@@ -7,8 +7,22 @@ import NavGroup from './navgroup'
 import nodePath from 'path'
 import _ from 'lodash'
 import {remote} from 'electron'
+import { DropTarget } from 'react-dnd'
 
+const NavbarTarget = {
+  drop(props) {
+    console.log(props)
+  }
+};
 
+function collect(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+}
+
+@DropTarget("NAVGROUP", NavbarTarget, collect)
 @connect((state) => {
   return {navbar: state[constants.NAME].present,
     state: state
@@ -68,3 +82,4 @@ export default class Navbar extends React.Component {
     }
   } 
 }
+
