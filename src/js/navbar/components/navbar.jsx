@@ -13,7 +13,9 @@ import { NativeTypes } from 'react-dnd-html5-backend';
 
 const NavbarTarget = {
   drop(props, monitor) {
-    console.log(props)
+  const hasDroppedOnChild = monitor.didDrop()
+  if (hasDroppedOnChild) return
+  
   if(monitor.getItem().files.length > 0) {
     let title = _.last(_.split(nodePath.dirname(monitor.getItem().files[0].path), nodePath.sep))
     
@@ -59,11 +61,11 @@ export default class Navbar extends React.Component {
       'hide': this.props.hidden
     })
 
-    let dropStyle = { backgroundColor: '#AFD2E8' }
-    if(!isOver) dropStyle = {backgroundColor: ""}
+    let dndStyle = { backgroundColor: '#AFD2E8' }
+    if(!isOverCurrent) dndStyle = {backgroundColor: ""}
 
     return connectDropTarget(
-      <div className={classname} style={dropStyle}>
+      <div className={classname} style={dndStyle}>
         {navgroups}
       </div>
     )
@@ -71,7 +73,7 @@ export default class Navbar extends React.Component {
 
   createNavGroup = (item, index) => {
     return (<NavGroup
-      key={index}
+      key={item.id}
       index={index}
       groupID={item.id}
       activeItem={this.props.navbar.get("activeItem")}

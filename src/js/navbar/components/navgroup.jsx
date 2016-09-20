@@ -11,11 +11,30 @@ import * as Actions from '../navbar-actions'
 import { DnDTypes } from '../navbar-constants'
 import _ from 'lodash'
 const {Menu, MenuItem} = remote
-import { DropTarget } from 'react-dnd'
+import { DropTarget, DragSource } from 'react-dnd'
 import { findDOMNode } from 'react-dom';
+import { NativeTypes } from 'react-dnd-html5-backend';
+
 
 const groupTarget = {
+  drop(props, monitor, component) {
+    if(monitor.getItemType() === NativeTypes.FILE) {
+      if (props.isDiskGroup) return
+      if(monitor.getItem().files.length > 0) {
+        let files = []
+        _.forIn(monitor.getItem().files, function(value, key) {
+        if(_.hasIn(value, 'path'))
+        files.push(value.path)
+        })
+        props.dispatch(Actions.addGroupItems(props.index, files))
+      }
+    } else if(monitor.getItemType() === DnDTypes.NAVGROUP) {
+      props.dispatch(Actions.saveFavbartoStorage())
+    }
+  }, 
   hover(props, monitor, component) {
+    if(monitor.getItemType() !== DnDTypes.NAVGROUP) return
+
     const dragIndex = monitor.getItem().index;
     const hoverIndex = props.index;
 
@@ -52,7 +71,7 @@ const groupTarget = {
 
     // Time to actually perform the action
     //props.moveCard(dragIndex, hoverIndex);
-    //props.dispatch(Actions.moveNavGroup(dragIndex, hoverIndex))
+    props.dispatch(Actions.moveNavGroup(dragIndex, hoverIndex))
 
     // Note: we're mutating the monitor item here!
     // Generally it's better to avoid mutations,
@@ -62,8 +81,27 @@ const groupTarget = {
   }
 }
 
-@DropTarget([DnDTypes.NAVGROUP], groupTarget, connect => ({
-  connectDropTarget: connect.dropTarget()
+const groupSource = {
+  beginDrag(props) {
+    return {
+      id: props.groupID,
+      index: props.index
+    };
+  }
+}
+
+//https://gaearon.github.io/react-dnd/examples-sortable-simple.html
+@DropTarget([DnDTypes.NAVGROUP, NativeTypes.FILE], groupTarget, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  isOverCurrent: monitor.isOver({ shallow: true })
+}))
+@DragSource(DnDTypes.NAVGROUP, groupSource, (connect, monitor) => ({
+  // Call this function inside render()
+  // to let React DnD handle the drag events:
+  connectDragSource: connect.dragSource(),
+  // You can ask the monitor about the current drag state:
+  isDragging: monitor.isDragging(),
 }))
 export default class NavGroup extends React.Component {
   constructor(props) {
@@ -71,9 +109,9 @@ export default class NavGroup extends React.Component {
   }
 
   render() {
+    const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
     const dg = this.props.isDiskGroup
-    const { text, isDragging, connectDragSource, connectDropTarget } = this.props;
-    const opacity = isDragging ? 0 : 1;
+    const dndStyle = { backgroundColor: isOver ? '#AFD2E8' : '', opacity: isDragging ? 0 : 1 }
 
     let hideButtonText = this.props.hidden ? "show" : "hide";
     let classname = classnames({
@@ -81,60 +119,37 @@ export default class NavGroup extends React.Component {
       'hide': this.props.hidden
     })
 
-    return connectDropTarget(
-      <div className={classname} style={{opacity}} onDrop={this.handleDrop.bind(this)} onDragOver={this.handleDragOver}>
+    return connectDragSource(connectDropTarget(
+      <div className={classname} style={dndStyle}>
         <NavGroupTitle 
           title={this.props.title}
           isDiskGroup={dg}
-          groupID={this.props.groupID} 
           onGroupTitleChange={!dg && this.handleGroupTitleChange} 
           hideButtonText={hideButtonText} 
-          onToggleGroup={this.handleToggleGroup.bind(this, this.props.groupID)}
+          onToggleGroup={this.handleToggleGroup.bind(this, this.props.index)}
           onContextMenu={!dg && this.onContextMenu}
         />
         <div className="nav-group-item-wrapper">
           {this.props.items.map(this.createGroupItem)}
         </div>
       </div>
-    )
+    ))
   }
 
   // GROUP EVENTS
 
   handleToggleGroup = () => {
-    this.props.dispatch(Actions.toggleGroup(this.props.groupID))
+    this.props.dispatch(Actions.toggleGroup(this.props.index))
   }  
 
   handleRemoveGroup = () => {
-    this.props.dispatch(Actions.removeNavGroup(this.props.groupID))
-  }
-
-  handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = "copy"
-  }
-
-  handleDrop(e) {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if(e.dataTransfer.files.length > 0) {
-    let files = []
-
-    _.forIn(e.dataTransfer.files, function(value, key) {
-      if(_.hasIn(value, 'path'))
-      files.push(value.path)
-    })
-
-    this.props.dispatch(Actions.addGroupItems(this.props.groupID, files))
-    }
+    this.props.dispatch(Actions.removeNavGroup(this.props.index))
   }
 
   // GROUP TITLE EVENTS
 
   handleGroupTitleChange = (newTitle) => {
-    this.props.dispatch(Actions.changeGroupTitle(this.props.groupID, newTitle))
+    this.props.dispatch(Actions.changeGroupTitle(this.props.index, newTitle))
   }
 
   /**
@@ -176,7 +191,7 @@ export default class NavGroup extends React.Component {
   handleOnItemRemove = (itemID, e) => {
     e.preventDefault()
     e.stopPropagation()
-    this.props.dispatch(Actions.removeGroupItem(this.props.groupID, itemID))
+    this.props.dispatch(Actions.removeGroupItem(this.props.index, itemID))
   }
 
   handleSelectionChanged = (path, e) => {

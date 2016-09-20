@@ -5,6 +5,12 @@ import _ from 'lodash'
 
 let nextNavGroupId = 0
 
+export function saveFavbartoStorage() {
+  return function(dispatch, getState) {
+    Utils.storage.saveFavbartoStorage(getState())
+  }
+}
+
 export function toggleGroup(groupID) { // Action Creator
   return { // action
     type: t.NAVBAR_TOGGLE_GROUP,
@@ -74,6 +80,15 @@ export function removeNavGroup(groupIndex) {
     })
 
     Utils.storage.saveFavbartoStorage(getState())
+  }
+}
+
+export function moveNavGroup(dragIndex, hoverIndex) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: t.MOVE_NAVGROUP,
+      payload: {dragIndex: dragIndex, hoverIndex: hoverIndex}
+    })
   }
 }
 
