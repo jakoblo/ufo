@@ -12,8 +12,8 @@ import { DnDTypes } from '../navbar-constants'
 import _ from 'lodash'
 const {Menu, MenuItem} = remote
 import { DropTarget, DragSource } from 'react-dnd'
-import { findDOMNode } from 'react-dom';
-import { NativeTypes } from 'react-dnd-html5-backend';
+import { findDOMNode } from 'react-dom'
+import { NativeTypes } from 'react-dnd-html5-backend'
 
 
 const groupTarget = {
@@ -158,7 +158,8 @@ export default class NavGroup extends React.Component {
    * 
    * @memberOf NavGroup
    */
-  createGroupItem = (path, itemID) => {
+  createGroupItem = (item, index) => {
+    const path = item.path
     let basePath = nodePath.basename(path)
     let active = false
     if(path === this.props.activeItem)
@@ -174,30 +175,36 @@ export default class NavGroup extends React.Component {
 
     return (
       <NavGroupItem
-        key={itemID}
+        key={item.id}
+        index={index}
         onClick={this.handleSelectionChanged.bind(this, path)}
-        onItemRemove={this.handleOnItemRemove.bind(this, itemID)}
+        onItemRemove={this.handleOnItemRemove.bind(this, index)}
         title={basePath}
-        isDeletable={!this.props.isDiskGroup}
+        isDiskGroup={this.props.isDiskGroup}
         active={active}
         glyph={glyph}
         draggable={!this.props.isDiskGroup && true}
+        onMoveGroupItem={this.handleMoveGroupItem}
         >
       </NavGroupItem>)
   }
 
   // GROUP ITEM EVENTS
 
-  handleOnItemRemove = (itemID, e) => {
+  handleOnItemRemove = (itemIndex, e) => {
     e.preventDefault()
     e.stopPropagation()
-    this.props.dispatch(Actions.removeGroupItem(this.props.index, itemID))
+    this.props.dispatch(Actions.removeGroupItem(this.props.index, itemIndex))
   }
 
   handleSelectionChanged = (path, e) => {
     e.preventDefault()
     e.stopPropagation()
     this.props.dispatch(App.actions.changeAppPath(path))
+  }
+
+  handleMoveGroupItem = (dragIndex, hoverIndex) => {
+    this.props.dispatch(Actions.moveGroupItem(this.props.index, dragIndex, hoverIndex))
   }
   
 /**

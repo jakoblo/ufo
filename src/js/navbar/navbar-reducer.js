@@ -4,13 +4,6 @@ import App from '../app/app-index'
 import Immutable from 'immutable'
 import { Map, List } from 'immutable'
 
-// const INITIAL_STATE = Immutable.fromJS({groupItems: [
-//     {title: "FavGroup 1", hidden: false, items: ["/", "/Users/jakoblo/Desktop"]},
-//     {title: "FavGroup 2", hidden: false, items: ["/Users/jakoblo/Documents", "/Users/jakoblo/Downloads", "/Users/jakoblo/Applications"]}
-//   ],
-//   activeItem: ''
-// })
-
 const INITIAL_STATE = Map({groupItems: List(), activeItem: ''})
 
 export default function navbarReducer(state = INITIAL_STATE, action = { type: '' }) {
@@ -21,9 +14,15 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
 
     case t.MOVE_NAVGROUP:
       if (action.payload.hoverIndex < 0) return state
-      let olditem = state.get('groupItems').get(action.payload.dragIndex)
-      let newlist = state.get('groupItems').delete(action.payload.dragIndex).insert(action.payload.hoverIndex, olditem)
-      return state.set('groupItems', newlist)
+      let oldgroup = state.get('groupItems').get(action.payload.dragIndex)
+      let newgrouplist = state.get('groupItems').delete(action.payload.dragIndex).insert(action.payload.hoverIndex, oldgroup)
+      return state.set('groupItems', newgrouplist)
+
+    case t.MOVE_GROUPITEM:
+      if (action.payload.hoverIndex < 0) return state
+      let olditem = state.getIn(['groupItems', action.payload.groupIndex, 'items', action.payload.dragIndex])
+      let newitemlist = state.getIn(['groupItems', action.payload.groupIndex, 'items']).delete(action.payload.dragIndex).insert(action.payload.hoverIndex, olditem)
+      return state.setIn(['groupItems', action.payload.groupIndex, 'items'], newitemlist)
 
     case t.REMOVE_DEVICE_ITEM:
       const deviceGroupIndex = state.get('groupItems').findIndex(group => group.get('title') === action.payload.groupTitle)

@@ -1,9 +1,10 @@
 import * as t from './navbar-actiontypes'
-import { List, Map } from 'immutable'
+import { List, Map, fromJS } from 'immutable'
 import * as Utils from '../utils/utils-index'
 import _ from 'lodash'
 
 let nextNavGroupId = 0
+let nextGroupItemId = 0
 
 export function saveFavbartoStorage() {
   return function(dispatch, getState) {
@@ -62,9 +63,10 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
  */
 export function addNavGroup(title, items, position, hidden, loading) { 
   return function(dispatch, getState) {
+
     dispatch({ // action
       type: t.ADD_NAVGROUP,
-      payload: {id: nextNavGroupId++, title: title, items: List(items), position: position, hidden: hidden}
+      payload: {id: nextNavGroupId++, title: title, items: getItemList(items), position: position, hidden: hidden}
     })
 
     if(loading == undefined)
@@ -92,6 +94,13 @@ export function moveNavGroup(dragIndex, hoverIndex) {
   }
 }
 
+export function moveGroupItem(groupIndex, dragIndex, hoverIndex) {
+  return {
+    type: t.MOVE_GROUPITEM,
+    payload: {groupIndex: groupIndex, dragIndex: dragIndex, hoverIndex: hoverIndex}
+  }
+}
+
 /**
  * 
  * 
@@ -110,7 +119,7 @@ export function addGroupItems(groupIndex, items) {
       {type: t.ADD_GROUP_ITEM,
       payload: {
           groupIndex: groupIndex,
-          items: itemArray
+          items: getItemList(itemArray)
         }
       }
     )
@@ -118,4 +127,16 @@ export function addGroupItems(groupIndex, items) {
     Utils.storage.saveFavbartoStorage(getState())
   }
 
+}
+
+function getItemList(items) {
+  let itemList = []
+  items.forEach(function(element) {
+    if(_.isObject(element) && _.has(element, 'path')) {
+    itemList.push({id: nextGroupItemId++, path: element.path})
+    } else {
+    itemList.push({id: nextGroupItemId++, path: element})
+    }
+  }, this)
+  return fromJS(itemList)
 }
