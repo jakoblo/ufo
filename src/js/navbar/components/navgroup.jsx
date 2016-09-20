@@ -93,7 +93,7 @@ const groupSource = {
 //https://gaearon.github.io/react-dnd/examples-sortable-simple.html
 @DropTarget([DnDTypes.NAVGROUP, NativeTypes.FILE], groupTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
+  isOver: monitor.isOver() && (monitor.getItemType() === NativeTypes.FILE),
   isOverCurrent: monitor.isOver({ shallow: true })
 }))
 @DragSource(DnDTypes.NAVGROUP, groupSource, (connect, monitor) => ({
