@@ -183,7 +183,6 @@ export default class NavGroup extends React.Component {
         isDiskGroup={this.props.isDiskGroup}
         active={active}
         glyph={glyph}
-        draggable={!this.props.isDiskGroup && true}
         onMoveGroupItem={this.handleMoveGroupItem}
         >
       </NavGroupItem>)
