@@ -3,6 +3,8 @@ import { List, Map } from 'immutable'
 import * as Utils from '../utils/utils-index'
 import _ from 'lodash'
 
+let nextNavGroupId = 0
+
 export function toggleGroup(groupID) { // Action Creator
   return { // action
     type: t.NAVBAR_TOGGLE_GROUP,
@@ -45,7 +47,7 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
 
 /**
  * 
- * 
+ * NAVGROUP
  * @export
  * @param {string} title
  * @param {array} items
@@ -56,7 +58,7 @@ export function addNavGroup(title, items, position, hidden, loading) {
   return function(dispatch, getState) {
     dispatch({ // action
       type: t.ADD_NAVGROUP,
-      payload: {title: title, items: List(items), position: position, hidden: hidden}
+      payload: {id: nextNavGroupId++, title: title, items: List(items), position: position, hidden: hidden}
     })
 
     if(loading == undefined)

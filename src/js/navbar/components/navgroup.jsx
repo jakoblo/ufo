@@ -8,9 +8,63 @@ import NavGroupTitle from './navgroup-title'
 import {remote} from 'electron'
 import App from '../../app/app-index'
 import * as Actions from '../navbar-actions'
+import { DnDTypes } from '../navbar-constants'
 import _ from 'lodash'
 const {Menu, MenuItem} = remote
+import { DropTarget } from 'react-dnd'
+import { findDOMNode } from 'react-dom';
 
+const groupTarget = {
+  hover(props, monitor, component) {
+    const dragIndex = monitor.getItem().index;
+    const hoverIndex = props.index;
+
+    // Don't replace items with themselves
+    if (dragIndex === hoverIndex) {
+      return;
+    }
+
+    // Determine rectangle on screen
+    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+
+    // Get vertical middle
+    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+    // Determine mouse position
+    const clientOffset = monitor.getClientOffset();
+
+    // Get pixels to the top
+    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+    // Only perform the move when the mouse has crossed half of the items height
+    // When dragging downwards, only move when the cursor is below 50%
+    // When dragging upwards, only move when the cursor is above 50%
+
+    // Dragging downwards
+    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+      return;
+    }
+
+    // Dragging upwards
+    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+      return;
+    }
+
+    // Time to actually perform the action
+    //props.moveCard(dragIndex, hoverIndex);
+    //props.dispatch(Actions.moveNavGroup(dragIndex, hoverIndex))
+
+    // Note: we're mutating the monitor item here!
+    // Generally it's better to avoid mutations,
+    // but it's good here for the sake of performance
+    // to avoid expensive index searches.
+    monitor.getItem().index = hoverIndex;
+  }
+}
+
+@DropTarget([DnDTypes.NAVGROUP], groupTarget, connect => ({
+  connectDropTarget: connect.dropTarget()
+}))
 export default class NavGroup extends React.Component {
   constructor(props) {
     super(props)
@@ -18,14 +72,17 @@ export default class NavGroup extends React.Component {
 
   render() {
     const dg = this.props.isDiskGroup
+    const { text, isDragging, connectDragSource, connectDropTarget } = this.props;
+    const opacity = isDragging ? 0 : 1;
+
     let hideButtonText = this.props.hidden ? "show" : "hide";
     let classname = classnames({
       'nav-group': true,
       'hide': this.props.hidden
     })
 
-    return(
-      <div className={classname} onDrop={this.handleDrop.bind(this)} onDragOver={this.handleDragOver}>
+    return connectDropTarget(
+      <div className={classname} style={{opacity}} onDrop={this.handleDrop.bind(this)} onDragOver={this.handleDragOver}>
         <NavGroupTitle 
           title={this.props.title}
           isDiskGroup={dg}

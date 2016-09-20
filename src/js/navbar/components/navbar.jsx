@@ -8,26 +8,40 @@ import nodePath from 'path'
 import _ from 'lodash'
 import {remote} from 'electron'
 import { DropTarget } from 'react-dnd'
+import classnames from 'classnames'
+import { NativeTypes } from 'react-dnd-html5-backend';
 
 const NavbarTarget = {
-  drop(props) {
+  drop(props, monitor) {
     console.log(props)
+  if(monitor.getItem().files.length > 0) {
+    let title = _.last(_.split(nodePath.dirname(monitor.getItem().files[0].path), nodePath.sep))
+    
+    let files = []
+    _.forIn(monitor.getItem().files, function(value, key) {
+      if(_.hasIn(value, 'path'))
+      files.push(value.path)
+    })
+    props.dispatch(Actions.addNavGroup(title, files))
+    }
   }
-};
-
-function collect(connect, monitor) {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
-  };
 }
 
-@DropTarget("NAVGROUP", NavbarTarget, collect)
 @connect((state) => {
   return {navbar: state[constants.NAME].present,
     state: state
   }
 })
+@DropTarget(NativeTypes.FILE, NavbarTarget, (connect, monitor) => ({
+  // Call this function inside render()
+  // to let React DnD handle the drag events:
+  connectDropTarget: connect.dropTarget(),
+  // You can ask the monitor about the current drag state:
+  isOver: monitor.isOver(),
+  isOverCurrent: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop(),
+  itemType: monitor.getItemType()
+}))
 export default class Navbar extends React.Component {
   constructor(props) {
     super(props)
@@ -37,8 +51,19 @@ export default class Navbar extends React.Component {
     let navgroups = null
     if(this.props.navbar.has('groupItems')) 
     navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
-    return(
-      <div className="nav-bar" onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
+
+    const { isOver, canDrop, connectDropTarget, isOverCurrent } = this.props;
+
+    let classname = classnames({
+      'nav-bar': true,
+      'hide': this.props.hidden
+    })
+
+    let dropStyle = { backgroundColor: '#AFD2E8' }
+    if(!isOver) dropStyle = {backgroundColor: ""}
+
+    return connectDropTarget(
+      <div className={classname} style={dropStyle}>
         {navgroups}
       </div>
     )
@@ -47,7 +72,8 @@ export default class Navbar extends React.Component {
   createNavGroup = (item, index) => {
     return (<NavGroup
       key={index}
-      groupID={index}
+      index={index}
+      groupID={item.id}
       activeItem={this.props.navbar.get("activeItem")}
       title={item.title}
       items={item.items}
@@ -56,30 +82,5 @@ export default class Navbar extends React.Component {
       dispatch={this.props.dispatch}
       />)
   }
-
-
-  handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = "copy"
-
-    
-  }
-
-  handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if(e.dataTransfer.files.length > 0) {
-    let title = _.last(_.split(nodePath.dirname(e.dataTransfer.files[0].path), nodePath.sep))
-    
-    let files = []
-    _.forIn(e.dataTransfer.files, function(value, key) {
-      if(_.hasIn(value, 'path'))
-      files.push(value.path)
-    })
-    this.props.dispatch(Actions.addNavGroup(title, files))
-    }
-  } 
 }
 
