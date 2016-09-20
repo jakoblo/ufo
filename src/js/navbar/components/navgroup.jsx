@@ -184,6 +184,7 @@ export default class NavGroup extends React.Component {
         active={active}
         glyph={glyph}
         onMoveGroupItem={this.handleMoveGroupItem}
+        saveFavbar={this.handleSaveFavbar}
         >
       </NavGroupItem>)
   }
@@ -204,6 +205,10 @@ export default class NavGroup extends React.Component {
 
   handleMoveGroupItem = (dragIndex, hoverIndex) => {
     this.props.dispatch(Actions.moveGroupItem(this.props.index, dragIndex, hoverIndex))
+  }
+
+  handleSaveFavbar = () => {
+    this.props.dispatch(Actions.saveFavbartoStorage())
   }
   
 /**

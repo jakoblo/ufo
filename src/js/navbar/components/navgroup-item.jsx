@@ -21,7 +21,12 @@ const itemSource = {
 }
 
 const itemTarget = {
-    hover(props, monitor, component) {
+  drop(props, monitor, component) {
+    if(monitor.getItemType() === DnDTypes.GROUPITEM) {
+      props.saveFavbar()
+    }
+  },
+  hover(props, monitor, component) {
     if(monitor.getItemType() !== DnDTypes.GROUPITEM) return
 
     const dragIndex = monitor.getItem().index;
