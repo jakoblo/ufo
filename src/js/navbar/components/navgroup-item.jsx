@@ -15,7 +15,8 @@ const itemSource = {
   beginDrag(props) {
     return {
       id: props.index,
-      index: props.index
+      index: props.index,
+      groupID: props.groupID
     };
   }
 }
@@ -28,6 +29,7 @@ const itemTarget = {
   },
   hover(props, monitor, component) {
     if(monitor.getItemType() !== DnDTypes.GROUPITEM) return
+    if(props.groupID !== monitor.getItem().groupID) return
 
     const dragIndex = monitor.getItem().index;
     const hoverIndex = props.index;

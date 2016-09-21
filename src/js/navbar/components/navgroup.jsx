@@ -177,6 +177,7 @@ export default class NavGroup extends React.Component {
       <NavGroupItem
         key={item.id}
         index={index}
+        groupID={this.props.groupID}
         onClick={this.handleSelectionChanged.bind(this, path)}
         onItemRemove={this.handleOnItemRemove.bind(this, index)}
         title={basePath}
