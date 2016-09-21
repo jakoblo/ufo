@@ -18,9 +18,9 @@ export default class NavGroupTitle extends React.Component {
    if(this.state.editGroupTitle) {
      title = <input ref="input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
    }
-
+  
   return (
-      <div className="nav-group-title" draggable={!this.props.isDiskGroup && true}>
+      <div className="nav-group-title">
         {title}
         <Button className="nav-group-hide" onClick={this.props.onToggleGroup} text={this.props.hideButtonText}/>
       </div>
