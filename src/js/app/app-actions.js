@@ -17,6 +17,7 @@ let pathRoute = []
 export function changeAppPath(fromPath, toPath, historyJump = false) {
 
   return dispatch => {
+    console.log("CHANGE APP PATH")
 
     if(fromPath && !toPath) { toPath = fromPath }
     fromPath = fromPath   ||  _.first(pathRoute)
