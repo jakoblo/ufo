@@ -28,6 +28,11 @@ export default class FileItemDisplay extends React.Component {
 
   render() {
 
+    if(!this.props.file.get('stats')) {
+      console.log(this.props.file.toJS())
+    }
+
+
     return (
       <span
         className={classNames({
@@ -39,7 +44,8 @@ export default class FileItemDisplay extends React.Component {
           'selected': this.props.file.get('selected'),
           'drag-target': this.state.data.get('dropTarget'),
           'drag-blocked': this.state.data.get('dropBlocked'),
-          'open-animation': this.state.data.get('openAnimation')
+          'open-animation': this.state.data.get('openAnimation'),
+          'writing': this.props.file.get('progress')
         })}
       >
         <span className="flex-box">

@@ -10,38 +10,27 @@ import mkdirp from 'mkdirp'
 import progress from 'progress-stream';
 import fs from 'mz/fs'
 import * as c from '../fs-write-constants'
+import * as t from '../fs-write-actiontypes'
 
 process.on('message', (m) => {
-  mv(m.source, m.dest, m.options, sendError)
+  mv(m.id, m.source, m.dest, m.options)
 });
 
-function sendError(err) {
-  process.send({ 
-    type: c.CHILD_ERR,
-    error: err 
-  });
-} 
-
-function sendLog(message) {
-  process.send({ 
-    type: c.CHILD_LOG,
-    payload: message 
-  });
-}
-
-function sendDone() {
+function mv(id, source, dest, param){
   process.send({
-    type: c.CHILD_DONE
+    type: t.FS_WRITE_NEW,
+    payload: {
+      ...param,
+      id: id,
+      source: source,
+      destination: dest
+    }
   })
-}
-
-function mv(source, dest, param, cb){
-
-  sendLog('start fs write')
 
   const options = {...param, limit: 16}
   const sourePermissions = (options.move) ? fs.constants.W_OK : fs.constants.R_OK || fs.constants.W_OK
   const destPermissions = fs.constants.W_OK
+
   questionJob()
 
   function questionJob() {
@@ -89,8 +78,8 @@ function mv(source, dest, param, cb){
     sendLog('try rename')
     if (options.clobber) {
       fs.rename(source, dest, function(err) {
-        if (!err) return cb();
-        if (err.code !== c.ERROR_RENAME_CROSS_DEVICE) return cb(err);
+        if (!err) return sendDone();
+        if (err.code !== c.ERROR_RENAME_CROSS_DEVICE) return sendError(err);
         copy(source, dest);
       });
     } else {
@@ -123,16 +112,18 @@ function mv(source, dest, param, cb){
       limit: options.limit,
       transform: (read, write) => {
         var str = progress({
-          length: fs.statSync(source).size,
-          time: 500
+          length: fs.statSync(read.path).size,
+          time: 200
         });
         str.on('progress', (progress) => {
           process.send({
-            type: c.CHILD_PROGRESS,
+            type: t.FS_WRITE_PROGRESS,
             payload: {
-              source: read.path,
-              dest: write.path,
-              progress: progress
+              id: id,
+              file: {
+                source: read.path,
+                destination: write.path,
+                progress: progress}
             }
           })
         })
@@ -141,6 +132,7 @@ function mv(source, dest, param, cb){
       } 
     };
     if (options.clobber) {
+      console.log('rimraf')
       rimraf(dest, { disableGlob: true }, (err) => {
         if (err) return sendError(err);
         startNcp();
@@ -165,5 +157,35 @@ function mv(source, dest, param, cb){
     }
   }
 
-}
+  function sendError(err) {
+    process.send({ 
+      type: t.FS_WRITE_ERROR,
+      payload: {
+        id: id,
+        source: source,
+        destination: dest,
+        ...param
+      },
+      error: err
+    });
+  }
 
+  function sendLog(message) {
+    process.send({
+      type: 'LOG',
+      payload: message 
+    });
+  }
+
+  function sendDone() {
+    process.send({
+      type: t.FS_WRITE_DONE,
+      payload: {
+        id: id,
+        source: source,
+        destination: dest,
+        ...param
+      }
+    })
+  }
+}

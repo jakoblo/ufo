@@ -197,6 +197,10 @@
   &.open-animation {
     animation: zoom 0.3s 1;
   }
+
+  &.writing {
+    opacity: 0.2
+  }
 }
 
 

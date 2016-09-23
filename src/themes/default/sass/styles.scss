@@ -20,7 +20,7 @@ $color-button-border-hover: #ddd;
 
 $shadow-mouse-over: 0px 0px 2px 0px rgba(0,0,0,0.27);
 
-$view-padding-horiz: 5%;
+$view-padding-horiz: 5%; 
 $view-padding-horiz-number: 0.05;
 
 $view-bottom-space: 10px;
@@ -35,6 +35,7 @@ $button-height: 25px;
 @import 'file-item';
 @import 'preview';  
 @import 'display-list'; 
+@import 'fs-write'; 
 @import 'icons'; 
 @import 'loading-cube';
 @import 'tooltip';

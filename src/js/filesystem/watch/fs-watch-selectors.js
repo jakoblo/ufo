@@ -1,37 +1,13 @@
 import { createSelector } from 'reselect'
 import nodePath from 'path'
-import Selection from '../../selection/sel-index'
+import FsWrite from '../write/fs-write-index'
 import ViewFile from '../../view-file/vf-index'
-
-/**
- * Main Selector to get all Files with all Information 
- * which are need to display the current Folder State
- * @return selector(state, {path: string}) => Immuteable Map of Files
- */
-export const getFolderCombinedFactory = () => {
-
-  let getFolderWithActive = getFolderWithActiveFactory()
-
-  return createSelector(
-    [getFolderWithActive, Selection.selectors.getSelectionFor],
-    (files, selection) => {
-      if(files && selection) {
-        selection.get('files').forEach((selectedFile, index) => {
-          if(files.get(selectedFile)) {
-            files = files.setIn([selectedFile, 'selected'], true)
-          } else {
-            console.error('Try to set a File selected which does not exists in the FileSystem', files.toJS(), selectedFile)
-          }
-        })
-      }
-      return files
-  })
-}
 
 /**
  * @param  {store} state
  */
 export const getDirectorySeq = (state) => state.fs.keySeq().toJS()
+
 
 
 /**
@@ -118,6 +94,22 @@ export function getFile(state, props) {
 }
 
 
+export const getFolderWithActiveFactory = () => {
+  return createSelector(
+    [getFiles, getActiveFile],
+    (files, activeFile) => {
+      if(files && activeFile) {
+        if(files.get(activeFile)) {
+          files = files.setIn([activeFile, 'active'], true)
+        } else {
+          console.error('Try to set a File active which does not exists in the FileSystem', files.toJS(), activeFile) 
+        }
+      }
+      return files
+  })
+}
+
+
 // -------------------
 // Private
 // -------------------
@@ -140,19 +132,4 @@ function getDirDirection(state, props, direction) {
   })
   let nextPath = directorySeq[currentIndex + direction]
   return nextPath
-}
-
-const getFolderWithActiveFactory = () => {
-  return createSelector(
-    [getFiles, getActiveFile],
-    (files, activeFile) => {
-      if(files && activeFile) {
-        if(files.get(activeFile)) {
-          files = files.setIn([activeFile, 'active'], true)
-        } else {
-          console.error('Try to set a File active which does not exists in the FileSystem', files.toJS(), activeFile) 
-        }
-      }
-      return files
-  })
 }
