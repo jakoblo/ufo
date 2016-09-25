@@ -11,7 +11,7 @@ export function moveToTrash(sources) {
 
 export function move(sources, targetFolder, options) {
   sources.forEach((src) => {
-    createFsWorker(
+    startFsWorker(
       src,
       nodePath.join(targetFolder, nodePath.basename(src)), 
       {clobber: false, ...options, move: true}
@@ -21,7 +21,7 @@ export function move(sources, targetFolder, options) {
 
 export function copy(sources, targetFolder, options) {
   sources.forEach((src) => {
-    createFsWorker(
+    startFsWorker(
       src, 
       nodePath.join(targetFolder, nodePath.basename(src)), 
       {clobber: false, ...options, move: false}
@@ -38,15 +38,9 @@ export function removeAction(id) {
   }
 }
 
-export function createFsWorker(source, destination, options, setId) {
-  let id = (setId != undefined) ? setId : window.store.getState()[c.NAME].size
-  if(source != destination) {
-    handleFsWorker(id, source, destination, options)
-  }
-}
-
-function handleFsWorker(id, source, destination, options) {
+export function startFsWorker(source, destination, options, setId) {
   
+  let id = (setId != undefined) ? setId : window.store.getState()[c.NAME].size
   var fsWriteWorker = fork(__dirname + '/child-worker/fs-write-worker.js');
 
   fsWriteWorker.send({
@@ -54,13 +48,13 @@ function handleFsWorker(id, source, destination, options) {
     source: source,
     dest: destination,
     options
-  });
+  })
 
   fsWriteWorker.on('message', function(response) {
-    if(
-        response.type == t.FS_WRITE_ERROR ||
-        response.type == t.FS_WRITE_DONE
-      ) { fsWriteWorker.kill() }
     window.store.dispatch(response)
-  });
+  })
+
+  // fsWriteWorker.on('close', (code) => {
+  //   console.log(`fs write worker exit: ${code}`);
+  // });
 }

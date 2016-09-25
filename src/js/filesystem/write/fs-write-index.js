@@ -4,5 +4,6 @@ import * as constants from './fs-write-constants'
 import reducer from './fs-write-reducer'
 import * as selectors from './fs-write-selectors'
 import component from './components/fs-write-overview'
+import * as utils from './fs-write-utils'
 
-export default {actions, actiontypes, reducer, constants, selectors, component}
+export default {actions, actiontypes, reducer, constants, selectors, component, utils}

@@ -14,8 +14,9 @@ export const getFolderCombinedFactory = () => {
   let getProgressingForFolder = Write.selectors.getProgressingForFolderFactory()
 
   return createSelector(
-    [getFolderWithActive, Selection.selectors.getSelectionFor, getProgressingForFolder, getProps],
-    (files, selection, write, props) => {
+    [getFolderWithActive, Selection.selectors.getSelectionFor, getProgressingForFolder, getPath],
+    (files, selection, write, path) => {
+
       if(files && selection) {
         selection.get('files').forEach((selectedFile, index) => {
           if(files.get(selectedFile)) {
@@ -34,4 +35,4 @@ export const getFolderCombinedFactory = () => {
   })
 }
 
-const getProps = (state, props) => props
+const getPath = (state, props) => props.path

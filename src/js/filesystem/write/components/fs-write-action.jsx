@@ -3,7 +3,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import Button from '../../../general-components/button'
-import {Map} from 'immutable'
 import nodePath from 'path'
 import * as c from '../fs-write-constants'
 import * as FsWriteActions from '../fs-write-actions'
@@ -15,48 +14,6 @@ export default class WriteAction extends React.Component {
   }
 
   render() {
-
-    let progressing, errorMessage, confirm, actionType, status = null
-
-    actionType = (this.props.action.get('move')) ? 'move' : 'copy'
-    status = 'doing'
-    if(this.props.action.get('finished')) {
-      status = "Finished"
-    }
-    if(this.props.action.get('error')) {
-      console.log(this.props.action.get('error').toJS())
-      status = "Error"
-      errorMessage = <p>{c.MESSAGES[this.props.action.getIn(['error', 'code'])]}</p>
-    }
-
-    progressing = this.props.action.get('files').valueSeq().map((progFile, index) => {
-
-      return  <div key={index} className="progressing-file">
-                {nodePath.basename(progFile.get('destination'))}
-                <progress max="100" value={progFile.get('progress').get('percentage')}></progress>
-              </div>
-    })
-
-    if(this.props.action.get('error') && this.props.action.getIn(['error', 'code']) == c.ERROR_DEST_ALREADY_EXISTS) {
-      confirm = 
-      <div className="confirm">
-        <Button text="Overwrite" onClick={
-          () => {
-            FsWriteActions.createFsWorker(
-              this.props.action.get('source'),
-              this.props.action.get('destination'),
-              {...this.props.action.get('options'), clobber: true},
-              this.props.action.get('id')
-            )
-          }
-        }/>
-        <Button text="Cancel" onClick={() => {
-          this.props.dispatch(FsWriteActions.removeAction(this.props.action.get('id')))
-        }}
-          />
-      </div>
-    }
-
     return (
       <div
         className={classNames({
@@ -65,13 +22,98 @@ export default class WriteAction extends React.Component {
           'error': this.props.action.get('error')
         })}
       >
-        <br/>{status}<br/>
-        {actionType + ' '} 
-        <b>{nodePath.basename(this.props.action.get('source'))}</b>{' to '} 
-        <b>{nodePath.basename(nodePath.dirname(this.props.action.get('destination')))}</b> 
-        {errorMessage} {confirm} {progressing}
+        {this.renderClose()}
+        <div className="action-describe">
+          {(this.props.action.get('move')) ? 'move ' : 'copy '} 
+          <b>{nodePath.basename(this.props.action.get('source'))}</b>{' to '} 
+          <b>{nodePath.basename(nodePath.dirname(this.props.action.get('destination')))}</b>
+        </div>
+        {this.renderErrorMessage()} 
+        {this.renderConfirm()} 
+        {this.renderProgressing()}
       </div>
     )
+  }
+
+  renderClose = () => {
+    if(this.props.action.get('finished') || this.props.action.get('error')) {
+      return <Button text="X" onClick={
+                () => { this.props.dispatch( FsWriteActions.removeAction(this.props.action.get('id')) ) }
+              }/> 
+    } else {
+      return null
+    }
+  }
+
+  renderErrorMessage = () => {
+    if(this.props.action.getIn(['error', 'code'])) {
+      return  <div className="error-handling">
+                <p className="error-message">
+                  {c.MESSAGES[this.props.action.getIn(['error', 'code'])]}
+                </p>
+                <div className="error-actions">
+                  <Button className="try-again" text="Try Again" onClick={
+                    () => {
+                      FsWriteActions.startFsWorker(
+                        this.props.action.get('source'),
+                        this.props.action.get('destination'),
+                        {
+                          move: this.props.action.get('move'),
+                          clobber: this.props.action.get('clobber')
+                        },
+                        this.props.action.get('id')
+                      )
+                    }
+                  }/>
+                </div>
+              </div>
+    } else {
+      return null
+    }
+  }
+
+  renderConfirm = () => {
+    if(this.props.action.get('error') && this.props.action.getIn(['error', 'code']) == c.ERROR_DEST_ALREADY_EXISTS) {
+      return  <div className="confirm">
+                <Button text="Overwrite" onClick={
+                  () => {
+                    FsWriteActions.startFsWorker(
+                      this.props.action.get('source'),
+                      this.props.action.get('destination'),
+                      {...this.props.action.get('options'), clobber: true},
+                      this.props.action.get('id')
+                    )
+                  }
+                }/>
+                <Button text="Cancel" onClick={() => {
+                  this.props.dispatch(FsWriteActions.removeAction(this.props.action.get('id')))
+                }}
+                  />
+              </div>
+    } else {
+      return null
+    }
+  }
+
+  renderProgressing = () => {
+    if(this.props.action.get('files').size > 0){
+      return <div className="progressing-files">
+              {
+                this.props.action.get('files').valueSeq().map((progFile, index) => {
+                  return  <div key={index} className="progressing-file">
+                            {nodePath.basename(progFile.get('destination'))}
+                            <progress max="100" value={progFile.get('progress').get('percentage')}></progress>
+                          </div>
+                })
+              }
+            </div>
+    } else {
+      return null
+    }
+  } 
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return nextProps.action !== this.props.action // || nextState.data !== this.state.data;
   }
 
   // setImmState(fn) {
@@ -80,8 +122,4 @@ export default class WriteAction extends React.Component {
   //     data: fn(data)
   //   }));
   // }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    return nextProps.action !== this.props.action // || nextState.data !== this.state.data;
-  }
 }

@@ -3,13 +3,13 @@ import * as c from './fs-write-constants'
 import nodePath from 'path'
 
 export const getFSWrite = (state, props) => state[c.NAME]
-export const getProps = (state, props) => props
+export const getPath = (state, props) => props.path
 
 export const getForFolderFactory = (state, props) => {
   return createSelector(
-    [getFSWrite, getProps], (fsWrite, props) => {
+    [getFSWrite, getPath], (fsWrite, path) => {
       return fsWrite.map((entry) => {
-        if(nodePath.dirname(entry.get('destination')) == props.path) {
+        if(nodePath.dirname(entry.get('destination')) == path) {
           return entry
         }
       })
@@ -22,17 +22,17 @@ export const getProgressingForFolderFactory = (state, props) => {
   let getForFolder = getForFolderFactory()
 
   return createSelector(
-    [getForFolder, getProps], (entryForFolder, props) => {
+    [getFSWrite, getPath], (fsWrite, path) => {
     let progressingFiles = []
-    entryForFolder.forEach((entry) => {
+    fsWrite.forEach((entry) => {
       if(entry) {
         entry.get('files').forEach((file) => {
-          if(nodePath.dirname(file.get('destination')) == props.path ) {
+          if(nodePath.dirname(file.get('destination')) == path ) {
             progressingFiles.push(file)
           }
         })
       }
     })
-    return progressingFiles
+    return (progressingFiles.length > 0) ? progressingFiles : null
   })
 }

@@ -32,6 +32,13 @@ export default class FileItemDisplay extends React.Component {
       console.log(this.props.file.toJS())
     }
 
+    let progress = null
+    if(this.props.file.get('progress')) {
+      progress = <div className="progress-bar">
+                  <progress max="100" value={this.props.file.get('progress').get('percentage')}></progress>
+                </div>
+    }
+
 
     return (
       <span
@@ -45,7 +52,7 @@ export default class FileItemDisplay extends React.Component {
           'drag-target': this.state.data.get('dropTarget'),
           'drag-blocked': this.state.data.get('dropBlocked'),
           'open-animation': this.state.data.get('openAnimation'),
-          'writing': this.props.file.get('progress')
+          'progress': this.props.file.get('progress')
         })}
       >
         <span className="flex-box">
@@ -64,6 +71,7 @@ export default class FileItemDisplay extends React.Component {
             {...this.renameHandler}
           />
         </span>
+        {progress}
         <span className="eventCatcher" 
           draggable={true}
           {...this.clickHandler}
