@@ -1,5 +1,5 @@
 import * as HotKeyActions from './hotkey-actions.js'
-import Selection from '../selection/sel-index'
+import Selection from '../filesystem/selection/sel-index'
 import App from '../app/app-index'
 
 /**

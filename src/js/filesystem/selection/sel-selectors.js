@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import FS from '../filesystem/watch/fs-watch-index'
+import FS from '../watch/fs-watch-index'
 import nodePath from 'path'
 
 export const getSelection = (state) => state.selection

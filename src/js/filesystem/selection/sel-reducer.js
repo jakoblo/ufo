@@ -1,8 +1,8 @@
 "use strict"
 import * as t from './sel-actiontypes'
-import App from '../app/app-index'
-import Preview from '../view-file/vf-index'
-import FS from '../filesystem/watch/fs-watch-index'
+import App from '../../app/app-index'
+import Preview from '../../view-file/vf-index'
+import FS from '../watch/fs-watch-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
 import {Map, List, Seq, fromJS} from 'immutable'

@@ -12,6 +12,7 @@ import ActionBar from './general-components/actionbar'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
+import FsWrite from './filesystem/write/fs-write-index'
 import ToggleBar from './general-components/togglebar'
 import * as Utils from './utils/utils-index'
 import {HotKeys} from 'react-hotkeys'
@@ -48,6 +49,7 @@ ReactDOM.render(
               <ToggleBar/>
             </Sidebar>
             <ViewPlacer.components.parent/>
+            <FsWrite.component />
         </Foundation>
       </HotKeys>
     </Provider>

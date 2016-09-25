@@ -10,92 +10,53 @@ import mkdirp from 'mkdirp'
 import progress from 'progress-stream';
 import fs from 'mz/fs'
 import * as c from '../fs-write-constants'
+import * as t from '../fs-write-actiontypes'
+import * as utils from '../fs-write-utils'
 
 process.on('message', (m) => {
-  mv(m.source, m.dest, m.options, sendError)
+  mv(m.id, m.source, m.dest, m.options)
 });
 
-function sendError(err) {
-  process.send({ 
-    type: c.CHILD_ERR,
-    error: err 
-  });
-} 
+function mv(id, source, dest, param){
 
-function sendLog(message) {
-  process.send({ 
-    type: c.CHILD_LOG,
-    payload: message 
-  });
-}
+  if(source == dest) { process.exit() }
 
-function sendDone() {
   process.send({
-    type: c.CHILD_DONE
+    type: t.FS_WRITE_NEW,
+    payload: {
+      ...param,
+      id: id,
+      source: source,
+      destination: dest
+    }
   })
-}
-
-function mv(source, dest, param, cb){
-
-  sendLog('start fs write')
 
   const options = {...param, limit: 16}
-  const sourePermissions = (options.move) ? fs.constants.W_OK : fs.constants.R_OK || fs.constants.W_OK
-  const destPermissions = fs.constants.W_OK
-  questionJob()
 
-  function questionJob() {
-    fs.access(source, sourePermissions)
-    // Can Read Source? 
-    .then(
-      fs.access(nodePath.dirname(dest), fs.constants.W_OK)  
-        // Can Write Target Parent?
-        .then(
-          fs.access(dest, fs.constants.W_OK)
-            // does the Target already exists?
-            .then(() => {
-              if(options.clobber) {
-                startJob() // overwrite
-              } else {
-                sendError({
-                  code: c.ERROR_DEST_ALREADY_EXISTS
-                }) // not alloed to overwrite
-              }
-            })
-            .catch((err) => {
-                if(err.code == c.ERROR_NOT_EXISTS) {
-                  startJob() // Free Space, start FileTransfer
-                } else {
-                  sendError(err)
-                }
-              }
-            )
-        )
-      .catch(sendError)
-    )
+  utils.verifyAccess(source, dest, param.move, param.clobber)
+    .then( () => {
+      utils.noMoveInItSelf(source, dest, param.move)
+        .then( () => {
+          (options.move) ? tryRename() : copy(source, dest)
+        })
+        .catch(sendError)
+    })
     .catch(sendError)
-  }
-
-  function startJob () {
-    console.log('start')
-    if(options.move) {
-      tryRename();
-    } else {
-      copy(source, dest);
-    }
-  }
 
   function tryRename() {
-    sendLog('try rename')
+    console.log('FS try rename')
     if (options.clobber) {
+      console.log('FS rename')
       fs.rename(source, dest, function(err) {
-        if (!err) return cb();
-        if (err.code !== c.ERROR_RENAME_CROSS_DEVICE) return cb(err);
+        if (!err) return sendDone();
+        if (err.code !== c.ERROR_RENAME_CROSS_DEVICE) return sendError(err);
         copy(source, dest);
       });
     } else {
+      console.log('FS link')
       fs.link(source, dest, function(err) {
         if (err) {
+          console.log(err)
           if (err.code === c.ERROR_RENAME_CROSS_DEVICE) { // cross-device link not permitted -> do a real copy
             copy(source, dest); 
             return;
@@ -109,6 +70,7 @@ function mv(source, dest, param, cb){
         }
         fs.unlink(source, (err) => {
           if(err) {sendError(err); return}
+          console.log('FS unlink done')
           sendDone()
         });
       });
@@ -116,33 +78,36 @@ function mv(source, dest, param, cb){
   }
 
   function copy(source, dest) {
-    sendLog('copy')
+    console.log('copy')
     var ncpOptions = {
       stopOnErr: true,
       clobber: false,
       limit: options.limit,
       transform: (read, write) => {
         var str = progress({
-          length: fs.statSync(source).size,
-          time: 500
+          length: fs.statSync(read.path).size,
+          time: 200
         });
         str.on('progress', (progress) => {
           process.send({
-            type: c.CHILD_PROGRESS,
+            type: t.FS_WRITE_PROGRESS,
             payload: {
-              source: read.path,
-              dest: write.path,
-              progress: progress
+              id: id,
+              file: {
+                source: read.path,
+                destination: write.path,
+                progress: progress}
             }
           })
         })
-        
         read.pipe(str).pipe(write) 
       } 
     };
     if (options.clobber) {
+      console.log('rimraf')
       rimraf(dest, { disableGlob: true }, (err) => {
         if (err) return sendError(err);
+        console.log('rimraf done')
         startNcp();
       });
     } else {
@@ -150,12 +115,12 @@ function mv(source, dest, param, cb){
     }
     function startNcp() {
       ncp(source, dest, ncpOptions, (errList) => {
-        if (errList) {return sendError(errList[0]);}
-        sendLog(options)
+        if (errList) {return sendError(errList[0]);}  
         if(options.move) {
-          sendLog('Remove Source')
+          console.log('start rimraf')
           rimraf(source, { disableGlob: true }, (err) => {
             if(err) {sendError(err); return}
+            console.log('rimraf done')
             sendDone()
           });
         } else {
@@ -165,5 +130,32 @@ function mv(source, dest, param, cb){
     }
   }
 
-}
+  function sendError(err) {
+    console.log('FS error', err)
+    process.send({ 
+      type: t.FS_WRITE_ERROR,
+      payload: {
+        id: id,
+        source: source,
+        destination: dest,
+        ...param
+      },
+      error: err
+    });
+    process.exit()
+  }
 
+  function sendDone() {
+    console.log('FS done')
+    process.send({
+      type: t.FS_WRITE_DONE,
+      payload: {
+        id: id,
+        source: source,
+        destination: dest,
+        ...param
+      }
+    })
+    process.exit()
+  }
+}
