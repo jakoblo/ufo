@@ -24,17 +24,12 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
       let newitemlist = state.getIn(['groupItems', action.payload.groupIndex, 'items']).delete(action.payload.dragIndex).insert(action.payload.hoverIndex, olditem)
       return state.setIn(['groupItems', action.payload.groupIndex, 'items'], newitemlist)
 
-    case t.REMOVE_DEVICE_ITEM:
-      const deviceGroupIndex = state.get('groupItems').findIndex(group => group.get('title') === action.payload.groupTitle)
-      const deviceGroupItem = state.getIn(['groupItems', deviceGroupIndex, 'items']).findIndex(item => item === action.payload.fileObj.path)
-      return state.deleteIn(['groupItems', deviceGroupIndex, 'items', deviceGroupItem])
-
     case t.NAVBAR_TOGGLE_GROUP:
       let hidden = state.getIn(['groupItems', action.payload.groupID, 'hidden'])
       return state.setIn(['groupItems', action.payload.groupID, 'hidden'], !hidden)
 
     case t.ADD_NAVGROUP:
-    const pl = action.payload
+    const pl = action.payload // pl.items is an array of "path" strings
     if(pl.position != undefined) {
       return state.set('groupItems', state.get('groupItems').insert(pl.position, Map({id: pl.id, title: pl.title, hidden: pl.hidden, items: pl.items})))
     } else {
@@ -42,11 +37,18 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
     }
 
     case t.ADD_GROUP_ITEM:
-      let newItems = state.getIn(['groupItems', action.payload.groupIndex, 'items']).push(...action.payload.items)
-      return state.setIn(['groupItems', action.payload.groupIndex, 'items'], newItems)
+      let addIndex = state.get("groupItems").findIndex(group => group.get('id') === action.payload.groupID)
+      let newItems = state.getIn(['groupItems', addIndex, 'items']).push(...action.payload.items)
+      return state.setIn(['groupItems', addIndex, 'items'], newItems)
 
     case t.NAVBAR_REMOVE_GROUP_ITEM:
-      return state.deleteIn(['groupItems', action.payload.groupIndex, 'items', action.payload.itemID])
+      let rmIndex = state.get("groupItems").findIndex(group => group.get('id') === action.payload.groupID)
+      return state.deleteIn(['groupItems', rmIndex, 'items', action.payload.itemID])
+    
+    case t.REMOVE_DISKGROUP_ITEM:
+      const deviceGroupIndex = state.get('groupItems').findIndex(group => group.get('id') === 0)
+      const deviceGroupItem = state.getIn(['groupItems', deviceGroupIndex, 'items']).findIndex(item => item.get('path') === action.payload.fileObj.path)
+      return state.deleteIn(['groupItems', deviceGroupIndex, 'items', deviceGroupItem])
 
     case t.NAVBAR_CHANGE_GROUP_TITLE:
       return state.setIn(['groupItems', action.payload.groupID, 'title'], action.payload.newTitle)

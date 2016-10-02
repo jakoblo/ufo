@@ -26,7 +26,7 @@ const groupTarget = {
         if(_.hasIn(value, 'path'))
         files.push(value.path)
         })
-        props.dispatch(Actions.addGroupItems(props.index, files))
+        props.dispatch(Actions.addGroupItems(props.groupID, files))
       }
     } else if(monitor.getItemType() === DnDTypes.NAVGROUP) {
       props.dispatch(Actions.saveFavbartoStorage())
@@ -195,7 +195,7 @@ export default class NavGroup extends React.Component {
   handleOnItemRemove = (itemIndex, e) => {
     e.preventDefault()
     e.stopPropagation()
-    this.props.dispatch(Actions.removeGroupItem(this.props.index, itemIndex))
+    this.props.dispatch(Actions.removeGroupItem(this.props.groupID, itemIndex))
   }
 
   handleSelectionChanged = (path, e) => {

@@ -53,7 +53,7 @@ export default class Navbar extends React.Component {
     let navgroups = null
     if(this.props.navbar.has('groupItems')) 
     navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
-
+    
     const { isOver, canDrop, connectDropTarget, isOverCurrent } = this.props;
 
     let classname = classnames({
@@ -80,7 +80,7 @@ export default class Navbar extends React.Component {
       title={item.title}
       items={item.items}
       hidden={item.hidden}
-      isDiskGroup={item.title === constants.DISKS_GROUP_NAME ? true : false}
+      isDiskGroup={item.id === 0 ? true : false} // Devices/Disk Group-ID is always 0
       dispatch={this.props.dispatch}
       />)
   }
