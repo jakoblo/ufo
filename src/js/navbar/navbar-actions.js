@@ -138,6 +138,5 @@ function getItemList(items) {
     itemList.push({id: nextGroupItemId++, path: element})
     }
   }, this)
-  console.log(nextGroupItemId)
   return fromJS(itemList)
 }
