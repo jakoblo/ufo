@@ -37,18 +37,17 @@ export default function navbarReducer(state = INITIAL_STATE, action = { type: ''
     }
 
     case t.ADD_GROUP_ITEM:
-      let index = state.get("groupItems").findIndex(group => group.get('id') === action.payload.groupID)
-      let newItems = state.getIn(['groupItems', index, 'items']).push(...action.payload.items)
-      return state
-      return state.setIn(['groupItems', action.payload.groupIndex, 'items'], newItems)
+      let addIndex = state.get("groupItems").findIndex(group => group.get('id') === action.payload.groupID)
+      let newItems = state.getIn(['groupItems', addIndex, 'items']).push(...action.payload.items)
+      return state.setIn(['groupItems', addIndex, 'items'], newItems)
 
     case t.NAVBAR_REMOVE_GROUP_ITEM:
-      let gindex = state.get("groupItems").findIndex(group => group.get('id') === action.payload.groupID)
-      return state.deleteIn(['groupItems', gindex, 'items', action.payload.itemID])
+      let rmIndex = state.get("groupItems").findIndex(group => group.get('id') === action.payload.groupID)
+      return state.deleteIn(['groupItems', rmIndex, 'items', action.payload.itemID])
     
     case t.REMOVE_DISKGROUP_ITEM:
-      const deviceGroupIndex = state.get('groupItems').findIndex(group => group.get('id') === action.payload.groupID)
-      const deviceGroupItem = state.getIn(['groupItems', deviceGroupIndex, 'items']).findIndex(item => item === action.payload.fileObj.path)
+      const deviceGroupIndex = state.get('groupItems').findIndex(group => group.get('id') === 0)
+      const deviceGroupItem = state.getIn(['groupItems', deviceGroupIndex, 'items']).findIndex(item => item.get('path') === action.payload.fileObj.path)
       return state.deleteIn(['groupItems', deviceGroupIndex, 'items', deviceGroupItem])
 
     case t.NAVBAR_CHANGE_GROUP_TITLE:

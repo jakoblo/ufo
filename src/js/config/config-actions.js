@@ -27,7 +27,7 @@ export function loadPreviousState(windowID) {
         Utils.storage.loadSystemVolumes(
           // Devices/Disk Group always gets a fixed ID of 0
         (fileObj) => {dispatch(Navbar.actions.addGroupItems(0, fileObj.path))},
-        (fileObj, activeWatcher) => {dispatch(Navbar.actions.removeGroupItemfromDeviceGroup(0, fileObj))},
+        (fileObj, activeWatcher) => {dispatch(Navbar.actions.removeGroupItemfromDeviceGroup(fileObj))},
         (fileObj) => {},
         (title, items) =>  {dispatch(Navbar.actions.addNavGroup(title, items, diskGroupPosition, false, true, true))}
         )

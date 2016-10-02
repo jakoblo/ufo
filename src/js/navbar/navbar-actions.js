@@ -42,11 +42,10 @@ export function removeGroupItem(groupID, itemID) { // Action Creator
   }
 }
 
-export function removeGroupItemfromDeviceGroup(groupID, fileObj) {
+export function removeGroupItemfromDeviceGroup(fileObj) {
   return function(dispatch, state) {
     dispatch({type: t.REMOVE_DISKGROUP_ITEM,
     payload: {
-      groupID: groupID,
       fileObj: fileObj
     }})
   }
@@ -123,13 +122,14 @@ export function addGroupItems(groupID, items) {
         }
       }
     )
-
+    if(groupID !== 0)
     Utils.storage.saveFavbartoStorage(getState())
   }
 
 }
 
 function getItemList(items) {
+  
   let itemList = []
   items.forEach(function(element) {
     if(_.isObject(element) && _.has(element, 'path')) {
@@ -138,5 +138,6 @@ function getItemList(items) {
     itemList.push({id: nextGroupItemId++, path: element})
     }
   }, this)
+  console.log(nextGroupItemId)
   return fromJS(itemList)
 }
