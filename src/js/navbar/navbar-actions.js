@@ -3,7 +3,7 @@ import { List, Map, fromJS } from 'immutable'
 import * as Utils from '../utils/utils-index'
 import _ from 'lodash'
 
-let nextNavGroupId = 0
+let nextNavGroupId = 1
 let nextGroupItemId = 0
 
 export function saveFavbartoStorage() {
@@ -29,12 +29,12 @@ export function changeGroupTitle(groupID, newTitle) { // Action Creator
   }
 }
 
-export function removeGroupItem(groupIndex, itemID) { // Action Creator
+export function removeGroupItem(groupID, itemID) { // Action Creator
   return function(dispatch, getState) {
     dispatch( 
       {type: t.NAVBAR_REMOVE_GROUP_ITEM,
       payload: {
-        groupIndex: groupIndex,
+        groupID: groupID,
         itemID: itemID}
       }
     )
@@ -42,11 +42,11 @@ export function removeGroupItem(groupIndex, itemID) { // Action Creator
   }
 }
 
-export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
+export function removeGroupItemfromDeviceGroup(groupID, fileObj) {
   return function(dispatch, state) {
-    dispatch({type: t.REMOVE_DEVICE_ITEM,
+    dispatch({type: t.REMOVE_DISKGROUP_ITEM,
     payload: {
-      groupTitle: groupTitle,
+      groupID: groupID,
       fileObj: fileObj
     }})
   }
@@ -61,12 +61,12 @@ export function removeGroupItemfromDeviceGroup(groupTitle, fileObj) {
  * @param {boolean} loading
  * @returns
  */
-export function addNavGroup(title, items, position, hidden, loading) { 
+export function addNavGroup(title, items, position, hidden, loading, diskGroup) { 
   return function(dispatch, getState) {
 
     dispatch({ // action
       type: t.ADD_NAVGROUP,
-      payload: {id: nextNavGroupId++, title: title, items: getItemList(items), position: position, hidden: hidden}
+      payload: {id: diskGroup ? 0 : nextNavGroupId++, title: title, items: getItemList(items), position: position, hidden: hidden}
     })
 
     if(loading == undefined)
@@ -109,7 +109,7 @@ export function moveGroupItem(groupIndex, dragIndex, hoverIndex) {
  * @param {array, string} items
  * @returns
  */
-export function addGroupItems(groupIndex, items) {
+export function addGroupItems(groupID, items) {
   return function(dispatch, getState) {
     let itemArray = items
     if(!_.isArray(items))
@@ -118,7 +118,7 @@ export function addGroupItems(groupIndex, items) {
     dispatch(
       {type: t.ADD_GROUP_ITEM,
       payload: {
-          groupIndex: groupIndex,
+          groupID: groupID,
           items: getItemList(itemArray)
         }
       }

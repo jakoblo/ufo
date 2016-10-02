@@ -51,8 +51,10 @@ export default class Navbar extends React.Component {
 
   render() {
     let navgroups = null
+    console.log(this.props.navbar.get("groupItems").toJS())
     if(this.props.navbar.has('groupItems')) 
     navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
+    
 
     const { isOver, canDrop, connectDropTarget, isOverCurrent } = this.props;
 
