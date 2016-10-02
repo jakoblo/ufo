@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux'
 import undoable from 'redux-undo'
 import Filesystem from './filesystem/watch/fs-watch-index'
-import Selection from './selection/sel-index'
+import Selection from './filesystem/selection/sel-index'
+import FsWrite from './filesystem/write/fs-write-index' 
 import Config from './config/config-index'
 import ViewFile from './view-file/vf-index'
 import Navbar from './navbar/navbar-index'
@@ -13,5 +14,6 @@ export const rootReducer = combineReducers({
   [Filesystem.constants.NAME]: Filesystem.reducer,
   [Config.constants.NAME]: undoable(Config.reducer),
   [Navbar.constants.NAME]: undoable(Navbar.reducer),
-  [History.constants.NAME]: History.reducer
+  [History.constants.NAME]: History.reducer,
+  [FsWrite.constants.NAME]: FsWrite.reducer
 }) 

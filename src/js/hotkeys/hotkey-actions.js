@@ -1,5 +1,5 @@
 import FS from '../filesystem/watch/fs-watch-index'
-import Selection from '../selection/sel-index'
+import Selection from '../filesystem/selection/sel-index'
 import * as FileActions from '../file-item/fi-actions'
 import Preview from '../view-file/vf-index'
 import App from '../app/app-index'

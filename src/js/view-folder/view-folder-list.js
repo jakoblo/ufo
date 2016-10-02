@@ -1,13 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import FS from  '../filesystem/watch/fs-watch-index'
+import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
 import FileItem from '../file-item/fi-component'
 import classnames from 'classnames'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
 
+
+
 @connect(() => {
-  const getFolderCombined = FS.selectors.getFolderCombinedFactory()
+  const getFolderCombined = FsCombinedSelector.getFolderCombinedFactory()
   return (state, props) => {
     return {
       folder: getFolderCombined(state, props)
@@ -29,7 +31,6 @@ export default class DisplayList extends React.Component {
     let fileList = ""
     if(this.props.folder) {
       fileList = this.props.folder.valueSeq().map((file, index) => {
-
         return ( <FileItem
           key={index}
           file={file}

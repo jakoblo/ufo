@@ -1,6 +1,6 @@
 import App from '../app/app-index'
 import ViewFile from '../view-file/vf-index'
-import Selection from '../selection/sel-index'
+import Selection from '../filesystem/selection/sel-index'
 import nodePath from 'path'
 import {ipcRenderer, shell} from 'electron'
 
