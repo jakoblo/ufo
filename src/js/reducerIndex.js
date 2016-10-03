@@ -12,8 +12,9 @@ export const rootReducer = combineReducers({
   [ViewFile.constants.NAME]: ViewFile.reducer,
   [Selection.constants.NAME]: Selection.reducer,
   [Filesystem.constants.NAME]: Filesystem.reducer,
-  [Config.constants.NAME]: undoable(Config.reducer),
-  [Navbar.constants.NAME]: undoable(Navbar.reducer),
+  [Config.constants.NAME]: Config.reducer,
+  [Navbar.constants.NAME]: Navbar.reducer,
   [History.constants.NAME]: History.reducer,
   [FsWrite.constants.NAME]: FsWrite.reducer
 }) 
+

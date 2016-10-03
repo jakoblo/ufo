@@ -38,7 +38,7 @@ export function saveStatetoStorage(currentState, bwid, callback) {
 
 export function saveFavbartoStorage(currentState, callback) {
   console.log("SAVEFAVBAR")
-  storage.set('navbar', currentState.navbar.present, function(error) {
+  storage.set('navbar', currentState.navbar, function(error) {
     if (error) throw error
     callback && callback()
   })

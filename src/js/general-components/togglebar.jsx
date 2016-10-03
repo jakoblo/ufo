@@ -6,7 +6,7 @@ import { List } from 'immutable'
 import classnames from 'classnames'
 
 @connect((state) => {
-  return {editMode: state.config.present.get('editMode')}
+  return {editMode: state.config.get('editMode')}
 })
 export default class ToggleBar extends React.Component {
   constructor(props) {
