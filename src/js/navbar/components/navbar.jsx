@@ -30,7 +30,7 @@ const NavbarTarget = {
 }
 
 @connect((state) => {
-  return {navbar: state[constants.NAME].present,
+  return {navbar: state[constants.NAME],
     state: state
   }
 })

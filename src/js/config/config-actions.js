@@ -3,7 +3,6 @@ import App from '../app/app-index'
 import Navbar from '../navbar/navbar-index'
 import * as Utils from '../utils/utils-index'
 import { List, Map } from 'immutable'
-import { ActionCreators } from 'redux-undo';
 import os from 'os' 
 import _ from 'lodash'
 
@@ -41,7 +40,6 @@ export function loadPreviousState(windowID) {
       // if(data.fs)
       dispatch(App.actions.changeAppPath(os.homedir()))
     })
-    dispatch(ActionCreators.clearHistory())
   }
 }
 
