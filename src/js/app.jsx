@@ -41,7 +41,7 @@ ipcRenderer.on('saveState', function(event) {
 
 ReactDOM.render(
     <Provider store={ store }>
-      <HotKeys keyMap={keyMap} handlers={handlerMapper(store.dispatch)}>
+      
         <Foundation>
             <Sidebar>
               <ActionBar/>
@@ -51,7 +51,7 @@ ReactDOM.render(
             <ViewPlacer.components.parent/>
             <FsWrite.component />
         </Foundation>
-      </HotKeys>
+      
     </Provider>
   ,
   document.getElementById('app')
