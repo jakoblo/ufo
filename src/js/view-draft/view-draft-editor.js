@@ -27,7 +27,9 @@ export default class DraftEditor extends React.Component {
       }),
       editorState: EditorState.createEmpty()
     }
-    this.onChange = (editorState) => this.setState({editorState})
+    this.onChange = (editorState) => {
+      console.log("onChange")
+      this.setState({editorState})}
     this.dragInOutCount = 0
   }
 
@@ -45,6 +47,7 @@ export default class DraftEditor extends React.Component {
       })
     }
     
+    return <Editor editorState={this.state.editorState} onChange={this.onChange} />
     return(
       <Editor 
         editorState={this.state.editorState} 
@@ -62,6 +65,7 @@ export default class DraftEditor extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
+    return true
     return nextProps.folder !== this.props.folder || nextState.data !== this.state.data;
   }
   
