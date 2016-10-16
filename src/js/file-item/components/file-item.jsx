@@ -2,10 +2,12 @@
 import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Icon from '../general-components/icon'
+import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
-import eventHandler from './fi-event-handler/fi-event-handler-index'
+import eventHandler from '../fi-event-handler/fi-event-handler-index'
+import * as HotKeyMap from '../../hotkeys/hotkey-map'
+import RenameInput from './file-item-rename-input'
 
 export default class FileItemDisplay extends React.Component {
 
@@ -14,8 +16,7 @@ export default class FileItemDisplay extends React.Component {
     this.dragOverTimeout = null
     this.state = {
       data: Map({
-        fileName: this.props.file.get('base'),
-        editing: false,
+        renaming: false,
         dropTarget: false,
         dropBlocked: false,
         openAnimation: false
@@ -28,23 +29,27 @@ export default class FileItemDisplay extends React.Component {
 
   render() {
 
-    if(!this.props.file.get('stats')) {
-      console.log(this.props.file.toJS())
-    }
-
-    let progress = null
+    let progress, renameInput = null
     if(this.props.file.get('progress')) {
       progress = <div className="progress-bar">
                   <progress max="100" value={this.props.file.get('progress').get('percentage')}></progress>
-                </div>
+                 </div>
     }
 
-
+    if(this.state.data.get('renaming')) {
+      renameInput = <RenameInput 
+        fileName={this.props.file.get('base')} 
+        root={this.props.file.get('root')}
+        path={this.props.file.get('path')}
+        renameStop={this.renameStop}
+      />
+    }
+    
     return (
       <span
         className={classNames({
           'file-item': true,
-          'edit': this.state.data.get('editing'),
+          'edit': this.state.data.get('renaming'),
           'folder': this.props.file.get('stats').isDirectory(),
           'file': this.props.file.get('stats').isFile(),
           'active': this.props.file.get('active'),
@@ -64,12 +69,7 @@ export default class FileItemDisplay extends React.Component {
             <span className="base">{this.props.file.get('name')}</span>
             <span className="suffix">{this.props.file.get('suffix')}</span>
           </label>
-          <input
-            ref="editField"
-            className="edit"
-            value={this.state.data.get('fileName')}
-            {...this.renameHandler}
-          />
+          {renameInput}
         </span>
         {progress}
         <span className="eventCatcher" 
@@ -93,11 +93,25 @@ export default class FileItemDisplay extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(!prevState.data.get('editing') && this.state.data.get('editing')) {
-      // Focus rename input
-      var node = ReactDOM.findDOMNode(this.refs["editField"]);
-      node.focus();
-      node.setSelectionRange(0, node.value.length);
-    }
+    // if(
+    //   this.props.file.get('onlySelected')
+    // ) {
+    //   // Set Rename Callback
+    //   console.log('call bind '+this.props.file.get('name'))
+    //   HotKeyMap.bindRenameAction(this.renameStart)
+    // } else if (
+    //     prevProps.file.get('onlySelected')
+    // ) {
+    //   console.log('call unbind '+this.props.file.get('name'))
+    //   HotKeyMap.unbindRenameAction(this.renameStart)
+    // }
+  }
+
+  renameStart = () => {
+    this.setImmState((state) => (state.set('renaming', true)))
+  }
+
+  renameStop = () => {
+    this.setImmState((state) => (state.set('renaming', false)))
   }
 }

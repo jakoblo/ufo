@@ -1,4 +1,5 @@
-import FS from '../filesystem/watch/fs-watch-index'
+import fsWatch from '../filesystem/watch/fs-watch-index'
+import fsWrite from '../filesystem/write/fs-write-index'
 import Selection from '../filesystem/selection/sel-index'
 import * as FileActions from '../file-item/fi-actions'
 import Preview from '../view-file/vf-index'
@@ -17,16 +18,16 @@ export function navigateFileDown() {
 
 function navigateDirection(direction) {
   return function (dispatch, getState) {
-    let props = { 
+    let props = {
       path: Selection.selectors.getSelection( getState() ).get('root') || // selected Folder
-            FS.selectors.getDirectorySeq( getState() )[0] // or First Folder
+            fsWatch.selectors.getDirectorySeq( getState() )[0] // or First Folder
     } 
-    let indexedFiles =      FS.selectors.getFilesSeq( getState() , props)
-    let currentFileIndex =  Selection.selectors.getCurrentFileIndex( getState() , props)
-    let newActiveName =     indexedFiles[currentFileIndex + direction]
+    let indexedFiles =     fsWatch.selectors.getFilesSeq( getState() , props)
+    let currentFileIndex = Selection.selectors.getCurrentFileIndex( getState() , props)
+    let newActiveName =    indexedFiles[currentFileIndex + direction]
     if(newActiveName) {
       dispatch( FileActions.show(
-        FS.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)})
+        fsWatch.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)})
       ))
     }
   }
@@ -45,15 +46,23 @@ function selectFileNextToCurrent(direction) {
   return function (dispatch, getState) {
     let selection = Selection.selectors.getSelection( getState() )
     let props = { path: selection.get('root') }
-    let indexedFiles = FS.selectors.getFilesSeq( getState(), props )
+    let indexedFiles = fsWatch.selectors.getFilesSeq( getState(), props )
     let currentFileIndex = Selection.selectors.getCurrentFileIndex( getState(), props )
     let newSelectedName = indexedFiles[currentFileIndex + direction]
     if(newSelectedName) {
       dispatch( 
         FileActions.addToSelection(
-          FS.selectors.getFile(getState(), {path: nodePath.join(props.path, newSelectedName)})
+          fsWatch.selectors.getFile(getState(), {path: nodePath.join(props.path, newSelectedName)})
         )
       )
     }
+  }
+}
+
+export function selectionToTrash() {
+  return function (dispatch, getState) {
+    fsWrite.actions.moveToTrash(
+      Selection.selectors.getSelectionPathArray(getState())
+    )
   }
 }

@@ -1,12 +1,37 @@
 import {ipcRenderer} from 'electron'
 import nodePath from 'path'
 import trash from 'trash'
+import fs from 'mz/fs'
 import {fork} from 'child_process'
 import * as c from './fs-write-constants'
 import * as t from './fs-write-actiontypes'
 
 export function moveToTrash(sources) {
-  trash(sources)
+  sources.forEach((source) => {
+    let id = window.store.getState()[c.NAME].size 
+    let payload = {
+      id: id,
+      task: t.TASK_TRASH,
+      source: source
+    }
+    window.store.dispatch({
+      type: t.FS_WRITE_NEW,
+      payload: payload
+    })
+    trash([source]).then(() => {
+      window.store.dispatch({
+        type: t.FS_WRITE_DONE,
+        payload: payload
+      })
+    })
+    .catch((err) => {
+      window.store.dispatch({
+        type: t.FS_WRITE_ERROR,
+        payload: payload,
+        error: err
+      })
+    })
+  })
 }
 
 export function move(sources, targetFolder, options) {
@@ -14,7 +39,7 @@ export function move(sources, targetFolder, options) {
     startFsWorker(
       src,
       nodePath.join(targetFolder, nodePath.basename(src)), 
-      {clobber: false, ...options, move: true}
+      {clobber: false, ...options, task: t.TASK_MOVE}
     )
   })
 }
@@ -24,9 +49,55 @@ export function copy(sources, targetFolder, options) {
     startFsWorker(
       src, 
       nodePath.join(targetFolder, nodePath.basename(src)), 
-      {clobber: false, ...options, move: false}
+      {clobber: false, ...options, task: t.TASK_COPY}
     )
   })
+}
+
+export function rename(source, destination) {
+
+  let payload = {
+    id: window.store.getState()[c.NAME].size,
+    task: t.TASK_RENAME,
+    source: source,
+    destination: destination
+  }
+
+  window.store.dispatch({
+    type: t.FS_WRITE_NEW,
+    payload: payload
+  })
+
+  fs.access(destination, fs.constants.R_OK) // test if already exists
+    .then(() => {
+      //destination already exists
+      renameError({
+          code: c.ERROR_DEST_ALREADY_EXISTS
+      })
+    })
+    .catch((err) => {
+      if(err = c.ERROR_NOT_EXISTS) {
+        // destination does not exists start renaming
+        fs.rename(source, destination).then(() => {
+          window.store.dispatch({
+            type: t.FS_WRITE_DONE,
+            payload: payload
+          })
+        })
+        .catch(renameError)
+      } else {
+        // unknown error
+        renameError(err)
+      }
+    })
+
+  function renameError(err) {
+    window.store.dispatch({
+      type: t.FS_WRITE_ERROR,
+      payload: payload,
+      error: err
+    })
+  }
 }
 
 export function removeAction(id) {

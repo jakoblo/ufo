@@ -27,10 +27,24 @@ export const keyMap = {
   selectDown: 'shift+down',
   navRight: 'right',
   navLeft: 'left',
-  selectAll: ['ctrl+a', 'command+a']
+  selectAll: ['ctrl+a', 'command+a'],
+  moveToTrash: ['del', 'command+backspace'],
+  rename: ['F2', 'enter']
 }
 
-const rawHandlerMap = {
+export const bindRenameAction = (callback) => {
+  console.log('do bind')
+  rawHandlerMap.rename = callback
+}
+
+export const unbindRenameAction = (callback) => {
+  if(rawHandlerMap.rename === callback) {
+    console.log('do unbind')
+    rawHandlerMap.rename = () => () => {}
+  }
+}
+
+var rawHandlerMap = {
   navUp: HotKeyActions.navigateFileUp,
   selectUp: HotKeyActions.addPrevFileToSelection,
   pathUp: App.actions.navigateToParentFolder,
@@ -38,5 +52,6 @@ const rawHandlerMap = {
   selectDown: HotKeyActions.addNextFileToSelection,
   navRight: Selection.actions.selectNextDir,
   navLeft: Selection.actions.selectPreviousDir,
-  selectAll: Selection.actions.selectA
+  selectAll: Selection.actions.selectAll,
+  moveToTrash: HotKeyActions.selectionToTrash
 }

@@ -1,7 +1,5 @@
 import * as FileActions from '../fi-actions'
 import * as fsWriteActions from '../../filesystem/write/fs-write-actions'
-import {remote} from 'electron'
-const {Menu, MenuItem} = remote
 
 /**
  * Adding file to Selection
@@ -34,7 +32,7 @@ export function onDoubleClick (event) {
     // Open
     this.props.dispatch( FileActions.open(this.props.file) )
 
-    // CSS Animation
+    // CSS Animation @todo react css transitions
     this.setImmState((prevState) => (prevState.set('openAnimation', true)))
     setTimeout(() => {
       this.setImmState((prevState) => (prevState.set('openAnimation', false)))
@@ -50,17 +48,9 @@ export function onContextMenu(event) {
   event.preventDefault()
   event.stopPropagation()
 
-  let menu = new Menu();
-  menu.append(new MenuItem({ label: 'Open "' + this.props.file.get('base') + '"', click: null}))
-  menu.append(new MenuItem({ 
-    label: 'Rename', 
-    click: () => { this.setImmState((state) => (state.set('editing', true))) }
-  }))
-  
-  menu.append(new MenuItem({ type: 'separator' }));
-  menu.append(new MenuItem({ label: 'Move to Trash', click: () => {fsWriteActions.moveToTrash([this.props.file.get('path')]) } }));
-  menu.append(new MenuItem({ type: 'separator' }));
-  menu.append(new MenuItem({label: 'Add to FavBar', click: null }))
-
-  menu.popup(remote.getCurrentWindow());
+  this.props.dispatch( 
+    FileActions.showContextMenu(
+      this.props.file,
+      this.renameStart
+    ))
 }

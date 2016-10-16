@@ -16,11 +16,14 @@ export const getFolderCombinedFactory = () => {
   return createSelector(
     [getFolderWithActive, Selection.selectors.getSelectionFor, getProgressingForFolder, getPath],
     (files, selection, write, path) => {
-
+ 
       if(files && selection) {
         selection.get('files').forEach((selectedFile, index) => {
           if(files.get(selectedFile)) {
             files = files.setIn([selectedFile, 'selected'], true)
+            if(selection.get('files').size == 1) {
+              files = files.setIn([selectedFile, 'onlySelected'], true)
+            }
           } else {
             console.error('Try to set a File selected which does not exists in the FileSystem', files.toJS(), selectedFile)
           }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
-import FileItem from '../file-item/fi-component'
+import FileItem from '../file-item/components/file-item'
 import classnames from 'classnames'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
