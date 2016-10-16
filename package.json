@@ -1,10 +1,11 @@
 {
-  "name": "FileFlow",
-  "main": "./src/js-dist/main.js",
+  "name": "fileflow",
+  "main": "./src/js/main.js",
   "version": "1.0.0",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
     "dev": "gulp develop"
   },
   "author": "",
@@ -16,6 +17,7 @@
     "codemirror": "^5.18.2",
     "drivelist": "^3.3.1",
     "electron-json-storage": "^2.0.0",
+    "electron-prebuilt-compile": "^1.4.3",
     "filesize": "^3.3.0",
     "immutable": "^3.8.1",
     "lodash": "^4.15.0",
