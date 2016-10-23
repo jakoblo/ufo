@@ -6,4 +6,8 @@
   &.drag-target {
     background: #AFD2E8;
   }
+
+  &.focused {
+    border: 2px solid #AFD2E8;
+  }
 }

@@ -49,14 +49,14 @@ export const keyMap = {
 }
 
 var rawHandlerMap = {
-  navUp: Selection.actions.navigateFileUp,
-  selectUp: Selection.actions.addPrevFileToSelection,
+  navUp: Selection.actions.fileNavUp,
+  selectUp: Selection.actions.fileAddUp,
   pathUp: App.actions.navigateToParentFolder,
-  navDown: Selection.actions.navigateFileDown,
-  selectDown: Selection.actions.addNextFileToSelection,
-  navRight: Selection.actions.selectNextDir,
-  navLeft: Selection.actions.selectPreviousDir,
+  navDown: Selection.actions.fileNavDown,
+  selectDown: Selection.actions.fileAddDown,
+  navRight: Selection.actions.dirNext,
+  navLeft: Selection.actions.dirPrevious,
   selectAll: Selection.actions.selectAll,
   rename: Rename.actions.renameSelected,
-  moveToTrash: Selection.actions.selectionToTrash
+  moveToTrash: Selection.actions.toTrash
 }

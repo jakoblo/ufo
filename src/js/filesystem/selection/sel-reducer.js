@@ -21,12 +21,19 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
 
     case App.actiontypes.APP_CHANGE_PATH:
       // Set Selection to last folder in pathRoute
-      let selected = nodePath.basename( _.last(action.payload.pathRoute) )
-      let root = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
-      return fromJS({
-        root: root,
-        files: [selected]
-      })
+      if(action.payload.pathRoute.length > 1) {
+        let selected = nodePath.basename( _.last(action.payload.pathRoute) )
+        let root = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
+        return fromJS({
+          root: root,
+          files: [selected]
+        })  
+      } else {
+        return fromJS({
+          root: _.last(action.payload.pathRoute),
+          files: []
+        })
+      }
 
     case Preview.actiontypes.SHOW_PREVIEW:
       return fromJS({

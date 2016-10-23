@@ -37,12 +37,12 @@ export function show(file) {
 /**
  * Ctrl Click
  */
-export let addToSelection = (file) => Selection.actions.addToSelection( [file.get('path')] )
+export let addToSelection = (file) => Selection.actions.fileAdd( [file.get('path')] )
 
 /**
  * Shift Click
  */
-export let expandSelection = (file) => Selection.actions.expandSelectionTo( file.get('path') )
+export let expandSelection = (file) => Selection.actions.expandToFile( file.get('path') )
 
 /**
  * Drag of the Single file or the Selection

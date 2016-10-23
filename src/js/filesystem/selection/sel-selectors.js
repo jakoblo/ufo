@@ -22,6 +22,9 @@ export const getCurrentFile = (state) => {
 }
 
 
+export const getFocused = (state) => state.selection.get('root')
+export const isFocused = (state, props) => (getFocused(state) == props.path)
+
 /**
  * get Selection for the given path
  * maybe null
