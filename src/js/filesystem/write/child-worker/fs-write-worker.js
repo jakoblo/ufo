@@ -17,6 +17,14 @@ process.on('message', (m) => {
   mv(m.id, m.source, m.dest, m.options)
 });
 
+/**
+ * not really ready
+ * 
+ * @param {number} id
+ * @param {string} source
+ * @param {string} dest
+ * @param {Object} param
+ */
 function mv(id, source, dest, param){
 
   if(source == dest) { process.exit() }

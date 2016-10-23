@@ -15,6 +15,10 @@ export function renameSelected() {
   }
 }
 
+/**
+ * @export
+ * @param {string} filePath
+ */
 export function renameStart(filePath) {
   return {
     type: t.RENAME_START,
@@ -24,6 +28,10 @@ export function renameStart(filePath) {
   }
 }
 
+/**
+ * @export
+ * @param {string} filePath
+ */
 export function renameCancel(filePath) {
   return {
     type: t.RENAME_CANCEL,
@@ -33,6 +41,11 @@ export function renameCancel(filePath) {
   }
 }
 
+/**
+ * @export
+ * @param {string} filePath
+ * @param {string} newName
+ */
 export function renameSave(filePath, newName) {
   return function (dispatch, getState) {
     dispatch({
@@ -42,8 +55,6 @@ export function renameSave(filePath, newName) {
         newName: newName
       }
     })
-
-    console.log(filePath, newName)
 
     fsWrite.actions.rename(
       filePath,

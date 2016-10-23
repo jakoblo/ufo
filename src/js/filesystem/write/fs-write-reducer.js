@@ -1,5 +1,4 @@
 import * as t from './fs-write-actiontypes'
-// import App from '../../app/app-index'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
 import nodePath from 'path'
 

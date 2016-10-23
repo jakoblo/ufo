@@ -8,8 +8,6 @@ import {dragndrop} from '../utils/utils-index'
 import Button from '../general-components/button'
 import fsWrite from '../filesystem/write/fs-write-index'
 
-
-
 @connect(() => {
   const getFolderCombined = FsCombinedSelector.getFolderCombinedFactory()
   return (state, props) => {

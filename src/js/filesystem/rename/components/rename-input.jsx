@@ -31,6 +31,13 @@ export default class RenameInput extends React.Component {
     )
   }
 
+  componentDidMount(prevProps, prevState) {
+    // Select text in input
+    var node = ReactDOM.findDOMNode(this.refs["editField"]);
+    node.focus();
+    node.setSelectionRange(0, node.value.length);
+  }
+
   shortcutHandler = (action, event) => {
     switch (action) {
       case "cancel":
@@ -42,19 +49,10 @@ export default class RenameInput extends React.Component {
     }
   }
 
-  componentDidMount(prevProps, prevState) {
-    // Select text in input
-    var node = ReactDOM.findDOMNode(this.refs["editField"]);
-    node.focus();
-    node.setSelectionRange(0, node.value.length);
-  }
-
   onMouseDown = (event) => { event.stopPropagation() }
   onMouseUp = (event) => { event.stopPropagation() }
   onBlur = (event) => { this.renameSave(event) }
-
   onChange = (event) => {
-    console.log('change')
     this.setState({'fileName': event.target.value})
   }
 

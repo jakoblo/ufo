@@ -2,6 +2,16 @@ import fs from 'mz/fs'
 import nodePath from 'path'
 import * as c from './fs-write-constants'
 
+/**
+ * check if a copy or move action is possible
+ * 
+ * @export
+ * @param {string} source
+ * @param {string} destination
+ * @param {boolean} move
+ * @param {boolean} [clobber=false]
+ * @returns
+* */
 
 export function verifyAccess (source, destination, move, clobber = false) {
 
@@ -36,6 +46,13 @@ export function verifyAccess (source, destination, move, clobber = false) {
   })
 }
 
+/**
+ * @export
+ * @param {string} source
+ * @param {string} destination
+ * @param {boolean} move
+ * @returns
+* */
 export function noMoveInItSelf (source, destination, move) {
   return new Promise( function(resolve, reject) {
     if(!move) { resolve() } // Copy initself is allowed

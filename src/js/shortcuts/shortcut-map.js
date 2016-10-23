@@ -1,4 +1,3 @@
-import * as ShortcutActions from './shortcut-actions.js'
 import Selection from '../filesystem/selection/sel-index'
 import Rename from '../filesystem/rename/rename-index'
 import App from '../app/app-index'
@@ -17,8 +16,7 @@ export function shortcutHandler(action, event) {
 
 
 // React-Shortcuts
-// https://github.com/chrisui/react-hotkeys/blob/master/docs/getting-started.md#getting-started
-
+// https://github.com/avocode/react-shortcuts
 export const keyMap = {
   global: {
     navUp: 'up',
@@ -51,14 +49,14 @@ export const keyMap = {
 }
 
 var rawHandlerMap = {
-  navUp: ShortcutActions.navigateFileUp,
-  selectUp: ShortcutActions.addPrevFileToSelection,
+  navUp: Selection.actions.navigateFileUp,
+  selectUp: Selection.actions.addPrevFileToSelection,
   pathUp: App.actions.navigateToParentFolder,
-  navDown: ShortcutActions.navigateFileDown,
-  selectDown: ShortcutActions.addNextFileToSelection,
+  navDown: Selection.actions.navigateFileDown,
+  selectDown: Selection.actions.addNextFileToSelection,
   navRight: Selection.actions.selectNextDir,
   navLeft: Selection.actions.selectPreviousDir,
   selectAll: Selection.actions.selectAll,
   rename: Rename.actions.renameSelected,
-  moveToTrash: ShortcutActions.selectionToTrash
+  moveToTrash: Selection.actions.selectionToTrash
 }

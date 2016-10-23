@@ -8,6 +8,9 @@ import {fork} from 'child_process'
 import * as c from './fs-write-constants'
 import * as t from './fs-write-actiontypes'
 
+/**
+ * @param  {string[]} sources
+ */
 export function moveToTrash(sources) {
   sources.forEach((source) => {
     let id = window.store.getState()[c.NAME].size 
@@ -36,6 +39,11 @@ export function moveToTrash(sources) {
   })
 }
 
+/**
+ * @param  {string[]} sources
+ * @param  {string} targetFolder
+ * @param  {Object} options clobber & task: MOVE || COPY 
+ */
 export function move(sources, targetFolder, options) {
   sources.forEach((src) => {
     startFsWorker(
@@ -46,6 +54,12 @@ export function move(sources, targetFolder, options) {
   })
 }
 
+
+/**
+ * @param  {string[]} sources
+ * @param  {string} targetFolder
+ * @param  {Object} options clobber & task: MOVE || COPY 
+ */
 export function copy(sources, targetFolder, options) {
   sources.forEach((src) => {
     startFsWorker(
@@ -56,6 +70,11 @@ export function copy(sources, targetFolder, options) {
   })
 }
 
+
+/**
+ * @param  {string} source
+ * @param  {string} destination
+ */
 export function rename(source, destination) {
 
   let payload = {
@@ -101,7 +120,10 @@ export function rename(source, destination) {
     })
   }
 }
-
+/**
+ * Remove Action from store
+ * @param  {number} id
+ */
 export function removeAction(id) {
   return {
     type: t.FS_WRITE_REMOVE_ACTION,
@@ -111,6 +133,13 @@ export function removeAction(id) {
   }
 }
 
+
+/**
+ * @param  {string} source
+ * @param  {string} destination
+ * @param  {Object} options clobber & task: MOVE || COPY 
+ * @param  {number} setId optional
+ */
 export function startFsWorker(source, destination, options, setId) {
   
   let id = (setId != undefined) ? setId : window.store.getState()[c.NAME].size
@@ -132,6 +161,11 @@ export function startFsWorker(source, destination, options, setId) {
   // });
 }
 
+
+/**
+ * Create a blank new folder and start a rename action for that
+ * @param  {string} parentFolder
+ */
 export function newFolder(parentFolder) {
   return (dispatch, getState) => {
     let existingFiles = fsWatch.selectors.getFilesSeq(getState(), {path: parentFolder})

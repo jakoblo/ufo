@@ -5,6 +5,7 @@ import FS from '../watch/fs-watch-index'
 import App from '../../app/app-index'
 import ViewFile from '../../view-file/vf-index'
 import nodePath from 'path'
+import * as FileActions from '../../file-item/fi-actions'
 import * as _ from 'lodash'
 import {ipcRenderer} from 'electron'
 
@@ -172,5 +173,66 @@ export function startDragSelection() {
       return nodePath.join(selection.get('root'), filename)
     })
     ipcRenderer.send('ondragstart', selectedFiles)
+  }
+}
+
+// Navigate
+// Arrow Up and Down
+// Base on current Selection the "next" file will be selected
+export function navigateFileUp() {
+  return navigateDirection(-1)
+}
+export function navigateFileDown() {
+  return navigateDirection(+1)
+}
+
+function navigateDirection(direction) {
+  return function (dispatch, getState) {
+    let props = {
+      path: selectors.getSelection( getState() ).get('root') || // selected Folder
+            FS.selectors.getDirectorySeq( getState() )[0] // or First Folder
+    } 
+    let indexedFiles =     FS.selectors.getFilesSeq( getState() , props)
+    let currentFileIndex = selectors.getCurrentFileForFolderIndex( getState() , props)
+    let newActiveName =    indexedFiles[currentFileIndex + direction]
+    if(newActiveName) {
+      dispatch( FileActions.show(
+        FS.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)})
+      ))
+    }
+  }
+}
+
+// Select
+// Shift + ArrowUp/Down
+export function addPrevFileToSelection() {
+  return selectFileNextToCurrent(-1)
+}
+export function addNextFileToSelection() {
+  return selectFileNextToCurrent(+1)
+}
+
+function selectFileNextToCurrent(direction) {
+  return function (dispatch, getState) {
+    let selection = selectors.getSelection( getState() )
+    let props = { path: selection.get('root') }
+    let indexedFiles = FS.selectors.getFilesSeq( getState(), props )
+    let currentFileIndex = selectors.getCurrentFileForFolderIndex( getState(), props )
+    let newSelectedName = indexedFiles[currentFileIndex + direction]
+    if(newSelectedName) {
+      dispatch( 
+        FileActions.addToSelection(
+          FS.selectors.getFile(getState(), {path: nodePath.join(props.path, newSelectedName)})
+        )
+      )
+    }
+  }
+}
+
+export function selectionToTrash() {
+  return function (dispatch, getState) {
+    fsWrite.actions.moveToTrash(
+      selectors.getSelectionPathArray(getState())
+    )
   }
 }

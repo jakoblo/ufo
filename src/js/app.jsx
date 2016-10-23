@@ -3,10 +3,9 @@ import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store-setup'
 import {DevToolsSetup} from './utils/devtools-setup'
-import App from './app/app-index'
 import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
-/* React Components */
+// React
 import Foundation from './general-components/foundation'
 import ShortcutManagerSetup from './general-components/shortcutmanager-setup'
 import ActionBar from './general-components/actionbar'
@@ -16,6 +15,7 @@ import ViewPlacer from './view-placer/vp-index'
 import FsWrite from './filesystem/write/fs-write-index'
 import ToggleBar from './general-components/togglebar'
 import * as Utils from './utils/utils-index'
+// Shortcuts
 import {keyMap, shortcutHandler} from './shortcuts/shortcut-map.js'
 import { ShortcutManager, Shortcuts } from 'react-shortcuts'
 
@@ -27,7 +27,6 @@ if (process.env.NODE_ENV !== 'production') {
 const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 
-// INIT APP PATH
 
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
