@@ -3,9 +3,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import Button from '../../../general-components/button'
-import nodePath from 'path'
 import * as c from '../fs-write-constants'
+import * as t from '../fs-write-actiontypes'
 import * as FsWriteActions from '../fs-write-actions'
+
+import WriteActionTrash from './fs-write-action-trash'
+import WriteActionCopyMove from './fs-write-action-copy-move'
+import WriteActionRename from './fs-write-action-rename'
 
 export default class WriteAction extends React.Component {
 
@@ -14,7 +18,25 @@ export default class WriteAction extends React.Component {
   }
 
   render() {
+    
+    let ActionType
+    switch (this.props.action.get('task')) {
+      case t.TASK_MOVE:
+        ActionType = WriteActionCopyMove
+        break
+      case t.TASK_COPY:
+        ActionType = WriteActionCopyMove
+        break
+      case t.TASK_RENAME:
+        ActionType = WriteActionRename
+        break
+      case t.TASK_TRASH:
+        ActionType = WriteActionTrash
+        break
+    }
+
     return (
+
       <div
         className={classNames({
           'write-action': true,
@@ -23,14 +45,7 @@ export default class WriteAction extends React.Component {
         })}
       >
         {this.renderClose()}
-        <div className="action-describe">
-          {(this.props.action.get('move')) ? 'move ' : 'copy '} 
-          <b>{nodePath.basename(this.props.action.get('source'))}</b>{' to '} 
-          <b>{nodePath.basename(nodePath.dirname(this.props.action.get('destination')))}</b>
-        </div>
-        {this.renderErrorMessage()} 
-        {this.renderConfirm()} 
-        {this.renderProgressing()}
+        <ActionType action={this.props.action} dispatch={this.props.dispatch} />
       </div>
     )
   }
@@ -45,81 +60,7 @@ export default class WriteAction extends React.Component {
     }
   }
 
-  renderErrorMessage = () => {
-    if(this.props.action.getIn(['error', 'code'])) {
-      return  <div className="error-handling">
-                <p className="error-message">
-                  {c.MESSAGES[this.props.action.getIn(['error', 'code'])]}
-                </p>
-                <div className="error-actions">
-                  <Button className="try-again" text="Try Again" onClick={
-                    () => {
-                      FsWriteActions.startFsWorker(
-                        this.props.action.get('source'),
-                        this.props.action.get('destination'),
-                        {
-                          move: this.props.action.get('move'),
-                          clobber: this.props.action.get('clobber')
-                        },
-                        this.props.action.get('id')
-                      )
-                    }
-                  }/>
-                </div>
-              </div>
-    } else {
-      return null
-    }
-  }
-
-  renderConfirm = () => {
-    if(this.props.action.get('error') && this.props.action.getIn(['error', 'code']) == c.ERROR_DEST_ALREADY_EXISTS) {
-      return  <div className="confirm">
-                <Button text="Overwrite" onClick={
-                  () => {
-                    FsWriteActions.startFsWorker(
-                      this.props.action.get('source'),
-                      this.props.action.get('destination'),
-                      {...this.props.action.get('options'), clobber: true},
-                      this.props.action.get('id')
-                    )
-                  }
-                }/>
-                <Button text="Cancel" onClick={() => {
-                  this.props.dispatch(FsWriteActions.removeAction(this.props.action.get('id')))
-                }}
-                  />
-              </div>
-    } else {
-      return null
-    }
-  }
-
-  renderProgressing = () => {
-    if(this.props.action.get('files').size > 0){
-      return <div className="progressing-files">
-              {
-                this.props.action.get('files').valueSeq().map((progFile, index) => {
-                  return  <div key={index} className="progressing-file">
-                            {nodePath.basename(progFile.get('destination'))}
-                            <progress max="100" value={progFile.get('progress').get('percentage')}></progress>
-                          </div>
-                })
-              }
-            </div>
-    } else {
-      return null
-    }
-  } 
-
   shouldComponentUpdate (nextProps, nextState) {
     return nextProps.action !== this.props.action // || nextState.data !== this.state.data;
   }
-
-  // setImmState(fn) {
-  //   // https://github.com/facebook/immutable-js/wiki/Immutable-as-React-state
-  //   return this.setState(({data}) => ({
-  //     data: fn(data)
-  //   }));
-  // }
 }

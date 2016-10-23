@@ -5,6 +5,12 @@ import nodePath from 'path'
 export const getFSWrite = (state, props) => state[c.NAME]
 export const getPath = (state, props) => props.path
 
+/**
+ * get the fs write entrys for a Folder
+ * @param  {Object} state of the redux store
+ * @param  {Object} props {path: string}
+ * @returns Immuteable Map of fs write entry Objects
+ */
 export const getForFolderFactory = (state, props) => {
   return createSelector(
     [getFSWrite, getPath], (fsWrite, path) => {
@@ -17,6 +23,13 @@ export const getForFolderFactory = (state, props) => {
   )
 }
 
+
+/**
+ * get the progress objects for a folder to display progressbars 
+ * @param  {Object} state of the redux store
+ * @param  {Object} props {path: string}
+ * @returns Immuteable Map of progress Objects
+ */
 export const getProgressingForFolderFactory = (state, props) => {
 
   let getForFolder = getForFolderFactory()

@@ -17,6 +17,14 @@ process.on('message', (m) => {
   mv(m.id, m.source, m.dest, m.options)
 });
 
+/**
+ * not really ready
+ * 
+ * @param {number} id
+ * @param {string} source
+ * @param {string} dest
+ * @param {Object} param
+ */
 function mv(id, source, dest, param){
 
   if(source == dest) { process.exit() }
@@ -31,13 +39,17 @@ function mv(id, source, dest, param){
     }
   })
 
-  const options = {...param, limit: 16}
+  const options = {...param, limit: 8}
 
-  utils.verifyAccess(source, dest, param.move, param.clobber)
+  utils.verifyAccess(source, dest, (options.task == t.TASK_MOVE), param.clobber)
     .then( () => {
-      utils.noMoveInItSelf(source, dest, param.move)
+      utils.noMoveInItSelf(source, dest, (options.task == t.TASK_MOVE))
         .then( () => {
-          (options.move) ? tryRename() : copy(source, dest)
+          if (options.task == t.TASK_MOVE) { 
+            tryRename()
+          } else if(options.task == t.TASK_COPY) {
+            copy(source, dest)
+          }
         })
         .catch(sendError)
     })
@@ -86,7 +98,7 @@ function mv(id, source, dest, param){
       transform: (read, write) => {
         var str = progress({
           length: fs.statSync(read.path).size,
-          time: 200
+          time: 700
         });
         str.on('progress', (progress) => {
           process.send({
@@ -115,8 +127,8 @@ function mv(id, source, dest, param){
     }
     function startNcp() {
       ncp(source, dest, ncpOptions, (errList) => {
-        if (errList) {return sendError(errList[0]);}  
-        if(options.move) {
+        if (errList) {return sendError(errList[0]);}
+        if(options.task == t.TASK_MOVE) {
           console.log('start rimraf')
           rimraf(source, { disableGlob: true }, (err) => {
             if(err) {sendError(err); return}

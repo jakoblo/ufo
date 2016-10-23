@@ -1,5 +1,4 @@
 import * as t from './fs-write-actiontypes'
-// import App from '../../app/app-index'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
 import nodePath from 'path'
 
@@ -13,7 +12,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
 
       return state.set(action.payload.id, fromJS({
           id: action.payload.id,
-          move: action.payload.move,
+          task: action.payload.task,
           source: action.payload.source, 
           destination: action.payload.destination,
           clobber: action.payload.clobber,
@@ -31,7 +30,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
       }
     
     case t.FS_WRITE_ERROR:
-      return state.setIn([action.payload.id, 'error'], fromJS(action.error))
+      return state.setIn([action.payload.id, 'error'], Map(action.error))
 
     case t.FS_WRITE_DONE:
       return state.setIn([action.payload.id, 'finished'], true)
