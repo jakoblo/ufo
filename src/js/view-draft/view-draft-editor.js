@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
-import {FileItem} from '../file-item/fi-index'
+import {components} from '../file-item/fi-index'
 import classnames from 'classnames'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
@@ -160,7 +160,7 @@ const FileWrapper = (props) => {
   const {dispatch} = data
 
 //   props.blockProps
-  let item = <FileItem
+  let item = <components.fileItem
     key={key}
     file={file}
     dispatch={dispatch}
