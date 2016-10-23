@@ -6,7 +6,6 @@ import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
 import eventHandler from '../fi-event-handler/fi-event-handler-index'
-import * as HotKeyMap from '../../hotkeys/hotkey-map'
 import RenameInput from '../../filesystem/rename/components/rename-input'
 
 export default class FileItemDisplay extends React.Component {
@@ -56,6 +55,7 @@ export default class FileItemDisplay extends React.Component {
           'open-animation': this.state.data.get('openAnimation'),
           'progress': this.props.file.get('progress')
         })}
+        ref="file"
       >
         <span className="flex-box">
           <Icon glyph={classNames({

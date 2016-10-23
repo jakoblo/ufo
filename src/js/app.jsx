@@ -8,6 +8,7 @@ import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 /* React Components */
 import Foundation from './general-components/foundation'
+import ShortcutManagerSetup from './general-components/shortcutmanager-setup'
 import ActionBar from './general-components/actionbar'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
@@ -15,8 +16,8 @@ import ViewPlacer from './view-placer/vp-index'
 import FsWrite from './filesystem/write/fs-write-index'
 import ToggleBar from './general-components/togglebar'
 import * as Utils from './utils/utils-index'
-import {HotKeys} from 'react-hotkeys'
-import {keyMap, handlerMapper} from './hotkeys/hotkey-map.js'
+import {keyMap, shortcutHandler} from './shortcuts/shortcut-map.js'
+import { ShortcutManager, Shortcuts } from 'react-shortcuts'
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -31,8 +32,6 @@ const store = storeSetup();
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 window.utils = Utils.storage
-// setTimeout(function(){ store.dispatch(Navbar.actions.addNavGroup("Favbar", [])) }, 3000);
-
 ipcRenderer.on('saveState', function(event) {
   Utils.storage.saveStatetoStorage(store.getState(), windowID, function() {
     ipcRenderer.send('closeWindow', windowID)
@@ -41,8 +40,9 @@ ipcRenderer.on('saveState', function(event) {
 
 ReactDOM.render(
     <Provider store={ store }>
-      <HotKeys keyMap={keyMap} handlers={handlerMapper(store.dispatch)}>
-        <Foundation>
+      <ShortcutManagerSetup shortcutManager={new ShortcutManager(keyMap)}> 
+        <Shortcuts name="global" global={true} handler={shortcutHandler}>
+          <Foundation>
             <Sidebar>
               <ActionBar/>
               <Navbar.components.parent/>
@@ -50,8 +50,9 @@ ReactDOM.render(
             </Sidebar>
             <ViewPlacer.components.parent/>
             <FsWrite.component />
-        </Foundation>
-      </HotKeys>
+          </Foundation>
+        </Shortcuts>
+      </ShortcutManagerSetup>
     </Provider>
   ,
   document.getElementById('app')
