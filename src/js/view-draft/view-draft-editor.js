@@ -1,11 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
-import FileItem from '../file-item/fi-component'
+import FileItem from '../file-item/fi-component-draft'
 import classnames from 'classnames'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
-import {Editor, EditorState} from 'draft-js'
+import {AtomicBlockUtils,
+        Editor,
+        EditorState,
+        RichUtils,
+        convertToRaw, Entity, Modifier} from 'draft-js'
 
 
 
@@ -27,35 +31,23 @@ export default class DraftEditor extends React.Component {
       }),
       editorState: EditorState.createEmpty()
     }
-    this.onChange = (editorState) => {
-      console.log("onChange")
-      this.setState({editorState})}
+    this.onChange = (editorState) => { this.setState({editorState}) }
     this.dragInOutCount = 0
+    
   }
 
-
+ 
 
   render() {
-    let fileList = ""
-    if(this.props.folder) {
-      fileList = this.props.folder.valueSeq().map((file, index) => {
-        return ( <FileItem
-          key={index}
-          file={file}
-          dispatch={this.props.dispatch}
-        /> )
-      })
-    }
     
-    return <Editor editorState={this.state.editorState} onChange={this.onChange} />
+    // console.log("FOLDER", this.props.folder)
+    // return <Editor editorState={this.state.editorState} onChange={this.onChange} />
     return(
       <Editor 
-        editorState={this.state.editorState} 
+        editorState={this.state.editorState}
+        blockRendererFn={this.fileBlockRenderer} 
         onChange={this.onChange} 
-        className={classnames({
-          'display-list': true,
-          'drag-target': this.state.data.get('dropTarget')
-        })}
+        blockStyleFn={this.myBlockStyleFn}
         onDrop={this.onDrop}
         onDragOver={this.onDragOver}
         onDragEnter={this.onDragEnter}
@@ -64,9 +56,65 @@ export default class DraftEditor extends React.Component {
     )
   }
 
+   loadEditorContent(nextProps) {
+    
+    // console.log(this.props.folder)
+    let newEditorState = EditorState.createEmpty()
+    
+    if(nextProps.folder) {
+      console.log("FOLDER")
+          
+      nextProps.folder.valueSeq().forEach((file, index) => {
+      const entityKey = Entity.create(
+      'file',
+      'IMMUTABLE',
+      {key: index, file: file, dispatch: this.props.dispatch}
+      )
+
+      newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
+
+    })
+      
+    this.setState({
+     editorState: newEditorState
+    })
+
+    }
+  }
+
+  
+
+  fileBlockRenderer(contentBlock) {
+    const type = contentBlock.getType()
+    // console.log(type)
+    if (type === 'atomic') {
+      return {
+        component: Media,
+        editable: false
+      }
+    }
+  }
+
+  myBlockStyleFn(contentBlock) {
+    const type = contentBlock.getType();
+    if (type === 'atomic') {
+      return 'superFancyBlockquote';
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("RECEIVE")
+
+    this.loadEditorContent(nextProps)
+  }
+
   shouldComponentUpdate (nextProps, nextState) {
+    console.log("SHOULD")
+    // if(nextProps.folder !== this.props.folder)
+    
+    
+
     return true
-    return nextProps.folder !== this.props.folder || nextState.data !== this.state.data;
   }
   
   setImmState(fn) {
@@ -107,3 +155,37 @@ export default class DraftEditor extends React.Component {
     dragndrop.handleFileDrop(event, this.props.path)
   }
 }
+
+      const Media = (props) => {
+        console.log(props.blockProps)
+        // console.log(props)
+        // const entity = props.contentState.getEntity(
+        //   props.block.getEntityAt(0)
+        // );
+        // // const {src} = entity.getData();
+        // const type = entity.getType();
+
+        // let media;
+        // if (type === 'audio') {
+        //   media = <Audio src={src} />;
+        // } else if (type === 'image') {
+        //   media = <Image src={src} />;
+        // } else if (type === 'video') {
+        //   media = <Video src={src} />;
+        // }
+        const data = Entity.get(props.block.getEntityAt(0)).getData()
+        const {key} = data
+        const {file} = data
+        const {dispatch} = data
+        console.log(data)
+
+      //   props.blockProps
+       let item = <FileItem
+          key={key}
+          file={file}
+          dispatch={dispatch}
+        />
+
+
+        return item
+      };

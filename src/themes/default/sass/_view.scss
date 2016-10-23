@@ -2,6 +2,11 @@
  *  VIEW STYLES (REACT COMPONENT)
 */
 
+.superFancyBlockquote {
+  margin: 0;
+}
+
+
 .paneViews {
   &::-webkit-scrollbar {
     height:10px;
