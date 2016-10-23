@@ -1,3 +1,6 @@
+import fsWrite from '../../filesystem/write/fs-write-index'
+import nodePath from 'path'
+
 export function onMouseDown(event) {
   event.stopPropagation();
 }
@@ -20,7 +23,6 @@ export function onKeyDown(event) {
 
 export function onChange(event) {
   event.persist()
-  console.log(event.target.value)
   this.setImmState((prevState) => (prevState.set('fileName', event.target.value)))
 }
 
@@ -33,30 +35,20 @@ function renameSave(event) {
         .set('fileName', val)
         .set('editing', false)
       ))
+      fsWrite.actions.rename(
+        this.props.file.get('path'),
+        nodePath.join(this.props.file.get('root'), val) 
+      )
     } else {
       renameCancel.call(this, event)
     }
   }
 }
 
-
-
 function renameCancel() {
-    this.setImmState((prevState) => (
-      prevState
-      .set('fileName', this.props.file.get('base'))
-      .set('editing', false)
-    ))
-  }
-
-// function renameStart() {
-//   this.setState({
-//     fileName: this.props.file.get('displayName'),
-//     editing: true
-//   })
-
-//   // Focus
-//   var node = ReactDOM.findDOMNode<HTMLInputElement>(this.refs["editField"]);
-//   node.focus();
-//   node.setSelectionRange(0, node.value.length);
-// }
+  this.setImmState((prevState) => (
+    prevState
+    .set('fileName', this.props.file.get('base'))
+    .set('editing', false)
+  ))
+}

@@ -1,8 +1,11 @@
 import App from '../app/app-index'
 import ViewFile from '../view-file/vf-index'
 import Selection from '../filesystem/selection/sel-index'
+import fsWrite from '../filesystem/write/fs-write-index'
+import fsRename from '../filesystem/rename/rename-index'
 import nodePath from 'path'
-import {ipcRenderer, shell} from 'electron'
+import {ipcRenderer, shell, remote} from 'electron'
+const {Menu, MenuItem} = remote
 
 
 /**
@@ -10,20 +13,9 @@ import {ipcRenderer, shell} from 'electron'
  */
 export function open(file) {
   return (dispatch, getState) => {
-    if(file.get('stats').isFile()) {
-      if(file.get('selected')) {
-        // Open hole Selection
-        let selection = Selection.selectors.getSelectionPathArray(getState())
-        selection.forEach((filePath) => {
-          shell.openItem(filePath);
-        })
-      } else {
-        // Open Single file
-        shell.openItem(file.get('path'));
-      }
-    } else if (file.get('stats').isDirectory()) {
-      shell.showItemInFolder(file.get('path')); // Open Folder in Finder/Explorer
-    }
+    getPathArray(file, getState).forEach((filePath) => {
+      shell.openItem(filePath);
+    })
   }
 }
 
@@ -31,7 +23,6 @@ export function open(file) {
  * Opens view-folder for directory or view-file for file 
  */
 export function show(file) {
-  console.log("SHOW")
   return (dispatch, getState) => {
     if(file.get('stats').isFile()) {
       //@todo two actions? bad?
@@ -46,31 +37,53 @@ export function show(file) {
 /**
  * Ctrl Click
  */
-export function addToSelection(file) {
-  return (dispatch) => {
-    dispatch( Selection.actions.addToSelection( [file.get('path')] ))
-  }
-}
+export let addToSelection = (file) => Selection.actions.addToSelection( [file.get('path')] )
 
 /**
  * Shift Click
  */
-export function expandSelection(file) {
-  return (dispatch) => {
-    dispatch( Selection.actions.expandSelectionTo( file.get('path') ))
-  }
-}
-
+export let expandSelection = (file) => Selection.actions.expandSelectionTo( file.get('path') )
 
 /**
  * Drag of the Single file or the Selection
  */
 export function startDrag(file) {
-  return (dispatch) => {
-    if(file.get('selected')) {
-      dispatch( Selection.actions.startDragSelection() )
-    } else {
-      ipcRenderer.send('ondragstart', [file.get('path')] )
-    }
+  return (dispatch, getState) => {
+    ipcRenderer.send('ondragstart', getPathArray(file, getState ))
+  }
+}
+
+export function showContextMenu(file, startRename) {
+  return (dispatch, getState) => {
+
+    let filePathArray = getPathArray(file, getState)
+    let title = (filePathArray.length > 1) ? filePathArray.length+' items' : ""  
+
+    let menu = new Menu();
+    menu.append(new MenuItem({ 
+      label: 'Open ' + title, 
+      click: () => {
+        dispatch(open(file))
+      }
+    }))
+    menu.append(new MenuItem({
+      label: 'Rename: '+'"' + file.get('base') + '"', 
+      click: () => {
+        dispatch(fsRename.actions.renameStart(file.get('path')))
+      }
+    }))
+    menu.append(new MenuItem({ type: 'separator' }));
+    menu.append(new MenuItem({ label: 'Move '+title+' to Trash', 
+      click: () => {fsWrite.actions.moveToTrash(filePathArray) } 
+    }));
+    menu.popup(remote.getCurrentWindow());
+  }
+}
+
+function getPathArray(file, getState) {
+  if(file.get('selected')) {
+    return Selection.selectors.getSelectionPathArray(getState()).toJS()
+  } else {
+    return [file.get('path')]
   }
 }
