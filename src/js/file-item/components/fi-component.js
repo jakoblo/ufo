@@ -2,10 +2,10 @@
 import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Icon from '../general-components/icon'
+import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
-import eventHandler from './fi-event-handler/fi-event-handler-index'
+import eventHandler from '../fi-event-handler/fi-event-handler-index'
 
 export default class FileItemDisplay extends React.Component {
 

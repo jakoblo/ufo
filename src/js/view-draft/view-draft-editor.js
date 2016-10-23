@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
-import FileItem from '../file-item/fi-component-draft'
+import {FileItem} from '../file-item/fi-index'
 import classnames from 'classnames'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
@@ -11,7 +11,7 @@ import {AtomicBlockUtils,
         RichUtils,
         convertToRaw, Entity, Modifier} from 'draft-js'
 
-
+const FILE_BLOCK = "FILE_BLOCK"
 
 @connect(() => {
   const getFolderCombined = FsCombinedSelector.getFolderCombinedFactory()
@@ -24,7 +24,6 @@ import {AtomicBlockUtils,
 export default class DraftEditor extends React.Component {
   constructor(props) {
     super(props)
-    
     this.state = {
       data: Map({
         dropTarget: false
@@ -36,7 +35,13 @@ export default class DraftEditor extends React.Component {
     
   }
 
- 
+  componentWillReceiveProps(nextProps) {
+    this.loadEditorContent(nextProps)
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return nextProps.folder !== this.props.folder || nextState.data !== this.state.data;
+  }
 
   render() {
     
@@ -45,9 +50,9 @@ export default class DraftEditor extends React.Component {
     return(
       <Editor 
         editorState={this.state.editorState}
-        blockRendererFn={this.fileBlockRenderer} 
+        blockRendererFn={this.getBlockRendererFn} 
         onChange={this.onChange} 
-        blockStyleFn={this.myBlockStyleFn}
+        blockStyleFn={this.getBlockStyleFn}
         onDrop={this.onDrop}
         onDragOver={this.onDragOver}
         onDragEnter={this.onDragEnter}
@@ -66,55 +71,47 @@ export default class DraftEditor extends React.Component {
           
       nextProps.folder.valueSeq().forEach((file, index) => {
       const entityKey = Entity.create(
-      'file',
-      'IMMUTABLE',
-      {key: index, file: file, dispatch: this.props.dispatch}
+        FILE_BLOCK,
+        'IMMUTABLE',
+        {key: index, file: file, dispatch: this.props.dispatch}
       )
 
       newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
 
     })
-      
-    this.setState({
-     editorState: newEditorState
-    })
-
+      this.onChange(newEditorState)
     }
   }
 
-  
-
-  fileBlockRenderer(contentBlock) {
+  getBlockRendererFn(contentBlock) {
     const type = contentBlock.getType()
-    // console.log(type)
-    if (type === 'atomic') {
-      return {
-        component: Media,
-        editable: false
-      }
+    switch(type) {
+        case "atomic":
+          const entity = Entity.get(contentBlock.getEntityAt(0))
+          const type = entity.getType()
+          if (type === FILE_BLOCK) {
+            return {
+                component: FileWrapper,
+                // props: {
+                //     getEditorState,
+                //     onChange,
+                // }
+            }
+          } else {
+            return null
+          }
+        default:
+            return null
     }
   }
 
-  myBlockStyleFn(contentBlock) {
-    const type = contentBlock.getType();
-    if (type === 'atomic') {
-      return 'superFancyBlockquote';
+  getBlockStyleFn(contentBlock) {
+    switch (contentBlock.getType()) {
+      case FILE_BLOCK:
+        return 'block';
+      default:
+        return 'block';
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log("RECEIVE")
-
-    this.loadEditorContent(nextProps)
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    console.log("SHOULD")
-    // if(nextProps.folder !== this.props.folder)
-    
-    
-
-    return true
   }
   
   setImmState(fn) {
@@ -156,36 +153,19 @@ export default class DraftEditor extends React.Component {
   }
 }
 
-      const Media = (props) => {
-        console.log(props.blockProps)
-        // console.log(props)
-        // const entity = props.contentState.getEntity(
-        //   props.block.getEntityAt(0)
-        // );
-        // // const {src} = entity.getData();
-        // const type = entity.getType();
+const FileWrapper = (props) => {
+  const data = Entity.get(props.block.getEntityAt(0)).getData()
+  const {key} = data
+  const {file} = data
+  const {dispatch} = data
 
-        // let media;
-        // if (type === 'audio') {
-        //   media = <Audio src={src} />;
-        // } else if (type === 'image') {
-        //   media = <Image src={src} />;
-        // } else if (type === 'video') {
-        //   media = <Video src={src} />;
-        // }
-        const data = Entity.get(props.block.getEntityAt(0)).getData()
-        const {key} = data
-        const {file} = data
-        const {dispatch} = data
-        console.log(data)
-
-      //   props.blockProps
-       let item = <FileItem
-          key={key}
-          file={file}
-          dispatch={dispatch}
-        />
+//   props.blockProps
+  let item = <FileItem
+    key={key}
+    file={file}
+    dispatch={dispatch}
+  />
 
 
-        return item
-      };
+  return item
+};

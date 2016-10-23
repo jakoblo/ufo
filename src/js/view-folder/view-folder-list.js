@@ -25,12 +25,10 @@ export default class DisplayList extends React.Component {
       })
     }
     this.dragInOutCount = 0
-    
   }
 
   render() {
     let fileList = ""
-    console.log(this.props.folder)
     if(this.props.folder) {
       fileList = this.props.folder.valueSeq().map((file, index) => {
         return ( <FileItem
@@ -57,7 +55,6 @@ export default class DisplayList extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    console.log("SHOULD")
     return nextProps.folder !== this.props.folder || nextState.data !== this.state.data;
   }
   
