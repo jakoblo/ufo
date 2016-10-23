@@ -45,8 +45,6 @@ export const getFolderCombinedFactory = () => {
       if(files && renaming) {
         if(files.get(renaming)) {
           files = files.setIn([renaming, 'renaming'], true)
-        } else {
-          console.error('Try to rename a File which does not exists in the FileSystem', files.toJS(), renaming)
         }
       }
 

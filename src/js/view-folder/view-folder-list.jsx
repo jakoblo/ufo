@@ -5,6 +5,8 @@ import FileItem from '../file-item/components/file-item'
 import classnames from 'classnames'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
+import Button from '../general-components/button'
+import fsWrite from '../filesystem/write/fs-write-index'
 
 
 
@@ -50,6 +52,9 @@ export default class DisplayList extends React.Component {
         onDragLeave={this.onDragLeave}
       >
         {fileList}
+        <Button text="new Folder" onClick={() => {
+          this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
+        }} />
       </div>
     )
   }

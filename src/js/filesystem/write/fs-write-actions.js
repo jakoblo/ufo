@@ -2,6 +2,8 @@ import {ipcRenderer} from 'electron'
 import nodePath from 'path'
 import trash from 'trash'
 import fs from 'mz/fs'
+import fsWatch from '../watch/fs-watch-index'
+import fsRename from '../rename/rename-index'
 import {fork} from 'child_process'
 import * as c from './fs-write-constants'
 import * as t from './fs-write-actiontypes'
@@ -128,4 +130,27 @@ export function startFsWorker(source, destination, options, setId) {
   // fsWriteWorker.on('close', (code) => {
   //   console.log(`fs write worker exit: ${code}`);
   // });
+}
+
+export function newFolder(parentFolder) {
+  return (dispatch, getState) => {
+    let existingFiles = fsWatch.selectors.getFilesSeq(getState(), {path: parentFolder})
+    let folderName = "new Folder"
+    if(existingFiles.indexOf(folderName) > -1) {
+      let count = 2
+      while (existingFiles.indexOf(folderName+count) > -1) {
+        count++
+      }
+      folderName = folderName+count
+    }
+    let newFolderPath = nodePath.join(parentFolder, folderName)
+    
+    fs.mkdir(nodePath.join(parentFolder, folderName))
+      .then(() => {
+        dispatch( fsRename.actions.renameStart(newFolderPath) )
+      })
+      .catch((err) => {
+        alert(err)
+      })
+  }
 }
