@@ -1,5 +1,6 @@
 import * as HotKeyActions from './hotkey-actions.js'
 import Selection from '../filesystem/selection/sel-index'
+import Rename from '../filesystem/rename/rename-index'
 import App from '../app/app-index'
 
 /**
@@ -32,18 +33,6 @@ export const keyMap = {
   rename: ['F2', 'enter']
 }
 
-export const bindRenameAction = (callback) => {
-  console.log('do bind')
-  rawHandlerMap.rename = callback
-}
-
-export const unbindRenameAction = (callback) => {
-  if(rawHandlerMap.rename === callback) {
-    console.log('do unbind')
-    rawHandlerMap.rename = () => () => {}
-  }
-}
-
 var rawHandlerMap = {
   navUp: HotKeyActions.navigateFileUp,
   selectUp: HotKeyActions.addPrevFileToSelection,
@@ -53,5 +42,6 @@ var rawHandlerMap = {
   navRight: Selection.actions.selectNextDir,
   navLeft: Selection.actions.selectPreviousDir,
   selectAll: Selection.actions.selectAll,
+  rename: Rename.actions.renameSelected,
   moveToTrash: HotKeyActions.selectionToTrash
 }

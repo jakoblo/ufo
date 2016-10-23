@@ -23,7 +23,7 @@ function navigateDirection(direction) {
             fsWatch.selectors.getDirectorySeq( getState() )[0] // or First Folder
     } 
     let indexedFiles =     fsWatch.selectors.getFilesSeq( getState() , props)
-    let currentFileIndex = Selection.selectors.getCurrentFileIndex( getState() , props)
+    let currentFileIndex = Selection.selectors.getCurrentFileForFolderIndex( getState() , props)
     let newActiveName =    indexedFiles[currentFileIndex + direction]
     if(newActiveName) {
       dispatch( FileActions.show(
@@ -47,7 +47,7 @@ function selectFileNextToCurrent(direction) {
     let selection = Selection.selectors.getSelection( getState() )
     let props = { path: selection.get('root') }
     let indexedFiles = fsWatch.selectors.getFilesSeq( getState(), props )
-    let currentFileIndex = Selection.selectors.getCurrentFileIndex( getState(), props )
+    let currentFileIndex = Selection.selectors.getCurrentFileForFolderIndex( getState(), props )
     let newSelectedName = indexedFiles[currentFileIndex + direction]
     if(newSelectedName) {
       dispatch( 

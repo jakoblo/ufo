@@ -3,6 +3,7 @@ import nodePath from 'path'
 import Watch from './watch/fs-watch-index'
 import Write from './write/fs-write-index'
 import Selection from './selection/sel-index'
+import Rename from './rename/rename-index'
 
 /**
  * Main Selector to get all Files with all Information 
@@ -10,13 +11,20 @@ import Selection from './selection/sel-index'
  * @return selector(state, {path: string}) => Immuteable Map of Files
  */
 export const getFolderCombinedFactory = () => {
+
   let getFolderWithActive = Watch.selectors.getFolderWithActiveFactory()
   let getProgressingForFolder = Write.selectors.getProgressingForFolderFactory()
 
   return createSelector(
-    [getFolderWithActive, Selection.selectors.getSelectionFor, getProgressingForFolder, getPath],
-    (files, selection, write, path) => {
- 
+    [
+      getFolderWithActive, 
+      Selection.selectors.getSelectionFor, 
+      getProgressingForFolder,
+      Rename.selectors.getRenamingForDirectory, 
+      getPath
+    ],
+    (files, selection, write, renaming, path) => {
+
       if(files && selection) {
         selection.get('files').forEach((selectedFile, index) => {
           if(files.get(selectedFile)) {
@@ -34,6 +42,14 @@ export const getFolderCombinedFactory = () => {
           files = files.setIn([nodePath.basename(progressingFile.get('destination')), 'progress'], progressingFile.get('progress'))
         })
       }
+      if(files && renaming) {
+        if(files.get(renaming)) {
+          files = files.setIn([renaming, 'renaming'], true)
+        } else {
+          console.error('Try to rename a File which does not exists in the FileSystem', files.toJS(), renaming)
+        }
+      }
+
       return files
   })
 }
