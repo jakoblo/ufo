@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import * as actions from '../rename-actions'
 import nodePath from 'path'
+import { Shortcuts } from 'react-shortcuts'
 
 export default class RenameInput extends React.Component {
 
@@ -16,21 +17,33 @@ export default class RenameInput extends React.Component {
 
   render() {
     return (
-      <input
-        ref="editField"
-        className="edit"
-        value={this.state.fileName}
-        onMouseDown={this.onMouseDown}
-        onMouseUp={this.onMouseUp}
-        onBlur={this.onBlur}
-        onKeyDown={this.onKeyDown}
-        onChange={this.onChange}
-      />
+      <Shortcuts name="renameInput" handler={this.shortcutHandler}>
+        <input
+          ref="editField"
+          className="edit"
+          value={this.state.fileName}
+          onMouseDown={this.onMouseDown}
+          onMouseUp={this.onMouseUp}
+          onBlur={this.onBlur}
+          onChange={this.onChange}
+        />
+      </Shortcuts>
     )
   }
 
+  shortcutHandler = (action, event) => {
+    switch (action) {
+      case "cancel":
+        this.renameCancel()
+        break;
+      case "save":
+        this.renameSave(event);
+        break;
+    }
+  }
+
   componentDidMount(prevProps, prevState) {
-    // Focus rename input
+    // Select text in input
     var node = ReactDOM.findDOMNode(this.refs["editField"]);
     node.focus();
     node.setSelectionRange(0, node.value.length);
@@ -38,22 +51,11 @@ export default class RenameInput extends React.Component {
 
   onMouseDown = (event) => { event.stopPropagation() }
   onMouseUp = (event) => { event.stopPropagation() }
-  onBlur = (event) => { console.log('blur'); this.renameSave(event) }
-
-  onKeyDown = (event) => {
-    event.stopPropagation();
-    if (event.which === 27) {  // Escape
-      this.renameCancel()
-    } else if (event.which === 13) { // Enter
-      this.renameSave(event);
-    }
-  }
+  onBlur = (event) => { this.renameSave(event) }
 
   onChange = (event) => {
+    console.log('change')
     this.setState({'fileName': event.target.value})
-    event.persist()
-    event.stopPropagation();
-    event.preventDefault();
   }
 
   renameSave = (event) => {
