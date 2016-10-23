@@ -7,7 +7,7 @@ import classNames from 'classnames'
 import {Map} from 'immutable'
 import eventHandler from '../fi-event-handler/fi-event-handler-index'
 import * as HotKeyMap from '../../hotkeys/hotkey-map'
-import RenameInput from './file-item-rename-input'
+import RenameInput from '../../filesystem/rename/components/rename-input'
 
 export default class FileItemDisplay extends React.Component {
 
@@ -28,20 +28,17 @@ export default class FileItemDisplay extends React.Component {
   }
 
   render() {
-
     let progress, renameInput = null
     if(this.props.file.get('progress')) {
       progress = <div className="progress-bar">
-                  <progress max="100" value={this.props.file.get('progress').get('percentage')}></progress>
+                   <progress max="100" value={this.props.file.get('progress').get('percentage')}></progress>
                  </div>
     }
 
-    if(this.state.data.get('renaming')) {
+    if(this.props.file.get('renaming')) {
       renameInput = <RenameInput 
-        fileName={this.props.file.get('base')} 
-        root={this.props.file.get('root')}
         path={this.props.file.get('path')}
-        renameStop={this.renameStop}
+        dispatch={this.props.dispatch}
       />
     }
     
@@ -49,7 +46,7 @@ export default class FileItemDisplay extends React.Component {
       <span
         className={classNames({
           'file-item': true,
-          'edit': this.state.data.get('renaming'),
+          'edit': this.props.file.get('renaming'),
           'folder': this.props.file.get('stats').isDirectory(),
           'file': this.props.file.get('stats').isFile(),
           'active': this.props.file.get('active'),
@@ -90,28 +87,5 @@ export default class FileItemDisplay extends React.Component {
 
   shouldComponentUpdate (nextProps, nextState) {
     return nextProps.file !== this.props.file || nextState.data !== this.state.data;
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    // if(
-    //   this.props.file.get('onlySelected')
-    // ) {
-    //   // Set Rename Callback
-    //   console.log('call bind '+this.props.file.get('name'))
-    //   HotKeyMap.bindRenameAction(this.renameStart)
-    // } else if (
-    //     prevProps.file.get('onlySelected')
-    // ) {
-    //   console.log('call unbind '+this.props.file.get('name'))
-    //   HotKeyMap.unbindRenameAction(this.renameStart)
-    // }
-  }
-
-  renameStart = () => {
-    this.setImmState((state) => (state.set('renaming', true)))
-  }
-
-  renameStop = () => {
-    this.setImmState((state) => (state.set('renaming', false)))
   }
 }

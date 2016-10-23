@@ -11,6 +11,16 @@ export const getSelectionPathArray = (state) => {
   })
 }
 
+export const getCurrentFile = (state) => {
+  let root = state.selection.get('root')
+  let files = state.selection.get('files')
+  if(root && files.size > 0) {
+    return nodePath.join(root, files.last())
+  } else {
+    return null
+  }
+}
+
 
 /**
  * get Selection for the given path
@@ -32,7 +42,7 @@ export const getSelectionFor = (state, props) => {
  * @param  {path: string} props
  * @ returns string
  */
-export const getCurrentFile = (state, props) => {
+export const getCurrentFileForFolder = (state, props) => {
   let lastestSelected = undefined
   if(state.selection.get('root') == props.path) {
     lastestSelected = state.selection.get('files').last()
@@ -47,6 +57,6 @@ export const getCurrentFile = (state, props) => {
  * @param  {path: string} props
  * @returns number
  */
-export const getCurrentFileIndex = (state, props) => {
-  return FS.selectors.getFilesSeq(state, props).indexOf(  getCurrentFile(state, props)  )
+export const getCurrentFileForFolderIndex = (state, props) => {
+  return FS.selectors.getFilesSeq(state, props).indexOf(  getCurrentFileForFolder(state, props)  )
 }

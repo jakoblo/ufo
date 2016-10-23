@@ -2,6 +2,7 @@ import App from '../app/app-index'
 import ViewFile from '../view-file/vf-index'
 import Selection from '../filesystem/selection/sel-index'
 import fsWrite from '../filesystem/write/fs-write-index'
+import fsRename from '../filesystem/rename/rename-index'
 import nodePath from 'path'
 import {ipcRenderer, shell, remote} from 'electron'
 const {Menu, MenuItem} = remote
@@ -67,7 +68,9 @@ export function showContextMenu(file, startRename) {
     }))
     menu.append(new MenuItem({
       label: 'Rename: '+'"' + file.get('base') + '"', 
-      click: () => { startRename() }
+      click: () => {
+        dispatch(fsRename.actions.renameStart(file.get('path')))
+      }
     }))
     menu.append(new MenuItem({ type: 'separator' }));
     menu.append(new MenuItem({ label: 'Move '+title+' to Trash', 
