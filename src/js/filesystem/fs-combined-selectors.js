@@ -4,6 +4,7 @@ import Watch from './watch/fs-watch-index'
 import Write from './write/fs-write-index'
 import Selection from './selection/sel-index'
 import Rename from './rename/rename-index'
+import Filter from './filter/filter-index'
 
 /**
  * Main Selector to get all Files with all Information 
@@ -12,7 +13,7 @@ import Rename from './rename/rename-index'
  */
 export const getFolderCombinedFactory = () => {
 
-  let getFolderWithActive = Watch.selectors.getFolderWithActiveFactory()
+  let getFilteredFiles = getFilteredFilesFactory()
   let getProgressingForFolder = Write.selectors.getProgressingForFolderFactory()
 
   /**
@@ -21,7 +22,7 @@ export const getFolderCombinedFactory = () => {
    */
   return createSelector(  
     [
-      getFolderWithActive, 
+      getFilteredFiles, 
       Selection.selectors.getSelectionFor, 
       getProgressingForFolder,
       Rename.selectors.getRenamingForDirectory, 
@@ -58,3 +59,27 @@ export const getFolderCombinedFactory = () => {
 }
 
 const getPath = (state, props) => props.path
+
+
+export const getFilteredFilesFactory = () => {
+
+  let getFolderWithActive = Watch.selectors.getFolderWithActiveFactory()
+  let getFiterForFolder = Filter.selectors.getFiterForFolderFactory()
+
+  return createSelector(
+    [getFolderWithActive, getFiterForFolder],
+    (files, filters) => {
+      return files.filter((file) => {
+        let filename = file.get('name')
+        let count = 0
+        while (count < filters.length && filename.match(filters[count])) {
+          if(count == filters.length-1) {
+            return true
+          }
+          count++
+        }
+        return false
+      })
+  })
+}
+
