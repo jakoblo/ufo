@@ -7,8 +7,11 @@ const INITIAL_STATE = {
   global: {
     notHidden: /^[^.]/
   },
-  specific: {
-    '/Users/flow': /^\.?do/i
+  focused: {
+    userInput: {
+      input: 'do',
+      regEx: /^\.?d/i,
+    }
   }
 }
 
@@ -17,10 +20,13 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
   switch (action.type) {
 
     case t.FILTER_USER_SET:
-      return state.setIn(['specific', action.payload.path], new RegExp("^\.?"+action.payload.filterString, "i"))
+      return state.setIn(['focused', 'userInput'], Map({
+        input: action.payload.input,
+        regEx: action.payload.regEx
+      }))
 
     case t.FILTER_USER_CLEAR:
-      return state.deleteIn(['specific', action.payload.path])
+      return state.deleteIn(['focused', 'userInput'])
 
     default:
       return state;

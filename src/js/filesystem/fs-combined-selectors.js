@@ -64,11 +64,14 @@ const getPath = (state, props) => props.path
 export const getFilteredFilesFactory = () => {
 
   let getFolderWithActive = Watch.selectors.getFolderWithActiveFactory()
-  let getFiterForFolder = Filter.selectors.getFiterForFolderFactory()
+  let getFiterForFolder = Filter.selectors.getFiterRegExForFolder_Factory()
 
   return createSelector(
     [getFolderWithActive, getFiterForFolder],
     (files, filters) => {
+
+      console.log(filters)
+
       return files.filter((file) => {
         let filename = file.get('name')
         let count = 0
