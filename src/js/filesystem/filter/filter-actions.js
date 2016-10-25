@@ -6,37 +6,35 @@ import nodePath from 'path'
 import * as _ from 'lodash'
 
 
-export function renameSelected() {
+export function userInputAppend(append) {
   return function (dispatch, getState) {
-    let currentSelectedFile = Selection.selectors.getCurrentFile(getState())
-    if(currentSelectedFile) {
-      dispatch( renameStart( currentSelectedFile ))
-    }
+    dispatch(
+      userInputSet( selectors.getUserInput(getState()) + append )
+    )
   }
 }
 
-/**
- * @export
- * @param {string} filePath
- */
-window.test = userSet
-export function userSet(path, filterString) {
+export function userInputBackspace() {
+  return function (dispatch, getState) {
+    dispatch(
+      userInputSet( selectors.getUserInput(getState()).slice(0, -1) )
+    )
+  }
+}
+
+export function userInputSet(inputString) {
   return {
     type: t.FILTER_USER_SET,
     payload: {
-      filterString: filterString,
-      path: path
+      input: inputString,
+      regEx: new RegExp('^\\.?'+inputString, "i") // RegExp = /^\.?Filename/i > match .filename & fileName
     }
   }
 }
 
-window.clear = userClear
-export function userClear(path, filterString) {
+export function userInputClear() {
   return {
-    type: t.FILTER_USER_CLEAR,
-    payload: {
-      path: path
-    }
+    type: t.FILTER_USER_CLEAR
   }
 }
 
