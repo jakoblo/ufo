@@ -2,6 +2,7 @@
 import * as t from './sel-actiontypes'
 import App from '../../app/app-index'
 import Preview from '../../view-file/vf-index'
+import Filter from '../filter/filter-index'
 import FS from '../watch/fs-watch-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
@@ -42,13 +43,19 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       })
 
     case FS.actiontypes.FILE_UNLINK:
-        // a selected file has maybe been delete
-        // If that is the case, it's necessary to remove that
-        // or the easy way, reset the selection....
-        if(state.get('root') && state.get('root').indexOf(nodePath.dirname(action.payload.path)) > -1) {
-          return fromJS(INITIAL_STATE)
-        }
-        return state
+      // a selected file has maybe been delete
+      // If that is the case, it's necessary to remove that
+      // or the easy way, reset the selection....
+      if(state.get('root') && state.get('root').indexOf(nodePath.dirname(action.payload.path)) > -1) {
+        return state.set('files', List([]))
+      }
+      return state
+    
+    case Filter.actiontypes.FILTER_HIDE_HIDDEN:
+      return state.set('files', List([]))
+    
+    case Filter.actiontypes.FILTER_USER_SET:
+      return state.set('files', List([]))
 
     default:
       return state;

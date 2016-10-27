@@ -55,7 +55,7 @@ export function changeAppPath(fromPath, toPath, historyJump = false) {
 
 export function navigateToParentFolder() {
   return (dispatch, getState) => {
-    let currentDir = _.last( FileSystem.selectors.getDirectorySeq( getState() ) )
+    let currentDir = _.last( FileSystem.selectors.getDirSeq( getState() ) )
     let parentDir = nodePath.dirname( currentDir )
     dispatch( changeAppPath( null, parentDir))
   }

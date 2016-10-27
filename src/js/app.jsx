@@ -6,8 +6,7 @@ import {DevToolsSetup} from './utils/devtools-setup'
 import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 // React
-import Foundation from './general-components/foundation'
-import ShortcutManagerSetup from './general-components/shortcutmanager-setup'
+import EventCatcher from './app/components/event-catcher'
 import ActionBar from './general-components/actionbar'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
@@ -15,9 +14,6 @@ import ViewPlacer from './view-placer/vp-index'
 import FsWrite from './filesystem/write/fs-write-index'
 import ToggleBar from './general-components/togglebar'
 import * as Utils from './utils/utils-index'
-// Shortcuts
-import {keyMap, shortcutHandler} from './shortcuts/shortcut-map.js'
-import { ShortcutManager, Shortcuts } from 'react-shortcuts'
 
 if (process.env.NODE_ENV !== 'production') {
   // execute window.devToolsSetup() on the developer console to install them
@@ -37,21 +33,17 @@ ipcRenderer.on('saveState', function(event) {
 })
 
 ReactDOM.render(
-    <Provider store={ store }>
-      <ShortcutManagerSetup shortcutManager={new ShortcutManager(keyMap)}> 
-        <Shortcuts name="global" global={true} handler={shortcutHandler}>
-          <Foundation>
-            <Sidebar>
-              <ActionBar/>
-              <Navbar.components.parent/>
-              <ToggleBar/>
-            </Sidebar>
-            <ViewPlacer.components.parent/>
-            <FsWrite.component />
-          </Foundation>
-        </Shortcuts>
-      </ShortcutManagerSetup>
-    </Provider>
+  <Provider store={ store }>
+    <EventCatcher>
+      <Sidebar>
+        <ActionBar/>
+        <Navbar.components.parent/>
+        <ToggleBar/>
+      </Sidebar>
+      <ViewPlacer.components.parent/>
+      <FsWrite.component />
+    </EventCatcher>
+  </Provider>
   ,
   document.getElementById('app')
 );

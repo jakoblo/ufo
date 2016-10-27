@@ -6,6 +6,8 @@ var dragInOutCount = 0
 
 export function onDragStart (event) {
   event.preventDefault()
+  console.log('drag start')
+  debugger
   this.props.dispatch( FileActions.startDrag(this.props.file) )
 }
 

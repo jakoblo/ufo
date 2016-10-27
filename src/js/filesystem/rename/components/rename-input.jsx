@@ -4,7 +4,8 @@ import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import * as actions from '../rename-actions'
 import nodePath from 'path'
-import { Shortcuts } from 'react-shortcuts'
+import { keyEventHandler } from '../../../shortcuts/event-handler'
+import { keyMap } from '../../../shortcuts/shortcut-map'
 
 export default class RenameInput extends React.Component {
 
@@ -17,17 +18,16 @@ export default class RenameInput extends React.Component {
 
   render() {
     return (
-      <Shortcuts name="renameInput" handler={this.shortcutHandler}>
-        <input
-          ref="editField"
-          className="edit"
-          value={this.state.fileName}
-          onMouseDown={this.onMouseDown}
-          onMouseUp={this.onMouseUp}
-          onBlur={this.onBlur}
-          onChange={this.onChange}
-        />
-      </Shortcuts>
+      <input
+        ref="editField"
+        className="edit"
+        value={this.state.fileName}
+        onMouseDown={this.onMouseDown}
+        onMouseUp={this.onMouseUp}
+        onBlur={this.onBlur}
+        onChange={this.onChange}
+        onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)}
+      />
     )
   }
 
@@ -39,6 +39,7 @@ export default class RenameInput extends React.Component {
   }
 
   shortcutHandler = (action, event) => {
+    event.stopPropagation()
     switch (action) {
       case "cancel":
         this.renameCancel()
@@ -55,7 +56,6 @@ export default class RenameInput extends React.Component {
   onChange = (event) => {
     this.setState({'fileName': event.target.value})
   }
-
   renameSave = (event) => {
     var val = this.state.fileName.trim()
     if (val != nodePath.basename(this.props.path)) {
@@ -64,7 +64,6 @@ export default class RenameInput extends React.Component {
       this.renameCancel()
     }
   }
-
   renameCancel = () => {
     this.props.dispatch( actions.renameCancel( this.props.path) )
   }

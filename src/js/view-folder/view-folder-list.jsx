@@ -1,22 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
+import * as fsMergedSelectors from  '../filesystem/fs-merged-selectors'
 import FileItem from '../file-item/components/file-item'
 import classnames from 'classnames'
-import App from '../app/app-index'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
 import Button from '../general-components/button'
 import fsWrite from '../filesystem/write/fs-write-index'
 import Selection from '../filesystem/selection/sel-index'
-import { ShortcutManager, Shortcuts } from 'react-shortcuts'
+import Filter from '../filesystem/filter/filter-index'
 
 @connect(() => {
-  const getFolderCombined = FsCombinedSelector.getFolderCombinedFactory()
+  const getFilesMerged = fsMergedSelectors.getFilesMergedOf_Factory()
   return (state, props) => {
     return {
       focused: Selection.selectors.isFocused(state, props), 
-      folder: getFolderCombined(state, props)
+      files: getFilesMerged(state, props),
+      filterUserInput: Filter.selectors.getUserInput(state, props)
     }
   }
 })
@@ -32,12 +32,9 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
-
-    console.log('render')
-
     let fileList = ""
-    if(this.props.folder) {
-      fileList = this.props.folder.valueSeq().map((file, index) => {
+    if(this.props.files) {
+      fileList = this.props.files.valueSeq().map((file, index) => {
         return ( <FileItem
           key={index}
           file={file}
@@ -60,18 +57,19 @@ export default class DisplayList extends React.Component {
           onMouseUp={this.focus}
         >
           {fileList}
-          <Button text="new Folder" onClick={(e) => {
+          <Button text="new Folder" class="btn-new-folder" onClick={(e) => {
             event.preventDefault(); event.stopPropagation();
             this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
           }} />
+          <Filter.components.filterUserInput path={this.props.path} />
         </div>
     )
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
-      nextProps.folder !== this.props.folder || 
-      nextProps.focused !== this.props.focused || 
+      nextProps.files !== this.props.files || 
+      nextProps.focused !== this.props.focused ||
       nextState.data !== this.state.data
     )
   }

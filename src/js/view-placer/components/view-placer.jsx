@@ -9,7 +9,7 @@ import ViewFile from '../../view-file/vf-index'
 import FS from '../../filesystem/watch/fs-watch-index'
 
 @connect((state) => {
-  let dirs = FS.selectors.getDirectorySeq(state)
+  let dirs = FS.selectors.getDirSeq(state)
   return {
     viewFolderList: dirs.map((dir, index) => {
       return FS.selectors.getDirState(state, {path: dir})

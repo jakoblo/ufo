@@ -1,62 +1,42 @@
-import Selection from '../filesystem/selection/sel-index'
-import Rename from '../filesystem/rename/rename-index'
-import App from '../app/app-index'
 
-/**
- * Map dispatch to the raw handlerMap
- */
-export function shortcutHandler(action, event) {
-  if( event.target.tagName.toUpperCase() == 'INPUT' ) {
-    return
-  }
-  if(rawHandlerMap[action]) {
-    window.store.dispatch( rawHandlerMap[action]() )
-  }
-}
-
-
-// React-Shortcuts
-// https://github.com/avocode/react-shortcuts
 export const keyMap = {
   global: {
-    navUp: 'up',
-    selectUp: 'shift+up',
-    pathUp: ['ctrl+up', 'command+up'],
-    navDown: 'down',
-    selectDown: 'shift+down',
-    navRight: 'right',
-    navLeft: 'left',
+    navUp: 'ArrowUp',
+    selectUp: 'Shift+ArrowUp',
+    pathUp: {
+      windows: 'Control+ArrowUp', 
+      linux: 'Control+ArrowUp', 
+      darwin: 'Meta+ArrowUp'
+    },
+    navDown: 'ArrowDown',
+    selectDown: 'Shift+ArrowDown',
+    navRight: 'ArrowRight',
+    navLeft: 'ArrowLeft',
     selectAll: {
-      windows: 'ctrl+a',
-      linux: 'ctrl+a',
-      osx: 'command+a'
+      windows: 'Control+a',
+      linux: 'Control+a',
+      darwin: 'Meta+a'
     },
     moveToTrash: {
       windows: 'del',
       linux: 'del',
-      osx: 'command+backspace'
+      darwin: 'Meta+Backspace'
     },
     rename: {
-      windows: 'F2', 
-      linux: 'F2', 
-      osx: 'enter'
-    }
+      windows: 'F2',
+      linux: 'F2',
+      darwin: 'Enter'
+    },
+    toggleHiddenFiles: {
+      darwin: 'Shift+Meta+:',
+      windows: 'Shift+Controle+:',
+      linux: 'Shift+Controle+:'
+    },
+    clearFilter: "Escape",
+    deleteFilter: "Backspace",
   },
   renameInput: {
-    cancel: "esc",
-    save: "enter"
+    cancel: "Escape",
+    save: "Enter"
   }
-}
-
-var rawHandlerMap = {
-  navUp: Selection.actions.fileNavUp,
-  selectUp: Selection.actions.fileAddUp,
-  pathUp: App.actions.navigateToParentFolder,
-  navDown: Selection.actions.fileNavDown,
-  selectDown: Selection.actions.fileAddDown,
-  navRight: Selection.actions.dirNext,
-  navLeft: Selection.actions.dirPrevious,
-  selectAll: Selection.actions.selectAll,
-  rename: Rename.actions.renameSelected,
-  moveToTrash: Selection.actions.toTrash
 }

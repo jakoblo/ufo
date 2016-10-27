@@ -10,4 +10,14 @@
   &.focused {
     border: 2px solid #AFD2E8;
   }
+
+  .filterUserInput {
+    position: absolute;
+    bottom: 15px;
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+  }
 }

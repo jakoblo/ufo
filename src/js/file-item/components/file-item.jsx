@@ -55,6 +55,7 @@ export default class FileItemDisplay extends React.Component {
           'open-animation': this.state.data.get('openAnimation'),
           'progress': this.props.file.get('progress')
         })}
+        draggable={true}
         ref="file"
       >
         <span className="flex-box">

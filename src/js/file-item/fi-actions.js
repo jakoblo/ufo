@@ -37,7 +37,7 @@ export function show(file) {
 /**
  * Ctrl Click
  */
-export let addToSelection = (file) => Selection.actions.fileAdd( [file.get('path')] )
+export let addToSelection = (file) => Selection.actions.filesAdd( [file.get('path')] )
 
 /**
  * Shift Click
