@@ -1,8 +1,8 @@
 "use strict"
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { keyEventHandler } from '../../shortcuts/event-handler'
-import { keyMap } from '../../shortcuts/shortcut-map'
+import { keyEventHandler } from '../../shortcuts/key-event-handler'
+import { keyMap } from '../../shortcuts/key-map'
 import Selection from '../../filesystem/selection/sel-index'
 import Filter from '../../filesystem/filter/filter-index'
 import Rename from '../../filesystem/rename/rename-index'
@@ -36,7 +36,11 @@ export default class EventCatcher extends React.Component {
   keyAction = (action, event) => {
     if(this.actionMap[action]) {
       window.store.dispatch( this.actionMap[action]() )
-    } else if( event.key.length == 1 ) {
+    } else if( 
+      event.key.length == 1 &&
+      !event.metaKey &&
+      !event.ctrlKey 
+    ) {
       window.store.dispatch( Filter.actions.userInputAppend(event.key) )
     }
   }

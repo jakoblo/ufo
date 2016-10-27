@@ -57,7 +57,7 @@ export default class DisplayList extends React.Component {
           onMouseUp={this.focus}
         >
           {fileList}
-          <Button text="new Folder" class="btn-new-folder" onClick={(e) => {
+          <Button text="new Folder" className="btn-new-folder" onClick={(e) => {
             event.preventDefault(); event.stopPropagation();
             this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
           }} />

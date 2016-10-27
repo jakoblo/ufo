@@ -23,7 +23,6 @@ export default class FilterUserInput extends React.Component {
   }
 
   render() {
-    console.log(this.props.focused)
     return (
       <div
         className={classNames({
@@ -32,7 +31,7 @@ export default class FilterUserInput extends React.Component {
         })}
       >
         <label>Filter By:</label>
-        <input value={this.props.input} />
+        <input value={this.props.input || ""} />
       </div>
     )
   }

@@ -6,7 +6,7 @@ import {DevToolsSetup} from './utils/devtools-setup'
 import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 // React
-import EventCatcher from './app/components/event-catcher'
+import EventCatcher from './app/components/root-event-catcher'
 import ActionBar from './general-components/actionbar'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'

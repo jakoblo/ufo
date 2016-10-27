@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import * as actions from '../rename-actions'
 import nodePath from 'path'
-import { keyEventHandler } from '../../../shortcuts/event-handler'
-import { keyMap } from '../../../shortcuts/shortcut-map'
+import { keyEventHandler } from '../../../shortcuts/key-event-handler'
+import { keyMap } from '../../../shortcuts/key-map'
 
 export default class RenameInput extends React.Component {
 

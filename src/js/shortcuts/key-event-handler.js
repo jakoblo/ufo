@@ -4,12 +4,10 @@ import _ from 'lodash'
 import os from 'os'
 
 // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
-// String.fromCharCode()
 
 export function keyEventHandler (keyMap, callback) {
   return ( event )  => {
     let eventString = keyEventToString(event)
-    console.log(eventString)
     let action = _.findKey(keyMap, (value) => {
       switch (typeof value) {
         case "string":
@@ -19,7 +17,7 @@ export function keyEventHandler (keyMap, callback) {
         default:
           return false
       }
-    })
+    }) 
     if(action) {
       event.preventDefault()
       event.stopPropagation()

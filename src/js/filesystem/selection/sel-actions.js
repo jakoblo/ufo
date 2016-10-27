@@ -55,8 +55,6 @@ export function set(pathArray) {
 export function filesAdd(pathArray) {
   return function (dispatch, getState) {
 
-    console.log('files add')
-
     let previousRoot  = getState()[c.NAME].get('root')
     let selectedFiles = getState()[c.NAME].get('files').toJS().map((filename) => {
       return nodePath.join(previousRoot, filename)
@@ -211,7 +209,7 @@ export let fileAddUp = () => filesAddFromCurrent(-1)
 export let fileAddDown = () => filesAddFromCurrent(+1)
 function filesAddFromCurrent(direction) {
   return function (dispatch, getState) {
-    console.log('addfromCurrent')
+    
     let selection = selectors.getSelection( getState() )
     let props = { path: selection.get('root') }
     let indexedFiles = fsMergedSelector.getFiltedFilesSeq_Factory()( getState(), props )

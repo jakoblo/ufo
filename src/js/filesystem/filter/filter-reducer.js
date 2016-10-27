@@ -32,7 +32,6 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       return state.deleteIn(['focused', 'userInput'])
     
     case Selection.actiontypes.SET_SELECTION:
-      console.log('clear filter reduver')
       return state.deleteIn(['focused', 'userInput'])
     
     case Selection.actiontypes.SET_SELECTION_FOCUS:
