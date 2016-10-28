@@ -23,6 +23,7 @@ if (process.env.NODE_ENV !== 'production') {
 const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 
+
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 window.utils = Utils.storage

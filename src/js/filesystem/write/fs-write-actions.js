@@ -168,6 +168,7 @@ export function startFsWorker(source, destination, options, setId) {
  */
 export function newFolder(parentFolder) {
   return (dispatch, getState) => {
+
     let existingFiles = fsWatch.selectors.getFilesSeqOf(getState(), {path: parentFolder})
     let folderName = "new Folder"
     

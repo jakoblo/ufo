@@ -56,6 +56,7 @@ export default class RenameInput extends React.Component {
   onChange = (event) => {
     this.setState({'fileName': event.target.value})
   }
+
   renameSave = (event) => {
     var val = this.state.fileName.trim()
     if (val != nodePath.basename(this.props.path)) {
@@ -64,6 +65,7 @@ export default class RenameInput extends React.Component {
       this.renameCancel()
     }
   }
+
   renameCancel = () => {
     this.props.dispatch( actions.renameCancel( this.props.path) )
   }
