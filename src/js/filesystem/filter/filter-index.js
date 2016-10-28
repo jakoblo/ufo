@@ -3,10 +3,10 @@ import * as actiontypes from './filter-actiontypes';
 import * as constants from './filter-constants';
 import reducer from './filter-reducer'
 import * as selectors from './filter-selectors'
-import unserInputComponent from './components/filter-userinput'
+import filterTypeInput from './components/filter-type-input'
 
 const components = {
-  filterUserInput: unserInputComponent
+  filterTypeInput: filterTypeInput
 }
  
 export default {actions, actiontypes, selectors, reducer, constants, components}

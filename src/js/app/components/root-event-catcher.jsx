@@ -41,6 +41,7 @@ export default class EventCatcher extends React.Component {
       !event.metaKey &&
       !event.ctrlKey 
     ) {
+      // window.store.dispatch( Selection.actions.selectTypeInputAppend(event.key) )
       window.store.dispatch( Filter.actions.userInputAppend(event.key) )
     }
   }
@@ -57,7 +58,9 @@ export default class EventCatcher extends React.Component {
     rename: Rename.actions.renameSelected,
     moveToTrash: Selection.actions.toTrash,
     toggleHiddenFiles: Filter.actions.toggleHiddenFiles,
+    // clearFilter: Selection.actions.selectTypeInputClear,
     clearFilter: Filter.actions.userInputClear,
+    // deleteFilter: Selection.actions.selectTypeInputBackspace,
     deleteFilter: Filter.actions.userInputBackspace,
   }
 

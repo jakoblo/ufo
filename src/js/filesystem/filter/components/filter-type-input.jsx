@@ -5,18 +5,17 @@ import { connect } from 'react-redux'
 import classNames from 'classnames'
 import * as c from '../filter-constants'
 import * as t from '../filter-actiontypes'
-import Selection from '../../selection/sel-index'
 import * as FilterSelectors from '../filter-selectors'
 
 @connect(() => {
   return (state, props) => {
     return {
-      focused: Selection.selectors.isFocused(state, props),
+      focused: FilterSelectors.isFocused(state, props),
       input: FilterSelectors.getUserInput(state, props)
     }
   }
 })
-export default class FilterUserInput extends React.Component {
+export default class FilterTypeInput extends React.Component {
 
   constructor(props) {
     super(props)
@@ -26,12 +25,12 @@ export default class FilterUserInput extends React.Component {
     return (
       <div
         className={classNames({
-          'filterUserInput': true,
+          'filterTypeInput': true,
           'visible': this.props.focused && this.props.input && this.props.input.length > 0
         })}
       >
         <label>Filter By:</label>
-        <input value={this.props.input || ""} />
+        <input readOnly={true} value={this.props.input || ""} />
       </div>
     )
   }

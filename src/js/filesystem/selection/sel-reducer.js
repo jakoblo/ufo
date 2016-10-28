@@ -10,7 +10,8 @@ import {Map, List, Seq, fromJS} from 'immutable'
 
 const INITIAL_STATE = {
   root: '',
-  files: []
+  files: [],
+  selectTypeInput: ""
 }
 
 export default function reducer(state = fromJS(INITIAL_STATE), action = { type: '' }) {
@@ -28,18 +29,21 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
         return fromJS({
           root: root,
           files: [selected]
-        })  
+        })
       } else {
         return fromJS({
           root: _.last(action.payload.pathRoute),
-          files: []
+          files: [],
+          selectTypeInput: ""
         })
       }
 
     case Preview.actiontypes.SHOW_PREVIEW:
+      // Select File wich is opend in File Preview
       return fromJS({
         root: nodePath.dirname(action.payload.path),
-        files: [ nodePath.basename(action.payload.path) ]
+        files: [ nodePath.basename(action.payload.path) ],
+        selectTypeInput: ""
       })
 
     case FS.actiontypes.FILE_UNLINK:
@@ -50,11 +54,17 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
         return state.set('files', List([]))
       }
       return state
+
+    case t.SELECT_TYPE_SET:
+      return state.set('selectTypeInput', action.payload.input)
+
+    case t.SELECT_TYPE_CLEAR:
+      return state.set('selectTypeInput', '')
     
-    case Filter.actiontypes.FILTER_HIDE_HIDDEN:
+    case Filter.actiontypes.FILTER_HIDE_HIDDEN: // NOT IN USE RIGHT NOW
       return state.set('files', List([]))
     
-    case Filter.actiontypes.FILTER_USER_SET:
+    case Filter.actiontypes.FILTER_USER_SET: // NOT IN USE RIGHT NOW
       return state.set('files', List([]))
 
     default:

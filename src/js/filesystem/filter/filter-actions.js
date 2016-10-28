@@ -1,11 +1,10 @@
 import * as t from './filter-actiontypes'
 import * as selectors from './filter-selectors'
-import Selection from '../selection/sel-index'
 import * as fsMergedSelector from '../fs-merged-selectors'
-import App from '../../app/app-index'
-import fsWrite from '../write/fs-write-index'
 import nodePath from 'path'
 import * as _ from 'lodash'
+import Selection from '../selection/sel-index'
+import App from '../../app/app-index'
 
 export function toggleHiddenFiles() {
   return function (dispatch, getState) {
@@ -59,16 +58,16 @@ export function userInputSet(inputString) {
       }
     })
 
-    // // FROM HERE VERY VERY VERY DIRY!
-    // let focusedDirPath = Selection.selectors.getFocused(getState())
-    // let firstFilteredFile = fsMergedSelector.getFiltedFilesSeq_Factory()(
-    //   getState(), 
-    //   { path: focusedDirPath }
-    // )[0]
+    // FROM HERE VERY VERY VERY DIRY!
+    let focusedDirPath = selectors.getFocused(getState())
+    let firstFilteredFile = fsMergedSelector.getFiltedFilesSeq_Factory()(
+      getState(), 
+      { path: focusedDirPath }
+    )[0]
 
-    // if(firstFilteredFile) {
-    //   dispatch( App.actions.changeAppPath( null, nodePath.join(focusedDirPath, firstFilteredFile) ) )
-    // }
+    if(firstFilteredFile) {
+      dispatch( App.actions.changeAppPath( null, nodePath.join(focusedDirPath, firstFilteredFile), false, true ) )
+    }
   }
 }
 

@@ -14,7 +14,7 @@ let pathRoute = []
  * @param  {string} fromPath The first folder of the pathRout that will be displayed is optional
  * @param  {string} toPath   The last folder of the pathRout that will be displayed is optional
  */
-export function changeAppPath(fromPath, toPath, historyJump = false) {
+export function changeAppPath(fromPath, toPath, historyJump = false, peak = false) {
 
   return dispatch => {
     if(fromPath && !toPath) { toPath = fromPath }
@@ -30,15 +30,16 @@ export function changeAppPath(fromPath, toPath, historyJump = false) {
     
     let newPathRoute = buildPathRoute(fromPath, toPath)
 
-    // There was a change...
     dispatch({
       type: t.APP_CHANGE_PATH,
       payload: {
         pathRoute : newPathRoute,
-        historyJump: historyJump
+        historyJump: historyJump,
+        peak: peak
       }
     })    
 
+    //@TODO is Dirty
     let closeFsWatcher = _.difference(pathRoute, newPathRoute)
     closeFsWatcher.reverse().forEach((path, index) => { // reverse is necessary to Keep always the right Order of paths
       dispatch( FileSystem.actions.watcherClose(path) )

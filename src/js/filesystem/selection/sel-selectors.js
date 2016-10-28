@@ -21,9 +21,6 @@ export const getFocusedFile = (state) => {
   }
 }
 
-export const getFocused = (state) => state.selection.get('root')
-export const isFocused = (state, props) => (getFocused(state) == props.path)
-
 export const getSelectionOf = (state, props) => {
   if(props.path == state.selection.get('root')) {
     return state.selection
@@ -31,3 +28,5 @@ export const getSelectionOf = (state, props) => {
     return null
   }
 }
+
+export const getSelectTypeInput = (state) => state.selection.getIn(['selectTypeInput'])
