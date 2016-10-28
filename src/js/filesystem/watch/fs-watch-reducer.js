@@ -13,7 +13,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
     case t.WATCHER_READING:
       return state.setIn([action.payload.path], fromJS({
           ready: false,
-          files: null
+          files: _fromJSOrdered({})
         }))
 
     case t.WATCHER_READY:
@@ -29,7 +29,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
     case t.WATCHER_ERROR:
       return state.setIn([action.payload.path], fromJS({
           ready: false,
-          files: null,
+          files: _fromJSOrdered({}),
           error: action.payload.error
         }))
 

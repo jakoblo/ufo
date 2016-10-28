@@ -1,7 +1,9 @@
 import * as t from './sel-actiontypes'
 import * as selectors from './sel-selectors'
 import * as c from './sel-constants'
-import FS from '../watch/fs-watch-index'
+import fsWatch from '../watch/fs-watch-index'
+import fsWrite from '../write/fs-write-index'
+import * as fsMergedSelector from '../fs-merged-selectors'
 import App from '../../app/app-index'
 import ViewFile from '../../view-file/vf-index'
 import nodePath from 'path'
@@ -14,14 +16,14 @@ import {ipcRenderer} from 'electron'
  * used by all selecion actions
  * @param  {string[]} pathArray
  */
-export function setSelection(pathArray) {
+export function set(pathArray) {
   return function (dispatch, getState) {
     let fileList = []
     let lastRoot = null
 
     pathArray.forEach((path) => {
       let root = nodePath.dirname(path)
-      let filename = nodePath.basename(path)  
+      let filename = nodePath.basename(path)
       if(lastRoot && lastRoot != root) {
         throw "Selection with different root folders is not possible"
       }
@@ -31,6 +33,7 @@ export function setSelection(pathArray) {
 
     if(fileList.length > 1) {
       //Close Appending View if multiple files are selected
+      //@TODO is Dirty
       dispatch( App.actions.changeAppPath(null, lastRoot) )
       dispatch( ViewFile.actions.closePreview() )
     }
@@ -47,11 +50,12 @@ export function setSelection(pathArray) {
 
 /**
  * Adds the List of given paths to the selection
- * Ctrl Click on file & used by expandSelectionTo()
+ * Ctrl Click on file & used by expandToFile()
  * @param  {string[]} pathArray
  */
-export function addToSelection(pathArray) {
+export function filesAdd(pathArray) {
   return function (dispatch, getState) {
+
     let previousRoot  = getState()[c.NAME].get('root')
     let selectedFiles = getState()[c.NAME].get('files').toJS().map((filename) => {
       return nodePath.join(previousRoot, filename)
@@ -67,7 +71,7 @@ export function addToSelection(pathArray) {
         selectedFiles.push(filePath)
       }
     })
-    dispatch( setSelection( selectedFiles) )
+    dispatch( set( selectedFiles) )
   }  
 }
 
@@ -76,7 +80,7 @@ export function addToSelection(pathArray) {
  * expands selection from the last selected file to the current one
  * @param  {string} path of file to expand
  */
-export function expandSelectionTo(path) {
+export function expandToFile(path) {
   return function (dispatch, getState) {
 
     let state = getState()
@@ -86,8 +90,8 @@ export function expandSelectionTo(path) {
     let root = nodePath.dirname(path)
 
     if(selection.root == root) {
-
-      let filesSeq = FS.selectors.getFilesSeq(state, {path: root})
+      // @TODO Use Existing Factory somehow
+      let filesSeq = fsMergedSelector.getFiltedFilesSeq_Factory()(state, {path: root})
       let lastSelectionIndex  = filesSeq.indexOf( _.last(selection.files) )
       let currentIndex        = filesSeq.indexOf( filename )
       let start, length
@@ -103,10 +107,32 @@ export function expandSelectionTo(path) {
         return nodePath.join(root, filename)
       })
 
-      dispatch( addToSelection( newSelected ) )
+      dispatch( filesAdd( newSelected ) )
     } else {
-      dispatch( addToSelection( [path] ) )
+      dispatch( filesAdd( [path] ) )
     }
+  }
+}
+
+/**
+ * Base on current selection
+ */
+export function dirNext() {
+  return function (dispatch, getState) {
+    let currentSelection = selectors.getSelection(getState())
+    let nextFolder = fsWatch.selectors.getDirNext(getState(), {path: currentSelection.get('root')})
+    if(nextFolder) dispatch( dirSet( nextFolder ))
+  }
+}
+
+/**
+ * Base on current selection
+ */
+export function dirPrevious() {
+  return function (dispatch, getState) {
+    let currentSelection = selectors.getSelection(getState())
+    let prevFolder = fsWatch.selectors.getDirPrevious(getState(), {path: currentSelection.get('root')})
+    if(prevFolder) dispatch(  dirSet( prevFolder ))
   }
 }
 
@@ -115,58 +141,95 @@ export function expandSelectionTo(path) {
  * selects active or first file in the folder
  * @param  {string} root path
  */
-export function setSelectionToFolder(root) {
+export function dirSet(root) {
   return function (dispatch, getState) {
-    let activeFile = FS.selectors.getActiveFile(getState(), {path: root})
-    let firstFile =  FS.selectors.getFilesSeq(getState(), {path: root})[0]  
-    if(activeFile) {
-      dispatch( 
-          setSelection( [nodePath.join( root, activeFile )] )
-        )
+    let openFile = fsWatch.selectors.getOpenFileOf(getState(), {path: root})
+    // @TODO Use Existing Factory somehow
+    let firstFile =  fsMergedSelector.getFiltedFilesSeq_Factory()(getState(), {path: root})[0]  
+    if(openFile) {
+      dispatch( set( [nodePath.join( root, openFile )] ))
     } else if(firstFile) {
-      dispatch( App.actions.changeAppPath(null, nodePath.join(root, firstFile) ) )
+      dispatch( App.actions.changeAppPath(null, nodePath.join(root, firstFile), false, true ) )
+    } else {
+      dispatch({
+        type: t.SET_SELECTION,
+        payload: {
+          root: root,
+          files: []
+        }
+      })
     }
   }
 }
 
-
 /**
- * Base form current selection
- */
-export function selectNextDir() {
-  return function (dispatch, getState) {
-    let currentSelection = selectors.getSelection(getState())
-    let nextFolder = FS.selectors.getNextDir(getState(), {path: currentSelection.get('root')})
-    if(nextFolder) dispatch( setSelectionToFolder( nextFolder ))
-  }
-}
-
-/**
- * Base form current selection
- */
-export function selectPreviousDir() {
-  return function (dispatch, getState) {
-    let currentSelection = selectors.getSelection(getState())
-    let prevFolder = FS.selectors.getPreviousDir(getState(), {path: currentSelection.get('root')})
-    if(prevFolder) dispatch( setSelectionToFolder( prevFolder ))
-  }
-}
-
-/**
- * Base form current selection
+ * Base on current selection
  */
 export function selectAll() {
   return function (dispatch, getState) {
     let state = getState()
     let root  = state[c.NAME].get('root')
-    let allFiles = FS.selectors.getFilesSeq(state, {path: root}).map((filename) => {
+    // @TODO Use Existing Factory somehow
+    let allFiles = fsMergedSelector.getFiltedFilesSeq_Factory()(state, {path: root}).map((filename) => {
       return nodePath.join(root, filename)
     })
-    dispatch( setSelection( allFiles ) )
+    dispatch( set( allFiles ) )
   }
 }
 
-export function startDragSelection() {
+
+// Navigate
+// Arrow Up and Down
+// Base on current Selection the "next" file will be selected
+export let fileNavUp = () => fileNav(-1)
+export let fileNavDown = () => fileNav(+1)
+function fileNav(direction) {
+  return function (dispatch, getState) {
+    let props = {
+      path: selectors.getSelection( getState() ).get('root') || // selected Folder
+            fsWatch.selectors.getDirSeq( getState() )[0] // or First Folder
+    } 
+    // @TODO Use Existing Factory somehow
+    let indexedFiles =     fsMergedSelector.getFiltedFilesSeq_Factory()( getState() , props)
+    let currentFileIndex = fsMergedSelector.getFocusedFileIndexOf_Factory()( getState() , props)
+    
+    let newActiveName =    indexedFiles[currentFileIndex + direction]
+    if(newActiveName) {
+      dispatch( FileActions.show(
+        fsWatch.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)}), 
+        true
+      ))
+    }
+  }
+}
+
+// Select
+// Shift + ArrowUp/Down
+export let fileAddUp = () => filesAddFromCurrent(-1)
+export let fileAddDown = () => filesAddFromCurrent(+1)
+function filesAddFromCurrent(direction) {
+  return function (dispatch, getState) {
+    
+    let selection = selectors.getSelection( getState() )
+    let props = { path: selection.get('root') }
+    let indexedFiles = fsMergedSelector.getFiltedFilesSeq_Factory()( getState(), props )
+    let currentFileIndex = fsMergedSelector.getFocusedFileIndexOf_Factory()( getState(), props )
+    let newSelectedName = indexedFiles[currentFileIndex + direction]
+    if(newSelectedName) {
+      dispatch( filesAdd([nodePath.join(props.path, newSelectedName)] ))
+    }
+  }
+}
+
+export function toTrash() {
+  return function (dispatch, getState) {
+    fsWrite.actions.moveToTrash(
+      selectors.getSelectionPathArray(getState())
+    )
+  }
+}
+
+export function startDrag() {
   return function (dispatch, getState) {
     let selection = selectors.getSelection(getState())
     let selectedFiles = selection.get('files').toJS().map((filename) => {
@@ -176,63 +239,67 @@ export function startDragSelection() {
   }
 }
 
-// Navigate
-// Arrow Up and Down
-// Base on current Selection the "next" file will be selected
-export function navigateFileUp() {
-  return navigateDirection(-1)
-}
-export function navigateFileDown() {
-  return navigateDirection(+1)
-}
 
-function navigateDirection(direction) {
+/**
+ * USER SEARCH INPUT SELECTION
+ */
+
+export function selectTypeInputAppend(append) { 
   return function (dispatch, getState) {
-    let props = {
-      path: selectors.getSelection( getState() ).get('root') || // selected Folder
-            FS.selectors.getDirectorySeq( getState() )[0] // or First Folder
-    } 
-    let indexedFiles =     FS.selectors.getFilesSeq( getState() , props)
-    let currentFileIndex = selectors.getCurrentFileForFolderIndex( getState() , props)
-    let newActiveName =    indexedFiles[currentFileIndex + direction]
-    if(newActiveName) {
-      dispatch( FileActions.show(
-        FS.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)})
-      ))
-    }
-  }
-}
-
-// Select
-// Shift + ArrowUp/Down
-export function addPrevFileToSelection() {
-  return selectFileNextToCurrent(-1)
-}
-export function addNextFileToSelection() {
-  return selectFileNextToCurrent(+1)
-}
-
-function selectFileNextToCurrent(direction) {
-  return function (dispatch, getState) {
-    let selection = selectors.getSelection( getState() )
-    let props = { path: selection.get('root') }
-    let indexedFiles = FS.selectors.getFilesSeq( getState(), props )
-    let currentFileIndex = selectors.getCurrentFileForFolderIndex( getState(), props )
-    let newSelectedName = indexedFiles[currentFileIndex + direction]
-    if(newSelectedName) {
-      dispatch( 
-        FileActions.addToSelection(
-          FS.selectors.getFile(getState(), {path: nodePath.join(props.path, newSelectedName)})
-        )
-      )
-    }
-  }
-}
-
-export function selectionToTrash() {
-  return function (dispatch, getState) {
-    fsWrite.actions.moveToTrash(
-      selectors.getSelectionPathArray(getState())
+    let existingFilterString = selectors.getSelectTypeInput(getState())
+    let newFilterString = (existingFilterString) ? existingFilterString + append : append; 
+    dispatch(
+      selectTypeInputSet( newFilterString )
     )
+  }
+}
+
+export function selectTypeInputBackspace() {
+  return function (dispatch, getState) {
+    
+    let existingFilterString = selectors.getSelectTypeInput(getState())
+    
+    if(existingFilterString && existingFilterString.length > 0) {
+      dispatch(
+        selectTypeInputSet( existingFilterString.slice(0, -1) )
+      )
+    } else {
+      dispatch( selectTypeInputClear() )
+    }
+  }
+}
+
+
+export function selectTypeInputSet(inputString) {
+  return function (dispatch, getState) {
+
+    console.log(inputString)
+
+    dispatch({
+      type: t.SELECT_TYPE_SET,
+      payload: {
+        input: inputString
+      }
+    })
+
+    let regEx = new RegExp('^\\.?'+inputString, "i") // RegExp = /^\.?Filename/i > match .filename & fileName
+
+    let focusedDirPath = selectors.getFocused(getState())
+    let firstFileMatch = fsMergedSelector.getFiltedFilesSeq_Factory()(
+      getState(), 
+      { path: focusedDirPath }
+    ).find((filename) => {
+      return filename.match(regEx)
+    })
+
+    if(firstFileMatch) {
+      dispatch( App.actions.changeAppPath( null, nodePath.join(focusedDirPath, firstFileMatch) ) )
+    }
+  }
+}
+
+export function selectTypeInputClear() {
+  return {
+    type: t.SELECT_TYPE_CLEAR
   }
 }

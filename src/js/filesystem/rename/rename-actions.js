@@ -8,7 +8,7 @@ import * as _ from 'lodash'
 
 export function renameSelected() {
   return function (dispatch, getState) {
-    let currentSelectedFile = Selection.selectors.getCurrentFile(getState())
+    let currentSelectedFile = Selection.selectors.getFocusedFile(getState())
     if(currentSelectedFile) {
       dispatch( renameStart( currentSelectedFile ))
     }

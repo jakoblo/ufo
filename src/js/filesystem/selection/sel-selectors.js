@@ -11,7 +11,7 @@ export const getSelectionPathArray = (state) => {
   })
 }
 
-export const getCurrentFile = (state) => {
+export const getFocusedFile = (state) => {
   let root = state.selection.get('root')
   let files = state.selection.get('files')
   if(root && files.size > 0) {
@@ -21,14 +21,7 @@ export const getCurrentFile = (state) => {
   }
 }
 
-
-/**
- * get Selection for the given path
- * maybe null
- * @param  {store} state
- * @param  {path: string} props
- */
-export const getSelectionFor = (state, props) => {
+export const getSelectionOf = (state, props) => {
   if(props.path == state.selection.get('root')) {
     return state.selection
   } else {
@@ -36,27 +29,4 @@ export const getSelectionFor = (state, props) => {
   }
 }
 
-/**
- * Current Files the Last Selected or the Active one
- * @param  {store} state
- * @param  {path: string} props
- * @ returns string
- */
-export const getCurrentFileForFolder = (state, props) => {
-  let lastestSelected = undefined
-  if(state.selection.get('root') == props.path) {
-    lastestSelected = state.selection.get('files').last()
-  }
-  let activeFile = FS.selectors.getActiveFile(state, props)
-  return lastestSelected || activeFile
-}
-
-/**
- * Current Files the Last Selected or the Active one
- * @param  {store} state
- * @param  {path: string} props
- * @returns number
- */
-export const getCurrentFileForFolderIndex = (state, props) => {
-  return FS.selectors.getFilesSeq(state, props).indexOf(  getCurrentFileForFolder(state, props)  )
-}
+export const getSelectTypeInput = (state) => state.selection.getIn(['selectTypeInput'])

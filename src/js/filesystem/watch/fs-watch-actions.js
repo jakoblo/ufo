@@ -4,7 +4,6 @@ import nodePath from 'path'
 import App from '../../app/app-index'
 
 const watcherSettings = {
-  ignored: /[\/\\]\./,
   persistent: true,
   depth: 0,
   alwaysStat: true
