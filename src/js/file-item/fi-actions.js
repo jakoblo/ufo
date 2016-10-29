@@ -22,14 +22,14 @@ export function open(file) {
 /**
  * Opens view-folder for directory or view-file for file 
  */
-export function show(file) {
+export function show(file, peakInFolder = false) {
   return (dispatch, getState) => {
     if(file.get('stats').isFile()) {
-      //@todo two actions? bad?
-      dispatch( App.actions.changeAppPath(null, nodePath.dirname( file.get('path') )) )
+      //@TODO is Dirty
+      dispatch( App.actions.changeAppPath(null, nodePath.dirname( file.get('path') ), false, false) )
       dispatch( ViewFile.actions.showPreview( file.get('path') ) )
     } else {
-      dispatch( App.actions.changeAppPath(null, file.get('path' )))
+      dispatch( App.actions.changeAppPath(null, file.get('path' ), false, peakInFolder))
     }
   }
 }
@@ -37,12 +37,12 @@ export function show(file) {
 /**
  * Ctrl Click
  */
-export let addToSelection = (file) => Selection.actions.addToSelection( [file.get('path')] )
+export let addToSelection = (file) => Selection.actions.filesAdd( [file.get('path')] )
 
 /**
  * Shift Click
  */
-export let expandSelection = (file) => Selection.actions.expandSelectionTo( file.get('path') )
+export let expandSelection = (file) => Selection.actions.expandToFile( file.get('path') )
 
 /**
  * Drag of the Single file or the Selection

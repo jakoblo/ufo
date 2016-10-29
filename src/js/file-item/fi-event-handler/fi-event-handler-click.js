@@ -5,6 +5,7 @@ import * as fsWriteActions from '../../filesystem/write/fs-write-actions'
  * Adding file to Selection
  */
 export function onMouseDown (event) {
+  event.stopPropagation()
   if(event.ctrlKey || event.metaKey) {
     this.props.dispatch( FileActions.addToSelection(this.props.file) )
   } else if(event.shiftKey) {
@@ -16,6 +17,7 @@ export function onMouseDown (event) {
  * Show Folder or File in Preview
  */
 export function onMouseUp (event) {
+  event.stopPropagation()
   if(!event.ctrlKey && !event.metaKey && !event.shiftKey) {
     if(!this.props.file.get('selected')) {
       this.props.dispatch( FileActions.show(this.props.file) )

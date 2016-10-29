@@ -6,14 +6,27 @@
   &.drag-target {
     background: #AFD2E8;
   }
-}
 
-.display-editor {
-  padding: 10px 0;
-  min-height: 100%;
-  box-sizing: border-box;
+  &.focused {
+    border: 2px solid #AFD2E8;
+  }
 
-  &.drag-target {
-    background: #AFD2E8;
+  .btn-new-folder {
+    position: absolute;
+    bottom: 45px;
+    left: 2px;
+    background: #f1f1f1;
+    border: 1px solid #ccc;
+    padding: 2px 4px;
+  }
+
+  .filterTypeInput {
+    position: absolute;
+    bottom: 15px;
+    display: none;
+
+    &.visible {
+      display: block;
+    }
   }
 }
