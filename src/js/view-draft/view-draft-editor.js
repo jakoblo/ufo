@@ -1,6 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import * as FsCombinedSelector from  '../filesystem/fs-combined-selectors'
+import * as FsMergedSelector from  '../filesystem/fs-merged-selectors'
+import FileItem from '../file-item/components/file-item'
+import FilterTypeInput from '../filesystem/filter/components/filter-type-input'
+import Filter from '../filesystem/filter/filter-index'
 import {components} from '../file-item/fi-index'
 import classnames from 'classnames'
 import {Map} from 'immutable'
@@ -14,10 +17,11 @@ import {AtomicBlockUtils,
 const FILE_BLOCK = "FILE_BLOCK"
 
 @connect(() => {
-  const getFolderCombined = FsCombinedSelector.getFolderCombinedFactory()
+  const getFilesMergedOf = FsMergedSelector.getFilesMergedOf_Factory()
   return (state, props) => {
     return {
-      folder: getFolderCombined(state, props)
+      focused: Filter.selectors.isFocused(state, props),
+      folder: getFilesMergedOf(state, props)
     }
   }
 })
@@ -30,9 +34,8 @@ export default class DraftEditor extends React.Component {
       }),
       editorState: EditorState.createEmpty()
     }
-    this.onChange = (editorState) => { this.setState({editorState}) }
-    this.dragInOutCount = 0
     
+    this.dragInOutCount = 0
   }
 
   componentWillReceiveProps(nextProps) {
@@ -40,48 +43,65 @@ export default class DraftEditor extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return nextProps.folder !== this.props.folder || nextState.data !== this.state.data;
+    return (
+      nextProps.folder !== this.props.folder || 
+      nextState.data !== this.state.data ||
+      nextState.editorState !== this.state.editorState
+      )
   }
 
   render() {
-    
     // console.log("FOLDER", this.props.folder)
     // return <Editor editorState={this.state.editorState} onChange={this.onChange} />
     return(
-      <Editor 
-        editorState={this.state.editorState}
-        blockRendererFn={this.getBlockRendererFn} 
-        onChange={this.onChange} 
-        blockStyleFn={this.getBlockStyleFn}
-        onDrop={this.onDrop}
-        onDragOver={this.onDragOver}
-        onDragEnter={this.onDragEnter}
-        onDragLeave={this.onDragLeave}
-      />
+      <div className={classnames({
+          'focused': this.props.focused
+        })}
+        onKeyDown={this.onKeyDown}
+        >
+        <Editor 
+          editorState={this.state.editorState}
+          blockRendererFn={this.getBlockRendererFn} 
+          onChange={this.onChange} 
+          blockStyleFn={this.getBlockStyleFn}
+          onDrop={this.onDrop}
+          onDragOver={this.onDragOver}
+          onDragEnter={this.onDragEnter}
+          onDragLeave={this.onDragLeave}
+        />
+      </div>
     )
   }
 
-   loadEditorContent(nextProps) {
-    
-    // console.log(this.props.folder)
-    let newEditorState = EditorState.createEmpty()
-    
-    if(nextProps.folder) {
-      console.log("FOLDER")
-          
-      nextProps.folder.valueSeq().forEach((file, index) => {
-      const entityKey = Entity.create(
-        FILE_BLOCK,
-        'IMMUTABLE',
-        {key: index, file: file, dispatch: this.props.dispatch}
-      )
-
-      newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
-
-    })
-      this.onChange(newEditorState)
-    }
+  onChange = (editorState) => {
+    this.setState({editorState})
   }
+
+  onKeyDown = (event) => {
+    event.stopPropagation()
+  }
+
+  loadEditorContent(nextProps) {
+  
+  // console.log(this.props.folder)
+  let newEditorState = EditorState.createEmpty()
+  
+  if(nextProps.folder) {
+    console.log("FOLDER")
+        
+    nextProps.folder.valueSeq().forEach((file, index) => {
+    const entityKey = Entity.create(
+      FILE_BLOCK,
+      'IMMUTABLE',
+      {key: index, file: file, dispatch: this.props.dispatch}
+    )
+
+    newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
+
+  })
+    this.onChange(newEditorState)
+  }
+}
 
   getBlockRendererFn(contentBlock) {
     const type = contentBlock.getType()
@@ -92,6 +112,7 @@ export default class DraftEditor extends React.Component {
           if (type === FILE_BLOCK) {
             return {
                 component: FileWrapper,
+                editable: false
                 // props: {
                 //     getEditorState,
                 //     onChange,
@@ -107,10 +128,13 @@ export default class DraftEditor extends React.Component {
 
   getBlockStyleFn(contentBlock) {
     switch (contentBlock.getType()) {
-      case FILE_BLOCK:
-        return 'block';
+       case "atomic":
+          const entity = Entity.get(contentBlock.getEntityAt(0))
+          const type = entity.getType()
+          if (type === FILE_BLOCK) 
+            return 'display-editor'
       default:
-        return 'block';
+        return '';
     }
   }
   
@@ -160,7 +184,7 @@ const FileWrapper = (props) => {
   const {dispatch} = data
 
 //   props.blockProps
-  let item = <components.fileItem
+  let item = <FileItem
     key={key}
     file={file}
     dispatch={dispatch}
