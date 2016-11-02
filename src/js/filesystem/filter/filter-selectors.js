@@ -3,14 +3,40 @@ import Selection from '../selection/sel-index'
 import nodePath from 'path'
 import {List} from 'immutable'
 
+/**
+ * Filter which have to applied for every folder
+ */
 export const getGlobal = (state) => state.filter.get('global')
+
+/**
+ * Filter for the given Path
+ */
 export const getLocal = (state, props) => {
   let focused = isFocused(state, props)
   return focused ? state.filter.get('focused') : List([])
 }
+
+/**
+ * The String which the User is currently Filtering for
+ */
 export const getUserInput = (state) => state.filter.getIn(['focused', 'userInput', 'input'])
 
+/**
+ * Focused is the folder where Typing-Filter is applied
+ * Which Filter is focused is deciedet in the Filter-Reducer
+ * 
+ * @param  {Objecct} state
+ * @returns  {String} Filesystem-Path
+ */
 export const getFocused = (state) => state.filter.get('focusedPath')
+
+/**
+ * Focused is the folder where Typing-Filter is applied
+ * Which Filter is focused is deciedet in the Filter-Reducer
+ * 
+ * @param  {Objecct} state
+ * @returns  {Boolean}
+ */
 export const isFocused = (state, props) => (getFocused(state) == props.path)
 
 /**
