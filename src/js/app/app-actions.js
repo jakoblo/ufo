@@ -1,6 +1,7 @@
 import * as t from './app-actiontypes'
 import _ from 'lodash'
 import nodePath from 'path'
+import * as selectors from './app-selectors'
 import FileSystem from '../filesystem/watch/fs-watch-index'
 
 let pathRoute = []
@@ -61,6 +62,31 @@ export function navigateToParentFolder() {
     dispatch( changeAppPath( null, parentDir))
   }
 }
+
+export function historyBack() {
+  return (dispatch, getState) => {
+      dispatch( historyJump(-1) )
+  }
+}
+
+export function historyForward() {
+  return (dispatch, getState) => {
+      dispatch( historyJump(+1) )
+  }
+}
+
+function historyJump(direction) {
+  return (dispatch, getState) => {
+    let newPosition = selectors.getHistoryPosition(getState()) + direction
+    let Sequence = selectors.getHistorySequence(getState())
+
+    if(-1 < newPosition && newPosition < Sequence.size) {
+      let newPath = Sequence.get(newPosition)
+      dispatch( changeAppPath( newPath.get('from'), newPath.get('to'), newPosition ))
+    }
+  }
+}
+
 
 /**
  * helper function that takes to paths and creates every "path step" between them
