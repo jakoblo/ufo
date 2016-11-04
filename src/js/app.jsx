@@ -7,7 +7,7 @@ import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 // React
 import EventCatcher from './app/components/root-event-catcher'
-import ActionBar from './general-components/actionbar'
+import AppControls from './app/components/app-controls'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
@@ -23,7 +23,6 @@ if (process.env.NODE_ENV !== 'production') {
 const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 
-
 store.dispatch(Config.actions.loadPreviousState(windowID))
 window.store = store
 window.utils = Utils.storage
@@ -37,7 +36,7 @@ ReactDOM.render(
   <Provider store={ store }>
     <EventCatcher>
       <Sidebar>
-        <ActionBar/>
+        <AppControls/>
         <Navbar.components.parent/>
         <ToggleBar/>
       </Sidebar>

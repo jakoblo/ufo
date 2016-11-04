@@ -12,7 +12,7 @@ function createNewBrowserWindow() {
           width : 800,
           height: 600,
           resizable: true,
-          frame: true
+          frame: false
         });
   windowID = browserWindow.id
 

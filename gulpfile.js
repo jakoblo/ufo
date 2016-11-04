@@ -3,7 +3,8 @@
 const gulp = require('gulp')
 const sourcemaps = require('gulp-sourcemaps')
 const babel = require("gulp-babel")
-const sass = require('gulp-sass')
+const less = require('gulp-less')
+const combiner = require('stream-combiner2');
 const googleWebFonts = require('gulp-google-webfonts')
 const git = require('gulp-git');
 const electron = require('electron-connect').server.create({
@@ -13,18 +14,18 @@ const electron = require('electron-connect').server.create({
 const config = { source: './src' }
 config.js2015 = config.source + '/js-dist/'
 config.jsNext = config.source + '/js/**/*.js*'
-config.sass = config.source + '/themes/default/sass/**/*'
+config.less = config.source + '/themes/default/less/**/*'
 config.css = config.source + '/themes/default/css/'
 config.fontsList = config.source + '/themes/googlefonts.list'
 config.fontsDest = config.source + '/themes/google-fonts/'
 
 /* Start Tasks */
 
-gulp.task('default', ['production', 'compile-babel', 'compile-sass', 'fonts', 'git-submodules']);
+gulp.task('default', ['production', 'compile-babel', 'compile-less', 'fonts', 'git-submodules']);
 
-gulp.task('develop', ['set-dev-node-env', 'compile-babel', 'compile-sass'], function () {
+gulp.task('develop', ['set-dev-node-env', 'compile-babel', 'compile-less'], function () {
   electron.start(["--remote-debugging-port=9992"]) // Electron Connect, Auto Reload
-  gulp.watch(config.sass, ['compile-sass', 'reloadSASS']);
+  gulp.watch(config.less, ['compile-less', 'reloadLess']);
   gulp.watch(config.jsNext, ['compile-babel', 'reloadJS']);
 });
 
@@ -43,10 +44,16 @@ gulp.task('compile-babel', function () {
     .pipe(gulp.dest(config.js2015));
 });
 
-gulp.task('compile-sass', function () {
-  return gulp.src(config.sass)
-    .pipe(sass.sync().on('error', swallowError))
-    .pipe(gulp.dest(config.css));
+gulp.task('compile-less', function () {
+  var combined = combiner.obj([
+    gulp.src(config.less),
+    sourcemaps.init(),
+    less(),
+    sourcemaps.write(),
+    gulp.dest(config.css)
+  ]);
+  combined.on('error', console.error.bind(console));
+  return combined; 
 });
 
 
@@ -55,10 +62,10 @@ gulp.task('compile-sass', function () {
 gulp.task('reloadJS', ['compile-babel'], function () {
   console.log('#JS Changed: Reload Electron')
   electron.reload()
-})
+}) 
 
-gulp.task('reloadSASS', ['compile-sass'], function () {
-  console.log('#SASS Changed: Reload Electron')
+gulp.task('reloadLess', ['compile-less'], function () {
+  console.log('#Less Changed: Reload Electron')
   electron.reload()
 })
 
@@ -66,7 +73,7 @@ gulp.task('reloadSASS', ['compile-sass'], function () {
 /** usefull? **/
 gulp.task('debug', ['set-debug-node-env'], function () {
   electron.start(["--remote-debugging-port=9992"]) // Electron Connect, Auto Reload
-  gulp.watch(config.sass, ['compile-sass', 'reloadSASS']);
+  gulp.watch(config.less, ['compile-less', 'reloadLess']);
   gulp.watch(config.jsNext, ['compile-babel', 'reloadJS']);
 });
 

@@ -16,7 +16,7 @@ export default class EventCatcher extends React.Component {
 
   render() {
     return(
-      <div className="foundation"
+      <div className="root-event-catcher"
         onDragEnter={this.stopEvent}
         onDragOver={this.stopEvent}
         onDrop={this.stopEvent}
