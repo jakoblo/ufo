@@ -98,7 +98,11 @@ export default class NavGroupItem extends React.Component {
  render() {
     // let icon = this.getIconComponent()
     const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
-    let className = classnames(this.props.className, "nav-group-item", {"active": this.props.active})
+    let className = classnames(this.props.className, 
+      {
+        "nav-bar-file": true,
+        "nav-bar-file--active": this.props.active
+      })
     let deleteButton = <Button className="remove" onClick={this.props.onItemRemove}></Button>
     const dndStyle = { opacity: isDragging ? 0 : 1 }
 

@@ -9,20 +9,25 @@ export default class NavGroupTitle extends React.Component {
     this.state = {editGroupTitle: false}
   }
 
-   render() {
-   let title = <span className="nav-group-text" 
-   onDoubleClick={!this.props.isDiskGroup && this.handleDoubleClick}
-   onContextMenu={this.props.onContextMenu}
-   >{this.props.title}</span>
-   
-   if(this.state.editGroupTitle) {
-     title = <input ref="input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
-   }
+  render() {
   
-  return (
-      <div className="nav-group-title">
+    let title;
+
+    if(this.state.editGroupTitle) {
+      title = <input ref="input" className="nav-bar-group__title-rename-input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
+    } else {
+      title = this.props.title
+    }
+  
+    return (
+      <div 
+        className="nav-bar-group__title-wrapper"
+        onDoubleClick={!this.props.isDiskGroup && this.handleDoubleClick}
+        onContextMenu={this.props.onContextMenu}
+        onClick={this.props.onToggleGroup}
+      >
+      {this.state.editGroupTitle}
         {title}
-        <Button className="nav-group-hide" onClick={this.props.onToggleGroup} text={this.props.hideButtonText}/>
       </div>
     )
   }

@@ -115,8 +115,8 @@ export default class NavGroup extends React.Component {
 
     let hideButtonText = this.props.hidden ? "show" : "hide";
     let classname = classnames({
-      'nav-group': true,
-      'hide': this.props.hidden
+      'nav-bar-group': true,
+      'nav-bar-group--collapsed': this.props.hidden
     })
 
     return connectDragSource(connectDropTarget(
@@ -129,7 +129,7 @@ export default class NavGroup extends React.Component {
           onToggleGroup={this.handleToggleGroup.bind(this, this.props.index)}
           onContextMenu={!dg && this.onContextMenu}
         />
-        <div className="nav-group-item-wrapper">
+        <div className="nav-bar-group__item-wrapper">
           {this.props.items.map(this.createGroupItem)}
         </div>
       </div>

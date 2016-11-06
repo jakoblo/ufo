@@ -36,11 +36,11 @@ ReactDOM.render(
   <Provider store={ store }>
     <EventCatcher>
       <Sidebar>
-        <AppControls/>
-        <Navbar.components.parent/>
-        <ToggleBar/>
+        <AppControls />
+        <Navbar.components.parent />
+        <ToggleBar />
       </Sidebar>
-      <ViewPlacer.components.parent/>
+      <ViewPlacer.components.parent />
       <FsWrite.component />
     </EventCatcher>
   </Provider>
