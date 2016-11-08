@@ -2,6 +2,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import Button from '../../general-components/button'
+import { keyEventHandler } from '../../shortcuts/key-event-handler'
+import { keyMap } from '../../shortcuts/key-map'
 
 export default class NavGroupTitle extends React.Component {
   constructor(props) {
@@ -12,22 +14,37 @@ export default class NavGroupTitle extends React.Component {
   render() {
   
     let title;
-
     if(this.state.editGroupTitle) {
-      title = <input ref="input" className="nav-bar-group__title-rename-input" onBlur={this.handleOnBlur} defaultValue={this.props.title} onKeyDown={this.handleKeyDown}></input>
+      title = <input 
+                ref="input" 
+                className="nav-bar-group__title__rename-input" 
+                onBlur={this.handleOnBlur} 
+                defaultValue={this.props.title} 
+                onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)} 
+              />
     } else {
-      title = this.props.title
+      title = <div 
+                className="nav-bar-group__title__text" 
+                onDoubleClick={!this.props.isDiskGroup && this.handleDoubleClick}
+              >
+                {this.props.title}
+              </div>
     }
   
     return (
-      <div 
-        className="nav-bar-group__title-wrapper"
-        onDoubleClick={!this.props.isDiskGroup && this.handleDoubleClick}
+      <div
+        className={
+          classnames({
+            'nav-bar-group__title': true,
+            'nav-bar-group__title--editing': this.state.editGroupTitle
+          })}
         onContextMenu={this.props.onContextMenu}
-        onClick={this.props.onToggleGroup}
       >
-      {this.state.editGroupTitle}
+        <div className="nav-bar-group__title__arrow"  onClick={this.props.onToggleGroup} />
         {title}
+        <button className="nav-bar-group__title__button-collapse-toggle" onClick={this.props.onToggleGroup}>
+          {this.props.hideButtonText}
+        </button>
       </div>
     )
   }
@@ -36,17 +53,19 @@ export default class NavGroupTitle extends React.Component {
     this.refs.input && this.refs.input.focus();
   }
 
-  handleDoubleClick = () => {
-    this.setState({editGroupTitle: true})
+  saveTitle(title) {
+    if(this.props.title != title && title != '') {
+      this.props.onGroupTitleChange(title)
+    }
+    this.setState({editGroupTitle: false})
   }
 
-  changeTitle(e) {
-    if(e.keyCode === 13 || e.type === 'blur') {
-      if(this.props.title != e.target.value && e.target.value != '') {
-      this.props.onGroupTitleChange(e.target.value)
-      }
-      this.setState({editGroupTitle: false})
-    }
+  cancelTitleEdit() {
+    this.setState({editGroupTitle: false})
+  }
+
+  handleDoubleClick = () => {
+    this.setState({editGroupTitle: true})
   }
 
   handleKeyDown = (e) => {
@@ -54,7 +73,19 @@ export default class NavGroupTitle extends React.Component {
   }
 
   handleOnBlur = (e) => {
-    this.changeTitle(e)
+    console.log('blur')
+    this.saveTitle(e.target.value)
   }
 
+  shortcutHandler = (action, event) => {
+    event.stopPropagation()
+    switch (action) {
+      case "cancel":
+        this.cancelTitleEdit()
+        break;
+      case "save":
+        this.saveTitle(event.target.value);
+        break;
+    }
+  }
 }

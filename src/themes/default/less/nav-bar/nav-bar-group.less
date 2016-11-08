@@ -1,0 +1,132 @@
+@import url('../variables.less');
+@import url('../mixins.less');
+
+.nav-bar-group {
+
+  @height__title: 25px;
+  @time_collapse-animation: 0.3s;
+
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+
+  &__title {
+
+    @color__title-text: #fff;
+    @font-size__title-text: 12px;
+
+    display: flex;
+    align-items: center;
+    padding: 0 @padding__sidebar-horizonal;
+    height: @height__title;
+
+    // Arrow Icon
+    &__arrow {
+      display: block;
+      height: 18px;
+      width: 18px;
+      margin-right: 3px;
+      margin-left: -6px;
+      background: url('../svg/arrow-small-white.svg') center no-repeat;
+      opacity: 0.4;
+      transition: transform @time_collapse-animation;
+      transform: rotate(90deg);
+      border: 1px solid transparent;
+      border-radius: 50%;
+
+      &:hover {
+        opacity: 0.7;
+        border-color: lighten(@color__main-dark, 20%);
+      }
+
+      &:active {
+        opacity: 1;
+        border-color: lighten(@color__main-dark, 20%);
+      }
+    }
+
+    &__text {
+      display: block;
+      width: 100%;
+      flex: 1 1;
+
+      // Text
+      line-height: @height__title;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: @color__text-white;
+    }
+
+    &__rename-input {
+      .input-reset;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      height: @height__title;
+      border-bottom: 1px solid @color__main-decoration;
+      background: @color__main-dark;
+      font-size: @font-size__title-text;
+      color: @color__title-text;
+    }
+
+    &__button-collapse-toggle {
+      .button-reset;
+      display: none;
+      height: 15px;
+      padding: 0 7px;
+      margin-left: 5px;
+      color: lighten(@color__main-dark, 50%);
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: lighten(@color__main-dark, 5%);
+
+      &:active {
+        background: lighten(@color__main-dark, 10%);
+      }
+    }
+
+    // Show toggle button on hover
+    &:hover {
+      .nav-bar-group__title__button-collapse-toggle {
+        display: block
+      }
+    }
+
+    // Disable toggle button while editing
+    &--editing {
+      .nav-bar-group__title__button-collapse-toggle {
+        display: none !important;
+      }
+    }
+  }
+
+  // Arrow Icon Rotate on Collapse
+  &--collapsed {
+    .nav-bar-group__title__arrow {
+      transform: rotate(0deg);
+    }
+  }
+
+  &--is-dragging {
+    position: relative;
+    &:after {
+      content: '';
+      .drop-zone;
+    }
+    * {
+      visibility: hidden;
+    }
+  }
+
+  &--drop-target {
+    position: relative;
+    &:after {
+      content: '';
+      .drop-zone;
+      top: 0;
+      bottom: 0;
+    }
+  }
+}

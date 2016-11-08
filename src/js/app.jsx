@@ -8,11 +8,11 @@ import { ipcRenderer, remote  } from 'electron'
 // React
 import EventCatcher from './app/components/root-event-catcher'
 import AppControls from './app/components/app-controls'
+import ToggleBar from './app/components/togglebar'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
 import FsWrite from './filesystem/write/fs-write-index'
-import ToggleBar from './general-components/togglebar'
 import * as Utils from './utils/utils-index'
 
 if (process.env.NODE_ENV !== 'production') {

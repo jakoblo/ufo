@@ -14,6 +14,7 @@ const {Menu, MenuItem} = remote
 import { DropTarget, DragSource } from 'react-dnd'
 import { findDOMNode } from 'react-dom'
 import { NativeTypes } from 'react-dnd-html5-backend'
+import Collapse from 'react-collapse'
 
 
 const groupTarget = {
@@ -111,16 +112,17 @@ export default class NavGroup extends React.Component {
   render() {
     const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
     const dg = this.props.isDiskGroup
-    const dndStyle = { backgroundColor: isOver ? '#AFD2E8' : '', opacity: isDragging ? 0 : 1 }
 
     let hideButtonText = this.props.hidden ? "show" : "hide";
     let classname = classnames({
       'nav-bar-group': true,
-      'nav-bar-group--collapsed': this.props.hidden
+      'nav-bar-group--collapsed': this.props.hidden,
+      'nav-bar-group--is-dragging': isDragging,
+      'nav-bar-group--drop-target': isOver,
     })
 
     return connectDragSource(connectDropTarget(
-      <div className={classname} style={dndStyle}>
+      <div className={classname}>
         <NavGroupTitle 
           title={this.props.title}
           isDiskGroup={dg}
@@ -129,9 +131,9 @@ export default class NavGroup extends React.Component {
           onToggleGroup={this.handleToggleGroup.bind(this, this.props.index)}
           onContextMenu={!dg && this.onContextMenu}
         />
-        <div className="nav-bar-group__item-wrapper">
+        <Collapse isOpened={!this.props.hidden}>
           {this.props.items.map(this.createGroupItem)}
-        </div>
+        </Collapse>
       </div>
     ))
   }
@@ -164,13 +166,13 @@ export default class NavGroup extends React.Component {
     let active = false
     if(path === this.props.activeItem)
     active = true
-    let glyph = "folder"
+    let type = "folder"
     if(this.props.isDiskGroup)
-    glyph = 'device'
+    type = 'device'
     
     // if(path.ext) {
     //   let res = path.ext.replace(".", "")
-    //   glyph = "file " + res
+    //   type = "file " + res
     // }
 
     return (
@@ -183,7 +185,7 @@ export default class NavGroup extends React.Component {
         title={basePath}
         isDiskGroup={this.props.isDiskGroup}
         active={active}
-        glyph={glyph}
+        type={type}
         onMoveGroupItem={this.handleMoveGroupItem}
         saveFavbar={this.handleSaveFavbar}
         >

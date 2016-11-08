@@ -58,14 +58,12 @@ export default class Navbar extends React.Component {
 
     let classname = classnames({
       'nav-bar': true,
-      'hide': this.props.hidden
+      'nav-bar--hide': this.props.hidden, // For what, hä?
+      'nav-bar--drop-target': isOverCurrent
     })
 
-    let dndStyle = { backgroundColor: '#AFD2E8' }
-    if(!isOverCurrent) dndStyle = {backgroundColor: ""}
-
     return connectDropTarget(
-      <div className={classname} style={dndStyle}>
+      <div className={classname}>
         {navgroups}
       </div>
     )
