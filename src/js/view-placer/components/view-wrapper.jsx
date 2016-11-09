@@ -12,17 +12,12 @@ export default class ViewWrapper extends React.Component {
       left: this.props.cssLeft,
       width: this.props.initWidth
     }
-    let classes = classnames('view', {
+    let classes = classnames('view-wrapper', {
       ready: this.props.ready
     })
     let loading
     if(!this.props.ready && !this.props.error) {
-      loading = <div className="loading-cube">
-                  <div className="sk-cube1 sk-cube"></div>
-                  <div className="sk-cube2 sk-cube"></div>
-                  <div className="sk-cube4 sk-cube"></div>
-                  <div className="sk-cube3 sk-cube"></div>
-                </div>
+      loading = "loading"
     }
     return(
       <div className={classes} ref={(c) => this.refView = c}  style={styles}>

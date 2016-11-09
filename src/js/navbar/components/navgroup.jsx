@@ -131,7 +131,7 @@ export default class NavGroup extends React.Component {
           onToggleGroup={this.handleToggleGroup.bind(this, this.props.index)}
           onContextMenu={!dg && this.onContextMenu}
         />
-        <Collapse isOpened={!this.props.hidden}>
+        <Collapse isOpened={!this.props.hidden}  springConfig={{stiffness: 200, damping: 20}}>
           {this.props.items.map(this.createGroupItem)}
         </Collapse>
       </div>
@@ -169,11 +169,6 @@ export default class NavGroup extends React.Component {
     let type = "folder"
     if(this.props.isDiskGroup)
     type = 'device'
-    
-    // if(path.ext) {
-    //   let res = path.ext.replace(".", "")
-    //   type = "file " + res
-    // }
 
     return (
       <NavGroupItem

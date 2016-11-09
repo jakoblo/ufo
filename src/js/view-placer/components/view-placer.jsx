@@ -17,7 +17,7 @@ import FS from '../../filesystem/watch/fs-watch-index'
     viewFilePath: ViewFile.selectors.getViewFilePath(state)
   }
 })
-export default class ViewContainer extends React.Component {
+export default class ViewPlacer extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -27,7 +27,7 @@ export default class ViewContainer extends React.Component {
 
   render() {
     return(
-      <section className="viewContainer">
+      <section className="view-placer">
         {this.renderViewFolders()}
         {this.renderViewFile()}
       </section>
