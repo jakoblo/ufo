@@ -21,9 +21,8 @@ export default class ViewWrapper extends React.Component {
     }
     return(
       <div className={classes} ref={(c) => this.refView = c}  style={styles}>
-        {this.props.ready}
-        {this.props.children}
         {loading}
+        {this.props.children}
         <ResizeSensor onResize={this.resizeHandle} />
       </div>
     )

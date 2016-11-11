@@ -14,7 +14,8 @@ const {Menu, MenuItem} = remote
 import { DropTarget, DragSource } from 'react-dnd'
 import { findDOMNode } from 'react-dom'
 import { NativeTypes } from 'react-dnd-html5-backend'
-import Collapse from 'react-collapse'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import NavGroupItemCollapser from './navgroup-item-collapser'
 
 
 const groupTarget = {
@@ -113,7 +114,6 @@ export default class NavGroup extends React.Component {
     const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
     const dg = this.props.isDiskGroup
 
-    let hideButtonText = this.props.hidden ? "show" : "hide";
     let classname = classnames({
       'nav-bar-group': true,
       'nav-bar-group--collapsed': this.props.hidden,
@@ -126,14 +126,20 @@ export default class NavGroup extends React.Component {
         <NavGroupTitle 
           title={this.props.title}
           isDiskGroup={dg}
-          onGroupTitleChange={!dg && this.handleGroupTitleChange} 
-          hideButtonText={hideButtonText} 
+          hidden={this.props.hidden}
+          onGroupTitleChange={!dg && this.handleGroupTitleChange}
+          onGroupRemove={!dg && this.handleRemoveGroup}
           onToggleGroup={this.handleToggleGroup.bind(this, this.props.index)}
-          onContextMenu={!dg && this.onContextMenu}
         />
-        <Collapse isOpened={!this.props.hidden}  springConfig={{stiffness: 200, damping: 20}}>
-          {this.props.items.map(this.createGroupItem)}
-        </Collapse>
+        <NavGroupItemCollapser itemCount={this.props.items.length} collapsed={this.props.hidden} >
+          <ReactCSSTransitionGroup
+            transitionName="nav-bar-item--animation"
+            transitionEnterTimeout={350}
+            transitionLeaveTimeout={350}
+          >
+            {this.props.items.map(this.createGroupItem)}
+          </ReactCSSTransitionGroup>
+        </NavGroupItemCollapser>
       </div>
     ))
   }
@@ -207,26 +213,6 @@ export default class NavGroup extends React.Component {
 
   handleSaveFavbar = () => {
     this.props.dispatch(Actions.saveFavbartoStorage())
-  }
-  
-/**
- * Context Click menu for Title
- */
-  onContextMenu = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-
-    let menu = new Menu();
-    // menu.append(new MenuItem({ label: 'Open "' + this.props.file.get('base') + '"', click: null }))
-    // menu.append(new MenuItem({ label: 'Rename', click: null }))
-    // menu.append(new MenuItem({ type: 'separator' }))
-    menu.append(new MenuItem({ label: 'Remove Group', click: this.handleRemoveGroup }))
-    menu.append(new MenuItem({ type: 'separator' }))
-    let hideButtonText = this.props.hidden ? "show" : "hide"
-
-    menu.append(new MenuItem({label: hideButtonText, click: this.handleToggleGroup }))
-
-    menu.popup(remote.getCurrentWindow());
   }
 
 }

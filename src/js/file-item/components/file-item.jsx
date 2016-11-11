@@ -8,7 +8,7 @@ import {Map} from 'immutable'
 import eventHandler from '../fi-event-handler/fi-event-handler-index'
 import RenameInput from '../../filesystem/rename/components/rename-input'
 
-export default class FileItemDisplay extends React.Component {
+export default class FileItemComp extends React.Component {
 
   constructor(props) {
     super(props)

@@ -1,4 +1,5 @@
 import React from 'react'
+import {remote} from 'electron'
 
 export default class WindowControls extends React.Component {
   constructor(props) {

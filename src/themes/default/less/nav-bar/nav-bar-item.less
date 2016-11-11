@@ -1,24 +1,28 @@
 @import url('../variables.less');
 @import url('../mixins.less');
+@import url('./nav-bar-mixins.less');
+@import url('../mixins-animation.less');
 
 .nav-bar-item {
 
   @height_nav-bar-item: 26px;
 
   display: flex;
-  align-items: center;
+  align-items: top;
 
   height: @height_nav-bar-item;
   padding: 0 @padding__sidebar-horizonal;
   transition: background 0.3s;
+  overflow: hidden;
+
+  .animation__shrink(@height_nav-bar-item);
 
   // File Icon
   &::before {
     content: '';
     display: block;
     width: 17px;
-    height: 26px;
-    height: @height_nav-bar-item;
+    height: @height_nav-bar-item; 
     background-size: 17px 26px;
     opacity: 0.5;
     margin-right: 8px;
@@ -47,14 +51,7 @@
   }
 
   &__button-remove {
-    .button-reset;
-    display: none;
-    width: 17px;
-    height: 17px;
-    border-radius: 50%;
-    background: url('../svg/nav-bar-item__icon-delete.svg');
-    background-size: contain;
-    opacity: 0.4;
+    .button__right('../svg/nav-bar-item__icon-delete.svg', @height_nav-bar-item);
   }
 
   &:hover {
@@ -62,14 +59,7 @@
 
     .nav-bar-item__button-remove {
       display: block;
-      &:hover {
-        border: 1px solid lighten(@color__main-dark, 50%);
-      }
-      &:active {
-        opacity: 0.7;
-      }
     }
-
   }
 
   &--active {

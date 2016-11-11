@@ -32,9 +32,9 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
-    let fileList = ""
+    let items = ""
     if(this.props.folder) {
-      fileList = this.props.folder.valueSeq().map((file, index) => {
+      items = this.props.folder.valueSeq().map((file, index) => {
         return ( <FileItem
           key={index}
           file={file}
@@ -44,22 +44,31 @@ export default class DisplayList extends React.Component {
     }
 
     return(
-      <div className={classnames({
-        'display-list': true,
-        'drag-target': this.state.data.get('dropTarget'),
-        'focused': this.props.focused
-      })}
+      <div className={
+          classnames({
+            'folder-display-list': true,
+            'folder-display-list--drop-target': this.state.data.get('dropTarget'),
+            'folder-display-list--focused': this.props.focused
+          })
+        }
         onDrop={this.onDrop}
         onDragOver={this.onDragOver}
         onDragEnter={this.onDragEnter}
         onDragLeave={this.onDragLeave}
         onMouseUp={this.focus}
       >
-        {fileList}
+        <div className="folder-display-list__item-container">
+          {items}
+        </div>
         <FilterTypeInput path={this.props.path} />
-        <Button text="new Folder" onClick={() => {
-          this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
-        }} />
+        <button 
+          className="folder-display-list__button-add-folder" 
+          onClick={() => {
+            this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
+          }}
+        >
+          new Folder
+        </button>
       </div>
     )
   }

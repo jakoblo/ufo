@@ -4,6 +4,10 @@ import classnames from 'classnames'
 import Button from '../../general-components/button'
 import { keyEventHandler } from '../../shortcuts/key-event-handler'
 import { keyMap } from '../../shortcuts/key-map'
+import {remote} from 'electron'
+const {Menu, MenuItem} = remote
+
+//@TODO remove this.props.hideButtonText
 
 export default class NavGroupTitle extends React.Component {
   constructor(props) {
@@ -17,16 +21,14 @@ export default class NavGroupTitle extends React.Component {
     if(this.state.editGroupTitle) {
       title = <input 
                 ref="input" 
-                className="nav-bar-group__title__rename-input" 
+                className="nav-bar-group__title__rename-input"
                 onBlur={this.handleOnBlur} 
-                defaultValue={this.props.title} 
-                onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)} 
+                defaultValue={this.props.title}
+                onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)}
+                onClick={(e) => {e.stopPropagation();}}
               />
     } else {
-      title = <div 
-                className="nav-bar-group__title__text" 
-                onDoubleClick={!this.props.isDiskGroup && this.handleDoubleClick}
-              >
+      title = <div className="nav-bar-group__title__text">
                 {this.props.title}
               </div>
     }
@@ -38,13 +40,14 @@ export default class NavGroupTitle extends React.Component {
             'nav-bar-group__title': true,
             'nav-bar-group__title--editing': this.state.editGroupTitle
           })}
-        onContextMenu={this.props.onContextMenu}
+         onClick={this.props.onToggleGroup}
+         onContextMenu={!this.props.isDiskGroup && this.onContextMenu}
       >
-        <div className="nav-bar-group__title__arrow"  onClick={this.props.onToggleGroup} />
+        <div className="nav-bar-group__title__arrow"  />
         {title}
-        <button className="nav-bar-group__title__button-collapse-toggle" onClick={this.props.onToggleGroup}>
-          {this.props.hideButtonText}
-        </button>
+        { !this.props.isDiskGroup ?
+          <button className="nav-bar-group__title__button-burger-menu" onClick={this.onContextMenu} /> : null
+        }
       </div>
     )
   }
@@ -73,7 +76,6 @@ export default class NavGroupTitle extends React.Component {
   }
 
   handleOnBlur = (e) => {
-    console.log('blur')
     this.saveTitle(e.target.value)
   }
 
@@ -87,5 +89,18 @@ export default class NavGroupTitle extends React.Component {
         this.saveTitle(event.target.value);
         break;
     }
+  }
+
+  onContextMenu = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    let menu = new Menu();
+    menu.append(new MenuItem({ label: 'Remove', click: this.props.onGroupRemove }))
+    menu.append(new MenuItem({ label: 'Rename', click: () => {this.setState({editGroupTitle: true})} }))
+    menu.append(new MenuItem({ type: 'separator' }))
+    menu.append(new MenuItem({label: this.props.hidden ? "show" : "hide", click: this.props.onToggleGroup }))
+
+
+    menu.popup(remote.getCurrentWindow());
   }
 }

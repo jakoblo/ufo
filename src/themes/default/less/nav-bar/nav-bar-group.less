@@ -1,5 +1,6 @@
 @import url('../variables.less');
 @import url('../mixins.less');
+@import url('./nav-bar-mixins.less');
 
 .nav-bar-group {
 
@@ -8,7 +9,7 @@
 
   display: flex;
   flex-direction: column;
-  margin-top: 10px;
+  padding: 10px 0;
 
   &__title {
 
@@ -19,6 +20,7 @@
     align-items: center;
     padding: 0 @padding__sidebar-horizonal;
     height: @height__title;
+
 
     // Arrow Icon
     &__arrow {
@@ -33,11 +35,6 @@
       transform: rotate(90deg);
       border: 1px solid transparent;
       border-radius: 50%;
-
-      &:hover {
-        opacity: 0.7;
-        border-color: lighten(@color__main-dark, 20%);
-      }
 
       &:active {
         opacity: 1;
@@ -71,26 +68,18 @@
       color: @color__title-text;
     }
 
-    &__button-collapse-toggle {
-      .button-reset;
-      display: none;
-      height: 15px;
-      padding: 0 7px;
-      margin-left: 5px;
-      color: lighten(@color__main-dark, 50%);
-      border: 1px solid transparent;
-      border-radius: 7px;
-      background: lighten(@color__main-dark, 5%);
-
-      &:active {
-        background: lighten(@color__main-dark, 10%);
-      }
+    &__button-burger-menu {
+      .button__right('../svg/nav-bar-group__title__burger-menu.svg', @height__title);
     }
 
-    // Show toggle button on hover
     &:hover {
-      .nav-bar-group__title__button-collapse-toggle {
-        display: block
+      .nav-bar-group__title__button-burger-menu {
+        display: block;
+      }
+
+      .nav-bar-group__title__arrow {
+        opacity: 0.7;
+        border-color: lighten(@color__main-dark, 20%);
       }
     }
 
@@ -100,6 +89,12 @@
         display: none !important;
       }
     }
+  }
+
+  &__item-wrapper {
+    overflow: hidden;
+    /*outline: 1px solid #f00;*/
+    transition: max-height 350ms ease-out;
   }
 
   // Arrow Icon Rotate on Collapse

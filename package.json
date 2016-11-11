@@ -27,7 +27,7 @@
     "progress": "^1.1.8",
     "rc-tooltip": "^3.4.2",
     "react": "^15.3.2",
-    "react-collapse": "^2.3.3",
+    "react-addons-css-transition-group": "^15.3.2",
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^15.3.0",

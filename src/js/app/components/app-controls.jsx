@@ -1,7 +1,6 @@
 "use strict"
 import React from 'react'
 import { connect } from 'react-redux'
-import {remote} from 'electron'
 import classnames from 'classnames'
 import * as AppActions from '../app-actions'
 import * as selectors from '../app-selectors'

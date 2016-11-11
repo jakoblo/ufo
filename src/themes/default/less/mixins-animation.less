@@ -1,0 +1,19 @@
+.animation__shrink(@default-height) {
+  &--animation-enter {
+    height: 0px;
+  }
+
+  &--animation-enter&--animation-enter-active {
+    height: @default-height;
+    transition: height 350ms linear;
+  }
+
+  &--animation-leave {
+    height: @default-height;
+  }
+
+  &--animation-leave&--animation-leave-active {
+    height: 0;
+    transition: height 350ms ease-out;
+  }
+}
