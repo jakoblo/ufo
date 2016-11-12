@@ -35,46 +35,39 @@ export default class FileItemComp extends React.Component {
     }
 
     if(this.props.file.get('renaming')) {
-      renameInput = <RenameInput 
+      renameInput = <RenameInput
+        className={this.props.className+'__rename-input'}
         path={this.props.file.get('path')}
         dispatch={this.props.dispatch}
       />
     }
     
     return (
-      <span
+      <div
         className={classNames({
-          'file-item': true,
-          'edit': this.props.file.get('renaming'),
-          'folder': this.props.file.get('stats').isDirectory(),
-          'file': this.props.file.get('stats').isFile(),
-          'active': this.props.file.get('active'),
-          'selected': this.props.file.get('selected'),
-          'drag-target': this.state.data.get('dropTarget'),
-          'drag-blocked': this.state.data.get('dropBlocked'),
-          'open-animation': this.state.data.get('openAnimation'),
-          'progress': this.props.file.get('progress')
+          [this.props.className]: true,
+          [this.props.className+'--edit']: this.props.file.get('renaming'),
+          [this.props.className+'--theme-folder']: this.props.file.get('stats').isDirectory(),
+          [this.props.className+'--theme-file']: this.props.file.get('stats').isFile(),
+          [this.props.className+'--active']: this.props.file.get('active'),
+          [this.props.className+'--selected']: this.props.file.get('selected'),
+          [this.props.className+'--drop-target']: this.state.data.get('dropTarget'),
+          [this.props.className+'--drop-blocked']: this.state.data.get('dropBlocked'),
+          [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
+          [this.props.className+'--in-progress']: this.props.file.get('progress')
         })}
         ref="file"
       >
-        <span className="flex-box">
-          <Icon glyph={classNames({
-            'folder': this.props.file.get('stats').isDirectory(),
-            'file': this.props.file.get('stats').isFile()
-          })}/>
-          <label>
-            <span className="base">{this.props.file.get('name')}</span>
-            <span className="suffix">{this.props.file.get('suffix')}</span>
-          </label>
-          {renameInput}
-        </span>
+        <div className={this.props.className+'__name-base'} >{this.props.file.get('name')}</div>
+        <div className={this.props.className+'__name-suffix'} >{this.props.file.get('suffix')}</div>
+        {renameInput}
         {progress}
-        <span className="eventCatcher" 
+        <div className={this.props.className+'__event-catcher'} 
           draggable={true}
           {...this.clickHandler}
           {...this.dragndropHandler}
         />
-      </span>
+      </div>
     )
   }
 

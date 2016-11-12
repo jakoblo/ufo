@@ -48,7 +48,7 @@ gulp.task('compile-less', function () {
   var combined = combiner.obj([
     gulp.src(config.less),
     sourcemaps.init(),
-    less(),
+    less({ relativeUrls: true }),
     sourcemaps.write(),
     gulp.dest(config.css)
   ]);

@@ -7,14 +7,10 @@ var ResizeSensor = React.createClass({
   render: function () {
     return (
       <iframe ref="iframe" style={{
-        height: '100%',
-        width: '100%',
         border: 'none',
         background: 'transparent',
-        position: 'absolute',
+        height: 0,
         zIndex: -1,
-        top: 0,
-        left: 0,
       }} />
     );
   },

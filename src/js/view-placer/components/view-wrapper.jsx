@@ -9,7 +9,7 @@ export default class ViewWrapper extends React.Component {
 
   render() {
     let styles = {
-      left: this.props.cssLeft,
+      // left: this.props.cssLeft,
       width: this.props.initWidth
     }
     let classes = classnames('view-wrapper', {
@@ -17,7 +17,7 @@ export default class ViewWrapper extends React.Component {
     })
     let loading
     if(!this.props.ready && !this.props.error) {
-      loading = "loading"
+      loading = null
     }
     return(
       <div className={classes} ref={(c) => this.refView = c}  style={styles}>

@@ -6,10 +6,12 @@ import FilterTypeInput from '../filesystem/filter/components/filter-type-input'
 import Filter from '../filesystem/filter/filter-index'
 import App from '../app/app-index'
 import classnames from 'classnames'
+import nodePath from 'path'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
 import Button from '../general-components/button'
 import fsWrite from '../filesystem/write/fs-write-index'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 @connect(() => {
   const getFilesMergedOf = FsMergedSelector.getFilesMergedOf_Factory()
@@ -32,12 +34,14 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
+
     let items = ""
     if(this.props.folder) {
       items = this.props.folder.valueSeq().map((file, index) => {
         return ( <FileItem
-          key={index}
+          key={file.get('path')}
           file={file}
+          className="folder-list-item"
           dispatch={this.props.dispatch}
         /> )
       })
@@ -56,19 +60,29 @@ export default class DisplayList extends React.Component {
         onDragEnter={this.onDragEnter}
         onDragLeave={this.onDragLeave}
         onMouseUp={this.focus}
-      >
-        <div className="folder-display-list__item-container">
-          {items}
+      > 
+        <div className="folder-display-list__toolbar">
+          <div className="folder-display-list__name">
+            {nodePath.basename(this.props.path)}
+          </div>
         </div>
+        {(this.props.folder.size > 0) ?
+        <ReactCSSTransitionGroup className="folder-display-list__item-container"
+          transitionName="folder-list-item--animation"
+          transitionEnterTimeout={250}
+          transitionLeaveTimeout={250}
+        >
+          {items}
+        </ReactCSSTransitionGroup>
+        : null
+        }
         <FilterTypeInput path={this.props.path} />
         <button 
           className="folder-display-list__button-add-folder" 
           onClick={() => {
             this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
           }}
-        >
-          new Folder
-        </button>
+        >new folder</button>
       </div>
     )
   }

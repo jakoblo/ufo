@@ -1,0 +1,53 @@
+@import url('../variables.less');
+@import url('../mixins.less');
+@import url('./folder-list-item.less');
+
+
+.folder-display-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+
+  &__toolbar {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    -webkit-app-region: drag;
+    left: 0;
+    right: 5px;
+    z-index: 10;
+    height: @height__top-toolbar;
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 95%, rgba(255,255,255,0) 100%);
+  }
+
+  &__name {
+    font-size: 17px;
+    color: lighten(@color__main-dark, 50%);
+    margin: 0 @padding__sidebar-horizonal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__item-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 100%;
+    padding-top: calc(@height__top-toolbar + @padding__sidebar-horizonal);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    .nicer-scrollbars(#fff)
+  }
+
+  &__button-add-folder {
+    .button-reset;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    display: none;
+  }
+}

@@ -3,21 +3,16 @@
 
 .view-wrapper {
   position: relative;
-  width:250px;
+  min-width:250px;
   display: flex;
   flex-direction: column;
-  border-right:1px solid @color__text-light;
+  box-sizing: border-box;
   resize: horizontal;
   overflow-x: auto;
+  padding-bottom: 14px;
 
   &::-webkit-resizer {
-    background: url('../svg/view-wrapper__resize-arrows.svg');
+    background: url('../../img/view-wrapper__resize-arrows.svg');
     background-size: 14px 14px;
-  }
-
-  .view-content {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
   }
 }

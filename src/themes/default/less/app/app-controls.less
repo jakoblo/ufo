@@ -6,6 +6,7 @@
   background: lighten(@color__main-dark, 3%);
   border-bottom: 1px solid lighten(@color__main-dark, 10%);
   display: flex;
+  flex-shrink: 0;
   padding: 0 @padding__sidebar-horizonal;
   justify-content: space-between;
   align-items: center;
@@ -21,7 +22,7 @@
     .button-reset;
     width: 34px;
     height: 34px;
-    background: url('../svg/arrow-large-white.svg') center no-repeat;
+    background: url('../../img/arrow-large-white.svg') center no-repeat;
     transform: rotate(@rotation);
     transition: border 0.2s;
     border-radius: 50%;

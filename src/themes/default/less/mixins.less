@@ -1,5 +1,7 @@
 @import url('./variables.less');
 
+@image_dir: '../img/';
+
 .button-reset {
   border: 0;
   line-height:0;
@@ -16,6 +18,7 @@
   outline-offset: 0;
   font-family: @font__family-main;
   border: 0;
+  font-size: @font__size-base;
 }
 
 .drop-zone {
@@ -53,4 +56,19 @@
   &::-webkit-scrollbar-thumb:hover {
     background: @color__main-decoration;
   }
+}
+
+
+.icon(@icon; @opacity; @height: image-height('@{image_dir}@{icon}'); @width: image-width('@{image_dir}@{icon}')) { 
+  content: '';
+  display: block;
+  width: @width;
+  height: @height;
+  opacity: @opacity;
+  background-image: url('@{image_dir}@{icon}');
+  background-size: image-size('@{image_dir}@{icon}');
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  flex-grow: 0;
 }

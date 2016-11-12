@@ -26,7 +26,7 @@ export default class ViewPlacer extends React.Component {
   }
 
   render() {
-    return(
+    return (
       <section className="view-placer">
         {this.renderViewFolders()}
         {this.renderViewFile()}
