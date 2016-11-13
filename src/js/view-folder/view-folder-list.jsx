@@ -61,28 +61,31 @@ export default class DisplayList extends React.Component {
         onDragLeave={this.onDragLeave}
         onMouseUp={this.focus}
       > 
-        <div className="folder-display-list__toolbar">
+        <div className="folder-display-list__toolbar-top">
           <div className="folder-display-list__name">
             {nodePath.basename(this.props.path)}
           </div>
         </div>
-        {(this.props.folder.size > 0) ?
-        <ReactCSSTransitionGroup className="folder-display-list__item-container"
-          transitionName="folder-list-item--animation"
-          transitionEnterTimeout={250}
-          transitionLeaveTimeout={250}
-        >
-          {items}
-        </ReactCSSTransitionGroup>
-        : null
+        {(this.props.ready) ?
+          <ReactCSSTransitionGroup className="folder-display-list__item-container"
+            transitionName="folder-list-item--animation"
+            transitionEnterTimeout={250}
+            transitionLeaveTimeout={250}
+          >
+            {items}
+          </ReactCSSTransitionGroup>
+        :
+          null
         }
-        <FilterTypeInput path={this.props.path} />
-        <button 
-          className="folder-display-list__button-add-folder" 
-          onClick={() => {
-            this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
-          }}
-        >new folder</button>
+        <div className="folder-display-list__toolbar-bottom">
+          <button
+            className="folder-display-list__button-add-folder" 
+            onClick={() => {
+              this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
+            }}
+          />
+          <FilterTypeInput path={this.props.path} />
+        </div>
       </div>
     )
   }
@@ -132,6 +135,10 @@ export default class DisplayList extends React.Component {
     event.stopPropagation()
     this.setImmState((prevState) => (prevState.set('dropTarget', false)))
     dragndrop.handleFileDrop(event, this.props.path)
+  }
+
+  onMouseDown = () => {
+    
   }
   
   /**

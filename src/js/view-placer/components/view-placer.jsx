@@ -20,9 +20,6 @@ import FS from '../../filesystem/watch/fs-watch-index'
 export default class ViewPlacer extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      widthStorage: [] 
-    }
   }
 
   render() {
@@ -36,11 +33,7 @@ export default class ViewPlacer extends React.Component {
 
   renderViewFile = () => {
     if(this.props.viewFilePath) {
-      let styles = {left: 0}
-      this.props.viewFolderList.forEach((dirState) => {
-        styles.left = styles.left + this.state.widthStorage[dirState.path]
-      })
-      return <ViewFile.components.ViewFile styles={styles} path={this.props.viewFilePath} />
+      return <ViewFile.components.ViewFile path={this.props.viewFilePath} />
     }
   }
 
@@ -49,27 +42,23 @@ export default class ViewPlacer extends React.Component {
     
     if(this.props.viewFolderList.length > 0) {
 
-      let cssLeft = 0
       let prevFolder = null
 
       views = this.props.viewFolderList.map((dirState, index) => {
-        cssLeft = cssLeft + this.state.widthStorage[prevFolder] || 0
         prevFolder = dirState.path
         
         let view = (dirState) => {
           if(dirState.error) {
             return <Error error={dirState.error} />
           } else {
-            return <ViewFolderList path={dirState.path} />
+            return <ViewFolderList path={dirState.path} ready={dirState.ready} />
           }
         }
 
-        return (
+        return ( 
           <ViewWrapper 
             key={dirState.path} 
-            path={dirState.path} 
-            initWidth={this.state.widthStorage[dirState.path] || DEFAULT_VIEW_WIDTH} 
-            cssLeft={cssLeft} 
+            path={dirState.path}
             onResize={this.resizeHandle}
             ready={dirState.ready}
             error={dirState.error}
@@ -81,16 +70,5 @@ export default class ViewPlacer extends React.Component {
     }
 
     return views
-  }
-
-  /**
-   * View Child changes Size
-   * Store that Size to the State
-   */
-  resizeHandle = (path, width) => {
-    this.state.widthStorage[path] = width
-    this.setState({
-      widthStorage: this.state.widthStorage
-    })
   }
 }

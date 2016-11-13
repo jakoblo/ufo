@@ -7,6 +7,7 @@ import classNames from 'classnames'
 import {Map} from 'immutable'
 import eventHandler from '../fi-event-handler/fi-event-handler-index'
 import RenameInput from '../../filesystem/rename/components/rename-input'
+import ProgressPie from '../../general-components/progress-pie'
 
 export default class FileItemComp extends React.Component {
 
@@ -27,26 +28,11 @@ export default class FileItemComp extends React.Component {
   }
 
   render() {
-    let progress, renameInput = null
-    if(this.props.file.get('progress')) {
-      progress = <div className="progress-bar">
-                   <progress max="100" value={this.props.file.get('progress').get('percentage')}></progress>
-                 </div>
-    }
-
-    if(this.props.file.get('renaming')) {
-      renameInput = <RenameInput
-        className={this.props.className+'__rename-input'}
-        path={this.props.file.get('path')}
-        dispatch={this.props.dispatch}
-      />
-    }
-    
     return (
       <div
         className={classNames({
           [this.props.className]: true,
-          [this.props.className+'--edit']: this.props.file.get('renaming'),
+          [this.props.className+'--renaming']: this.props.file.get('renaming'),
           [this.props.className+'--theme-folder']: this.props.file.get('stats').isDirectory(),
           [this.props.className+'--theme-file']: this.props.file.get('stats').isFile(),
           [this.props.className+'--active']: this.props.file.get('active'),
@@ -58,10 +44,23 @@ export default class FileItemComp extends React.Component {
         })}
         ref="file"
       >
+        <div className={this.props.className+'__underlay'} />
+        {this.props.file.get('progress') ? 
+          <ProgressPie
+            className={this.props.className+'__progress-pie'}
+            progress={this.props.file.get('progress').get('percentage')}
+            size={16}
+          />
+        : null }
         <div className={this.props.className+'__name-base'} >{this.props.file.get('name')}</div>
         <div className={this.props.className+'__name-suffix'} >{this.props.file.get('suffix')}</div>
-        {renameInput}
-        {progress}
+        {this.props.file.get('renaming') ? 
+          <RenameInput
+            className={this.props.className+'__rename-input'}
+            path={this.props.file.get('path')}
+            dispatch={this.props.dispatch}
+          />
+        : null}
         <div className={this.props.className+'__event-catcher'} 
           draggable={true}
           {...this.clickHandler}
