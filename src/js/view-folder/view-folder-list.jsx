@@ -80,20 +80,22 @@ export default class DisplayList extends React.Component {
   }
 
 
+  /**
+   * Filedrop to this Folder
+   * with Hover drop-target state
+  **/
   onDragOver = (event) => {
     event.preventDefault()
     event.stopPropagation()
     event.dataTransfer.dropEffect = "copy"
     this.setImmState((prevState) => (prevState.set('dropTarget', true)))
   }
-
   onDragEnter = (event) => {
     event.preventDefault()
     event.stopPropagation()
     this.dragInOutCount++
     this.setImmState((prevState) => (prevState.set('dropTarget', true)))
   }
-
   onDragLeave = (event) => {
     event.preventDefault()
     event.stopPropagation()
@@ -102,7 +104,6 @@ export default class DisplayList extends React.Component {
       this.setImmState((prevState) => (prevState.set('dropTarget', false)))
     }
   }
-
   onDrop = (event) => {
     event.preventDefault()
     event.stopPropagation()
@@ -110,8 +111,14 @@ export default class DisplayList extends React.Component {
     dragndrop.handleFileDrop(event, this.props.path)
   }
   
+  /**
+   * focus
+   * @memberOf DisplayList
+   * A click in the "Whitespace" of a Folderview 
+   * "Focus" the Folder show that one as the last one
+   * (behaviour from finder)
+   */
   focus = (event) => {
-    console.log('Fix folder')
     this.props.dispatch( App.actions.changeAppPath(null, this.props.path) )
   }
 }

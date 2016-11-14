@@ -4,11 +4,13 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import ButtonGroup from '../../general-components/button-group'
 import Button from '../../general-components/button'
-import * as HistoryActions from '../history-actions'
-import App from '../../app/app-index'
+import * as AppActions from '../app-actions'
+import * as selectors from '../app-selectors'
 
 @connect((state) => {
-  return {history: state.history}
+  return {
+    history: state.app.get('history'),
+  }
 })
 export default class ActionBar extends React.Component {
   constructor(props) {
@@ -16,15 +18,15 @@ export default class ActionBar extends React.Component {
   }
 
   handleHistoryBack = () => {
-    this.props.dispatch( HistoryActions.back() )
+    this.props.dispatch( AppActions.historyBack() )
   }
 
   handleHistoryForward = () => {
-    this.props.dispatch( HistoryActions.forward() )
+    this.props.dispatch( AppActions.historyForward() )
   }
 
   handleFolderUp = () => {
-    this.props.dispatch( App.actions.navigateToParentFolder() )
+    this.props.dispatch( AppActions.navigateToParentFolder() )
   }
 
   shouldComponentUpdate (nextProps, nextState) {

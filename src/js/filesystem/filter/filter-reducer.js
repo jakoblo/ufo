@@ -10,7 +10,7 @@ const INITIAL_STATE = {
   global: {
     notHidden: c.NOT_HIDDEN_REGEX
   },
-  focused: {},
+  focused: {}, // Filter Collection for the folder in 'focusedPath'
   focusedPath: ''
 }
 
@@ -19,6 +19,17 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
   switch (action.type) {
 
     case App.actiontypes.APP_CHANGE_PATH:
+
+      /**
+       * The behaviour is little bit confused but thaken from Finder
+       * it make sens, but is hard to explain...
+       * 
+       * The Focused Folder where the Typing filter will apply,
+       * is different is Click on a folder or if you select it arrow keys.
+       * If you select a file, its different again.
+       * 
+       * @TODO try to remove peak 
+       */
       let newFocus = null
       if(action.payload.peak && action.payload.pathRoute.length > 1) {
         newFocus = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
@@ -33,7 +44,11 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       }
     
     case Selection.actiontypes.SET_SELECTION:
-      return state.set('focusedPath', action.payload.root).deleteIn(['focused', 'userInput'])
+      if(action.payload.root != state.get('focusedPath')) {
+        return state.set('focusedPath', action.payload.root).deleteIn(['focused', 'userInput'])
+      } else {
+        return state
+      }
 
     case t.FILTER_SHOW_HIDDEN:
       return state.deleteIn(['global', 'notHidden'])
@@ -48,12 +63,6 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       }))
 
     case t.FILTER_USER_CLEAR:
-      return state.deleteIn(['focused', 'userInput'])
-    
-    case Selection.actiontypes.SET_SELECTION:
-      return state.deleteIn(['focused', 'userInput'])
-    
-    case Selection.actiontypes.SET_SELECTION_FOCUS:
       return state.deleteIn(['focused', 'userInput'])
 
     default:

@@ -1,7 +1,7 @@
 "use strict"
 import React from 'react'
-import History from '../history/history-index'
-import Button from './button'
+import HistoryButtons from './history-buttons'
+import Button from '../../general-components/button'
 
 export default class ActionBar extends React.Component {
   constructor(props) {
@@ -11,8 +11,8 @@ export default class ActionBar extends React.Component {
   render() {
     return (
       <div className="toolbar">
-        <WindowControls></WindowControls>
-        <History.components.Buttons />
+        <WindowControls/>
+        <HistoryButtons />
       </div>
     )
   }
