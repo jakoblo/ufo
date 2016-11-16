@@ -2,13 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import nodePath from 'path'
 import FS from '../../filesystem/watch/fs-watch-index'
-import ButtonGroup from '../../general-components/button-group'
-import Button from '../../general-components/button'
-import Icon from '../../general-components/icon'
 import filesize from 'filesize' // https://www.npmjs.com/package/filesize
-import Calendar from './calendar'
 import classnames from 'classnames'
-import Tooltip from 'rc-tooltip'
 import getRenderer from '../render/get-renderer'
 
 @connect(() => {
@@ -32,56 +27,34 @@ export default class ViewFile extends React.Component {
     let FileRenderer = getRenderer( nodePath.extname(this.props.path) )
 
     return(
-      <div className="preview file" style={this.props.styles}>
-        <div className="file-title-wrapper">
-          <div className="file-title">
-            <h1 className="title"><Icon glyph="file" />{ this.props.file.get('base') }</h1>
-            <h3 className="file-size">{ filesize( file.get('stats').size ) }</h3>
-          </div>
+      <div className="view-file" style={this.props.styles}>
+        <div className="view-file__top-toolbar">
+          <div className="view-file__name">{ this.props.file.get('base') }</div>
+          <div className="view-file__size">{ filesize( file.get('stats').size ) }</div>
         </div>
-        <FileRenderer path={this.props.path} />
-        <div className="file-times-wrapper">
-          <div className="file-times-header">
-            {this.getFileTime( file.get('stats').mtime, "Modified" )}
-            {this.getFileTime( file.get('stats').birthtime, "Created" )}
-            {this.getFileTime( file.get('stats').atime, "Accessed" )}
-          </div>
+        <div className="view-file__renderer">
+          <FileRenderer path={this.props.path} />
+        </div>
+        <div className="view-file__bottom-bar">
+          {this.getFileTime( file.get('stats').mtime, "Modified" )}
+          {this.getFileTime( file.get('stats').birthtime, "Created" )}
+          {this.getFileTime( file.get('stats').atime, "Accessed" )}
         </div>
       </div>
     )
   }
   
-  getFileTime(date, title) {
-    
-    let classes = classnames({
-      'file-time': true
-    })
-    
-    let tooltipContent =  <div className="file-times-tooltip">
-                            <h4>{this.monthNames[date.getMonth()]} {date.getFullYear()}</h4>
-                            <Calendar date={date} />
-                          </div>
-    
+  getFileTime(date, type) {
     return (
-      <Tooltip 
-        placement="top" 
-        overlay={tooltipContent}
-        trigger={['hover']}
-      >
-        <div className={classes}>
-          <h4>{title}</h4>
-          <div className="file-time-content">
-            <div className="file-time-col day">{date.getDate()}</div>
-            <div className="file-time-col">
-              <div className="file-time-row date">
-                <div className="month">{this.monthNames[date.getMonth()]}</div>
-                <div className="yeah">{date.getFullYear()}</div>
-              </div>
-              <div className="file-time-row time">{date.toLocaleTimeString()}</div>
-            </div>
-          </div>
+      <div className="file-time">
+        <div className="file-time__type">{type}</div>
+        <div className="file-time__date">
+          {date.getDate()+' '+this.monthNames[date.getMonth()]+' '+date.getFullYear()}
         </div>
-      </Tooltip>
+        <div className="file-time__clock">
+          {date.toLocaleTimeString()}
+        </div>
+      </div>
     ) 
   }
 }

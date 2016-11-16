@@ -1,0 +1,82 @@
+@import (reference) '../variables.less';
+@import (reference) '../mixins.less';
+@import (reference) '../mixins-animation.less';
+
+.view-file {
+
+  @padding_bar-vertical: 5px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+  min-width: 350px;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  &__top-toolbar {
+    min-height: @height__top-toolbar;
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: flex;
+    box-sizing: border-box;
+    padding: @padding_bar-vertical 0;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__name {
+    .view-title;
+    white-space: normal;
+    flex-shrink: 1;
+  }
+
+  &__size {
+    .view-title;
+    flex-shrink: 0;
+    flex-grow: 0;
+    text-align: right;
+  }
+
+  &__renderer {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    padding: @padding__sidebar-horizonal;
+    justify-content: center;
+    align-items: center;
+    .nicer-scrollbars(#fff);
+    overflow: auto;
+  }
+
+  &__bottom-bar {
+    display: flex;
+    padding: @padding_bar-vertical @padding__sidebar-horizonal;
+    justify-content: space-around;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+}
+
+.file-time {
+
+  @font-size__file-time: 11px;
+
+  &_type {
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: 7px 0;
+  } 
+
+  &__date {
+    font-size: @font-size__file-time;
+  }
+
+  &__clock {
+    font-size: @font-size__file-time;
+  }
+
+}

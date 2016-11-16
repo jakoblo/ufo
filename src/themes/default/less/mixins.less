@@ -70,6 +70,15 @@
   }
 }
 
+.view-title {
+  font-size: 17px;
+  color: lighten(@color__main-dark, 50%);
+  margin: 0 @padding__sidebar-horizonal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 .icon(@icon; @opacity: 1; @height: image-height('@{image_dir}@{icon}'); @width: image-width('@{image_dir}@{icon}')) { 
   content: '';

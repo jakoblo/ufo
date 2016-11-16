@@ -9,16 +9,20 @@
   height: @height__item;
   padding: 0 @padding__sidebar-horizonal;
   position: relative;
-  box-sizing: border-box;
+  box-sizing: border-box; 
 
   .animation__shrink(@height__item, 250ms);
+
+  // -----------------------------------
+  // Item Type Icons
+  // ---
 
   &::before {
     margin-right: 10px;
   }
   // Folder
   &--theme-folder::before {
-    .icon(@icon: 'folder-list-item__icon-folder.svg', @opacity: 1, @height: @height__item);
+    .icon(@icon: 'folder-list-item__icon-folder.svg' , @opacity: 1, @height: @height__item);
   }
   &--theme-folder&--active::after {
     .icon(@icon: 'arrow-small-black.svg', @opacity: 0.3, @height: @height__item);
@@ -37,7 +41,11 @@
   &--theme-file&--selected::before {
     .icon(@icon: 'folder-list-item__icon-file--selected.svg', @opacity: 1, @height: @height__item);
   }
- 
+
+  // -----------------------------------
+  // File Name
+  // ---
+
   &__name-base {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -66,7 +74,9 @@
     z-index: 10;
   }
 
+  // -----------------------------------
   // Renaming
+  // ---
 
   &__rename-input {
     width: 100%;
@@ -78,7 +88,9 @@
     display: none;
   }
 
+  // -----------------------------------
   // File in Progress Copy & Move
+  // ---
 
   &__progress-pie {
     .progress-pie(@progress-color: darken(@color__grey-light, 10%));
@@ -98,18 +110,45 @@
     opacity: 0.6;
   }
 
+  // -----------------------------------
   // Underlay Drop Targets
+  // ---
 
   &__underlay {
-    display: none;
+    @drag-over-expand-time: 0.9s;
+    display: block;
+    z-index: -10;
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      z-index: -10;
+      width: 100%;
+      height: 0;
+      background: @color__main-decoration;
+      opacity: 0;
+      top: calc(@height__item / 2);
+      transition: 
+        top @drag-over-expand-time linear, 
+        height @drag-over-expand-time linear, 
+        opacity @drag-over-expand-time linear;
+    }
   }
+  
 
   &--drop-target &__underlay {
     .drop-zone;
-    z-index: 10;
     display: block;
     top: -2px;
     bottom: -2px;
+
+    &::before {
+      // drag-over-expand transition
+      top: 0;
+      height: @height__item;
+      opacity: 1;
+    }
+    
   }
 
   &--drop-blocked &__underlay {
@@ -118,6 +157,10 @@
     top: -2px;
     bottom: -2px;
   }
+
+  // -----------------------------------
+  // Other Modifier
+  // ---
   
   &--active {
     background-color: lighten(@color__text-light, 15%);
