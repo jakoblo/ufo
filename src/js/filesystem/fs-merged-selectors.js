@@ -79,7 +79,7 @@ export const getFilteredFiles_Factory = () => {
         return files
       }
       return files.filter((file) => {
-        let filename = file.get('name')
+        let filename = file.get('base')
         let count = 0
         while (count < filters.length && filename.match(filters[count])) {
           if(count == filters.length-1) {

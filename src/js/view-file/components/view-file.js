@@ -32,9 +32,7 @@ export default class ViewFile extends React.Component {
           <div className="view-file__name">{ this.props.file.get('base') }</div>
           <div className="view-file__size">{ filesize( file.get('stats').size ) }</div>
         </div>
-        <div className="view-file__renderer">
-          <FileRenderer path={this.props.path} />
-        </div>
+        <FileRenderer path={this.props.path} />
         <div className="view-file__bottom-bar">
           {this.getFileTime( file.get('stats').mtime, "Modified" )}
           {this.getFileTime( file.get('stats').birthtime, "Created" )}

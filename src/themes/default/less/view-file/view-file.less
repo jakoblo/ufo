@@ -1,6 +1,7 @@
 @import (reference) '../variables.less';
 @import (reference) '../mixins.less';
 @import (reference) '../mixins-animation.less';
+@import './renderer.less';
 
 .view-file {
 
@@ -40,18 +41,6 @@
     text-align: right;
   }
 
-  &__renderer {
-    display: flex;
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-direction: column;
-    padding: @padding__sidebar-horizonal;
-    justify-content: center;
-    align-items: center;
-    .nicer-scrollbars(#fff);
-    overflow: auto;
-  }
-
   &__bottom-bar {
     display: flex;
     padding: @padding_bar-vertical @padding__sidebar-horizonal;
@@ -62,9 +51,7 @@
 }
 
 .file-time {
-
   @font-size__file-time: 11px;
-
   &_type {
     text-transform: uppercase;
     font-weight: 600;
@@ -78,5 +65,4 @@
   &__clock {
     font-size: @font-size__file-time;
   }
-
 }

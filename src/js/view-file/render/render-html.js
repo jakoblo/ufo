@@ -1,5 +1,4 @@
 import React from 'react'
-import classnames from 'classnames'
 
 export default class DisplayHTML extends React.Component {
 
@@ -8,16 +7,8 @@ export default class DisplayHTML extends React.Component {
   }
 
   render() {
-    
-    let classes = classnames(
-        'display',
-        'html'
-      )
-    
     return(
-      <div className={classes}>
-        <iframe src={this.props.path} />
-      </div>
+      <webview className="render-webview" src={this.props.path} />
     )
   }
 }
