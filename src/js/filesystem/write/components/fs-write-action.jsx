@@ -39,9 +39,9 @@ export default class WriteAction extends React.Component {
 
       <div
         className={classNames({
-          'write-action': true,
-          'finished': this.props.action.get('finished'),
-          'error': this.props.action.get('error')
+          'fs-write-action': true,
+          'fs-write-action--finished': this.props.action.get('finished'),
+          'fs-write-action--error': this.props.action.get('error')
         })}
       >
         {this.renderClose()}
@@ -52,7 +52,7 @@ export default class WriteAction extends React.Component {
 
   renderClose = () => {
     if(this.props.action.get('finished') || this.props.action.get('error')) {
-      return <Button text="X" onClick={
+      return <button className="fs-write-action__button-close" onClick={
                 () => { this.props.dispatch( FsWriteActions.removeAction(this.props.action.get('id')) ) }
               }/> 
     } else {

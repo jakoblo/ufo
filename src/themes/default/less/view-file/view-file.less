@@ -21,6 +21,7 @@
     min-height: @height__top-toolbar;
     flex-grow: 0;
     flex-shrink: 0;
+    -webkit-app-region: drag;
     display: flex;
     box-sizing: border-box;
     padding: @padding_bar-vertical 0;
@@ -44,18 +45,28 @@
   &__bottom-bar {
     display: flex;
     padding: @padding_bar-vertical @padding__sidebar-horizonal;
-    justify-content: space-around;
+    justify-content: center;
     flex-grow: 0;
     flex-shrink: 0;
+  }
+
+  &__time-container {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 0;
+    flex-shrink: 1;
+    width: 400px;
   }
 }
 
 .file-time {
   @font-size__file-time: 11px;
-  &_type {
+  max-width: 450px;
+  &__type {
+    @font-size__file-time: 11px;
     text-transform: uppercase;
     font-weight: 600;
-    margin: 7px 0;
+    margin: 0px 0;
   } 
 
   &__date {

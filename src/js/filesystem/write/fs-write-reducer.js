@@ -2,7 +2,26 @@ import * as t from './fs-write-actiontypes'
 import {OrderedMap, Map, List, Seq, fromJS} from 'immutable'
 import nodePath from 'path'
 
-const INITIAL_STATE = OrderedMap({})
+// const INITIAL_STATE = OrderedMap({})
+const INITIAL_STATE = OrderedMap({
+  0: fromJS({
+    "id":0,
+    "task":"MOVE",
+    "sources":
+      [
+        "/Users/flow/Screen Shot 2016-11-09 at 01.09.24.png",
+        "/Users/flow/Screen Shot 2016-11-09 at 01.09.25.png",
+        "/Users/flow/Screen Shot 2016-11-11 at 18.44.41.png",
+        "/Users/flow/Screen Shot 2016-11-12 at 12.44.12.png"
+      ]
+    ,
+    "targetFolder":"/Users/flow/Desktop",
+    "clobber": false,
+    "finished": false,
+    "files": {},
+    "error": {"code":"ERROR_DEST_ALREADY_EXISTS"}
+  })
+})
 
 export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
 
@@ -13,8 +32,8 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
       return state.set(action.payload.id, fromJS({
           id: action.payload.id,
           task: action.payload.task,
-          source: action.payload.source, 
-          destination: action.payload.destination,
+          sources: action.payload.sources, 
+          targetFolder: action.payload.targetFolder,
           clobber: action.payload.clobber,
           finished: false, 
           files: {}

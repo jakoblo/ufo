@@ -1,20 +1,22 @@
+'use strict';
+
 /**
  * Modified from mv
  * https://www.npmjs.com/package/mv
  */
 
-import {ncp} from 'ncp'
-import nodePath from 'path'
-import rimraf from 'rimraf'
-import mkdirp from 'mkdirp'
-import progress from 'progress-stream';
-import fs from 'mz/fs'
-import * as c from '../fs-write-constants'
-import * as t from '../fs-write-actiontypes'
-import * as utils from '../fs-write-utils'
+var {ncp} = require('ncp');
+var nodePath = require('path');
+var rimraf = require('rimraf');
+var mkdirp = require('mkdirp');
+var progress = require('progress-stream');
+var fs = require('mz/fs')
+var c = require('../fs-write-constants')
+var t = require('../fs-write-actiontypes')
+var utils = require('../fs-write-utils')
 
 process.on('message', (m) => {
-  mv(m.id, m.source, m.dest, m.options)
+  mv(m.id, m.sources, m.targetFolder, m.options)
 });
 
 /**
@@ -25,43 +27,64 @@ process.on('message', (m) => {
  * @param {string} dest
  * @param {Object} param
  */
-function mv(id, source, dest, param){
 
-  if(source == dest) { process.exit() }
+debugger
+
+function mv(id, sources, targetFolder, param){
+
+  sources.forEach((src) => {
+    if(nodePath.dirname(src) == targetFolder) { 
+      process.exit() 
+    }
+  })
 
   process.send({
     type: t.FS_WRITE_NEW,
     payload: {
       ...param,
       id: id,
-      source: source,
-      destination: dest
+      sources: sources,
+      targetFolder: targetFolder
     }
   })
 
-  const options = {...param, limit: 8}
+  var state = {
+    error: false,
+    options: _extends({}, param, { limit: 8 }),
+    toWorkOff: [],
+    size: 0
+  }
 
-  utils.verifyAccess(source, dest, (options.task == t.TASK_MOVE), param.clobber)
-    .then( () => {
-      utils.noMoveInItSelf(source, dest, (options.task == t.TASK_MOVE))
-        .then( () => {
-          if (options.task == t.TASK_MOVE) { 
-            tryRename()
-          } else if(options.task == t.TASK_COPY) {
-            copy(source, dest)
-          }
-        })
-        .catch(sendError)
+  var validateStack = []
+
+  sources.forEach((source) => {
+    var destination = nodePath.join( targetFolder, nodePath.basename(source));
+    validateStack.push(
+      utils.verifyAccess(source, destination, (state.options.task == t.TASK_MOVE), param.clobber)
+    )
+    validateStack.push(
+      utils.noMoveInItSelf(source, destination, (state.options.task == t.TASK_MOVE))
+    )
+  })
+
+  Promise.all(validateStack)
+    .then(values => {
+      console.log('hey')
+      if (state.options.task == t.TASK_MOVE) {
+        state.toWorkOff.push(() => { move() })
+      } else if(options.task == t.TASK_COPY) {
+        state.toWorkOff.push(() => { copy(source, destination) })
+      }
     })
-    .catch(sendError)
+    .catch(handleError);
 
-  function tryRename() {
+  function move() {
     console.log('FS try rename')
     if (options.clobber) {
       console.log('FS rename')
       fs.rename(source, dest, function(err) {
         if (!err) return sendDone();
-        if (err.code !== c.ERROR_RENAME_CROSS_DEVICE) return sendError(err);
+        if (err.code !== c.ERROR_RENAME_CROSS_DEVICE) return handleError(err);
         copy(source, dest);
       });
     } else {
@@ -77,11 +100,11 @@ function mv(id, source, dest, param){
             copy(source, dest);
             return;
           }
-          sendError(err);
+          handleError(err);
           return;
         }
         fs.unlink(source, (err) => {
-          if(err) {sendError(err); return}
+          if(err) {handleError(err); return}
           console.log('FS unlink done')
           sendDone()
         });
@@ -118,7 +141,7 @@ function mv(id, source, dest, param){
     if (options.clobber) {
       console.log('rimraf')
       rimraf(dest, { disableGlob: true }, (err) => {
-        if (err) return sendError(err);
+        if (err) return handleError(err);
         console.log('rimraf done')
         startNcp();
       });
@@ -127,11 +150,11 @@ function mv(id, source, dest, param){
     }
     function startNcp() {
       ncp(source, dest, ncpOptions, (errList) => {
-        if (errList) {return sendError(errList[0]);}
+        if (errList) {return handleError(errList[0]);}
         if(options.task == t.TASK_MOVE) {
           console.log('start rimraf')
           rimraf(source, { disableGlob: true }, (err) => {
-            if(err) {sendError(err); return}
+            if(err) {handleError(err); return}
             console.log('rimraf done')
             sendDone()
           });
@@ -142,14 +165,15 @@ function mv(id, source, dest, param){
     }
   }
 
-  function sendError(err) {
+  function handleError(err) {
     console.log('FS error', err)
+    state.error = true
     process.send({ 
       type: t.FS_WRITE_ERROR,
       payload: {
         id: id,
-        source: source,
-        destination: dest,
+        sources: sources,
+        targetFolder: targetFolder,
         ...param
       },
       error: err
@@ -163,11 +187,13 @@ function mv(id, source, dest, param){
       type: t.FS_WRITE_DONE,
       payload: {
         id: id,
-        source: source,
-        destination: dest,
+        sources: sources,
+        targetFolder: targetFolder,
         ...param
       }
     })
     process.exit()
   }
 }
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };

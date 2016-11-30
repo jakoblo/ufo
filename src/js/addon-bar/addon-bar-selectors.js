@@ -1,0 +1,1 @@
+export const getCurrentView = (state) => state.addonBar.get('currentView')

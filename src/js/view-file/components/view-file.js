@@ -34,9 +34,11 @@ export default class ViewFile extends React.Component {
         </div>
         <FileRenderer path={this.props.path} />
         <div className="view-file__bottom-bar">
-          {this.getFileTime( file.get('stats').mtime, "Modified" )}
-          {this.getFileTime( file.get('stats').birthtime, "Created" )}
-          {this.getFileTime( file.get('stats').atime, "Accessed" )}
+          <div className="view-file__time-container">
+            {this.getFileTime( file.get('stats').mtime, "Modified" )}
+            {this.getFileTime( file.get('stats').birthtime, "Created" )}
+            {this.getFileTime( file.get('stats').atime, "Accessed" )}
+          </div>
         </div>
       </div>
     )

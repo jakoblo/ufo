@@ -12,7 +12,8 @@ export const suffixTypes = {
     '.css',
     '.scss',
     '.py',
-    '.xml'
+    '.xml',
+    '.log'
   ],
   image: [
     '.jpg',

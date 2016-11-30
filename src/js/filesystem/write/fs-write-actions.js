@@ -45,13 +45,11 @@ export function moveToTrash(sources) {
  * @param  {Object} options clobber & task: MOVE || COPY 
  */
 export function move(sources, targetFolder, options) {
-  sources.forEach((src) => {
-    startFsWorker(
-      src,
-      nodePath.join(targetFolder, nodePath.basename(src)), 
-      {clobber: false, ...options, task: t.TASK_MOVE}
-    )
-  })
+  startFsWorker(
+    sources,
+    targetFolder, //nodePath.join(targetFolder, nodePath.basename(src)), 
+    {clobber: false, ...options, task: t.TASK_MOVE}
+  )
 }
 
 
@@ -61,13 +59,11 @@ export function move(sources, targetFolder, options) {
  * @param  {Object} options clobber & task: MOVE || COPY 
  */
 export function copy(sources, targetFolder, options) {
-  sources.forEach((src) => {
     startFsWorker(
-      src, 
-      nodePath.join(targetFolder, nodePath.basename(src)), 
+      sources, 
+      targetFolder, // nodePath.join(targetFolder, nodePath.basename(src)), 
       {clobber: false, ...options, task: t.TASK_COPY}
     )
-  })
 }
 
 
@@ -140,15 +136,22 @@ export function removeAction(id) {
  * @param  {Object} options clobber & task: MOVE || COPY 
  * @param  {number} setId optional
  */
-export function startFsWorker(source, destination, options, setId) {
+export function startFsWorker(sources, targetFolder, options, setId) {
   
   let id = (setId != undefined) ? setId : window.store.getState()[c.NAME].size
+
+  var debug = typeof v8debug === 'object';
+  if (debug) {   
+      //Set an unused port number.    
+      process.execArgv.push('--debug=' + (40894));    
+  }    
+
   var fsWriteWorker = fork(__dirname + '/child-worker/fs-write-worker.js');
 
   fsWriteWorker.send({
     id: id,
-    source: source,
-    dest: destination,
+    sources: sources,
+    targetFolder: targetFolder,
     options
   })
 
@@ -160,7 +163,6 @@ export function startFsWorker(source, destination, options, setId) {
   //   console.log(`fs write worker exit: ${code}`);
   // });
 }
-
 
 /**
  * Create a blank new folder and start a rename action for that

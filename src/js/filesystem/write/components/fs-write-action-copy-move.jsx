@@ -7,6 +7,8 @@ import nodePath from 'path'
 import * as c from '../fs-write-constants'
 import * as t from '../fs-write-actiontypes'
 import * as FsWriteActions from '../fs-write-actions'
+import FsWriteActionItem from './fs-write-action-item'
+import ProgressArrow from './fs-write-action-progress-arrow'
 
 export default class WriteActionMove extends React.Component {
 
@@ -18,13 +20,27 @@ export default class WriteActionMove extends React.Component {
 
     let title = (this.props.action.get('task') == t.TASK_MOVE) ? 'Move' : 'Copy' 
     if(this.props.action.get('clobber')) title = title + ' and overwrite'
+
+    let sourceItems = []
+    this.props.action.get('sources').forEach((source) => {
+      sourceItems.push(<FsWriteActionItem type="source" key={source} path={ source } />)
+    })
     
     return (
-      <div className="action-copy">
-        <div className="action-describe">
-          {title}
-          <b> {nodePath.basename(this.props.action.get('source'))}</b>{' to '} 
-          <b>{nodePath.basename(nodePath.dirname(this.props.action.get('destination')))}</b>
+      <div className="fs-write-action__container">
+
+        <div className="fs-write-action__title">{title}</div>
+        <div className="fs-write-action__content">
+          <ProgressArrow
+            className="fs-write-action__progress-arrow"
+            sourceCount={this.props.action.get('sources').size} 
+            progress={50}
+            status="progressing" 
+          />
+          <div className="fs-write-action__item-container">
+            {sourceItems}
+            <FsWriteActionItem type="targetFolder" path={ this.props.action.get('targetFolder') } />
+          </div>
         </div>
         {this.renderErrorMessage()}
         {this.renderConfirm()}
@@ -53,7 +69,7 @@ export default class WriteActionMove extends React.Component {
           break;
         
         case c.ERROR_DEST_ALREADY_EXISTS:
-          errorMessage = nodePath.basename(this.props.action.get('destination'))+" exists already. I can overwrite that for you, but that is maybe an bad idea?"
+          errorMessage = nodePath.basename(this.props.action.get('targetFolder'))+" exists already. I can overwrite that for you, but that is maybe an bad idea?"
           break;
         
         case c.ERROR_MOVE_IN_IT_SELF:
@@ -65,8 +81,10 @@ export default class WriteActionMove extends React.Component {
           break;
       }
 
-      return  <div className="error-handling">
-                <p className="error-message">{errorMessage}</p>
+      return  <div className="fs-write-action__error-container">
+                <div className="fs-write-action__error-message">
+                  {errorMessage}
+                </div>
                 {(tryAgain) ? this.renderTryAgain() : null}
               </div>
     } else {
@@ -76,12 +94,12 @@ export default class WriteActionMove extends React.Component {
 
   renderTryAgain = () => {
     return (
-      <div className="error-actions">
-        <Button className="try-again" text="Try Again" onClick={
+      <div className="fs-write-action__error-button-container">
+        <Button className="fs-write-action__error-button-try-again" text="Try Again" onClick={
           () => {
             FsWriteActions.startFsWorker(
               this.props.action.get('source'),
-              this.props.action.get('destination'),
+              this.props.action.get('targetFolder'),
               {
                 task: this.props.action.get('task'),
                 clobber: this.props.action.get('clobber')
@@ -96,24 +114,23 @@ export default class WriteActionMove extends React.Component {
 
   renderConfirm = () => {
     if(this.props.action.get('error') && this.props.action.getIn(['error', 'code']) == c.ERROR_DEST_ALREADY_EXISTS) {
-      return  <div className="confirm">
-                <Button text="Overwrite" onClick={
+      return  <div className="fs-write-action__error-button-container">
+                <button className="fs-write-action__error-button-overwrite" onClick={
                   () => {
                     FsWriteActions.startFsWorker(
                       this.props.action.get('source'),
-                      this.props.action.get('destination'),
+                      this.props.action.get('targetFolder'),
                       {
                         task: this.props.action.get('task'), 
                         clobber: true
                       },
                       this.props.action.get('id')
                     )
-                  }
-                }/>
-                <Button text="Cancel" onClick={() => {
+                  }}>Overwrite</button>
+
+                <button className="fs-write-action__error-button-cancel" onClick={() => {
                   this.props.dispatch(FsWriteActions.removeAction(this.props.action.get('id')))
-                }}
-                  />
+                }}>Cancel</button>
               </div>
     } else {
       return null
@@ -122,11 +139,11 @@ export default class WriteActionMove extends React.Component {
 
   renderProgressing = () => {
     if(this.props.action.get('files').size > 0){
-      return <div className="progressing-files">
+      return <div className="fs-write-action__error-button-overwrite">
               {
                 this.props.action.get('files').valueSeq().map((progFile, index) => {
                   return  <div key={index} className="progressing-file">
-                            {nodePath.basename(progFile.get('destination'))}
+                            {nodePath.basename(progFile.get('targetFolder'))}
                             <progress max="100" value={progFile.get('progress').get('percentage')}></progress>
                           </div>
                 })

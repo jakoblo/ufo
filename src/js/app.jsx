@@ -13,6 +13,7 @@ import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
 import FsWrite from './filesystem/write/fs-write-index'
+import AddonBar from './addon-bar/components/addon-bar'
 import * as Utils from './utils/utils-index'
 
 if (process.env.NODE_ENV !== 'production') {
@@ -41,7 +42,7 @@ ReactDOM.render(
         <ToggleBar />
       </Sidebar>
       <ViewPlacer.components.parent />
-      <FsWrite.component />
+      <AddonBar/>
     </EventCatcher>
   </Provider>
   ,
