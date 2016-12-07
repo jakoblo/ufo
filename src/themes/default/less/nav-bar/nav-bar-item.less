@@ -1,7 +1,7 @@
-@import url('../variables.less');
-@import url('../mixins.less');
-@import url('./nav-bar-mixins.less');
-@import url('../mixins-animation.less');
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+@import (reference) url('./nav-bar-mixins.less');
+@import (reference) url('../mixins-animation.less');
 
 .nav-bar-item {
   
@@ -22,13 +22,13 @@
     margin-right: 8px;
   }
   &--theme-folder::before {
-    .icon('nav-bar-item__icon-folder.svg', 0.5);
+    .icon('../../img/nav-bar-item__icon-folder.svg', 0.5);
   }
   &--theme-file::before {
-    .icon('nav-bar-item__icon-file.svg', 0.5);
+    .icon('../../img/nav-bar-item__icon-file.svg', 0.5);
   }
   &--theme-device::before {
-    .icon('nav-bar-item__icon-device.svg', 0.5);
+    .icon('../../img/nav-bar-item__icon-device.svg', 0.5);
   }
 
 
@@ -64,7 +64,7 @@
       opacity: 1;
     }
     &::after {
-      .icon(@icon: 'arrow-small-white.svg', @opacity: 0.5, @height: @height_nav-bar-item);
+      .icon(@icon: '../../img/arrow-small-white.svg', @opacity: 0.5, @height: @height_nav-bar-item);
     }
     &:hover::after {
       display: none;

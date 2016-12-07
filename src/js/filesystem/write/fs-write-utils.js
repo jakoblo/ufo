@@ -25,9 +25,11 @@ export function verifyAccess (source, destination, move, clobber = false) {
             .then( () => {
               fs.access(destination, fs.constants.W_OK) // does the Target already exists?
                 .then( () => {
+                  debugger
                   if(clobber) {
                     resolve() // im allowed to overwrite the existing destionation
                   } else {
+                    console.log('reject')
                     reject({  // not allowed to overwrite
                       code: c.ERROR_DEST_ALREADY_EXISTS
                     })

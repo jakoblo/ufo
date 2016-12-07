@@ -2,7 +2,7 @@
 import * as t from './filter-actiontypes'
 import * as c from './filter-constants'
 import Selection from '../selection/sel-index'
-import App from '../../App/app-index'
+import App from '../../app/app-index'
 import nodePath from 'path'
 import {Map, fromJS} from 'immutable'
 
@@ -11,7 +11,7 @@ const INITIAL_STATE = {
     notHidden: c.NOT_HIDDEN_REGEX
   },
   focused: {}, // Filter Collection for the folder in 'focusedPath'
-  focusedPath: ''
+  focusedPath: '' 
 }
 
 export default function reducer(state = fromJS(INITIAL_STATE), action = { type: '' }) {

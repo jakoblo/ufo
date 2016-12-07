@@ -21,6 +21,7 @@ export default class AddonBar extends React.Component {
   }
 
   render() {
+
     return(
       <div className="addon-bar">
         <div className="addon-bar__icon-toolbar">
@@ -44,6 +45,8 @@ export default class AddonBar extends React.Component {
   }
 
   getCurrentView = () => {
+
+    
     switch (this.props.currentView) {
       case 'fs-write':
         return <FsWrite.component/>

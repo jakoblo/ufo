@@ -1,6 +1,6 @@
-@import url('../variables.less');
-@import url('../mixins.less');
-@import url('../mixins-animation.less');
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+@import (reference) url('../mixins-animation.less');
 
 @icon-size: 45px;
 @width-container: 250px;
@@ -19,17 +19,17 @@
     border-left: 1px solid @border-color;
   }
 
-  .icon(@icon) {
+  .addon-bar-icon(@icon) {
     height: @icon-size;
     width: @icon-size;
-    background-size: image-size('../@{image_dir}@{icon}'); 
-    background-image: url('../@{image_dir}@{icon}'); 
+    background-size: image-size('../../img/@{icon}'); 
+    background-image: url('../../img/@{icon}'); 
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
     border-top: 1px solid @color__grey-light-bg;
     border-bottom: 1px solid @color__grey-light-bg;
-
+ 
     &--active {
       background-color: #fff;
       border-color: @border-color;
@@ -39,12 +39,12 @@
   }
 
   &__icon-search {
-    .icon('addon-bar__icon-search.svg');
+    .addon-bar-icon('addon-bar__icon-search.svg');
     border-top: 0;
-  }
+  } 
  
   &__icon-fs-write {
-    .icon('addon-bar__icon-fs-write.svg');
+    .addon-bar-icon('addon-bar__icon-fs-write.svg');
   }
 
   &__css-transition-group {

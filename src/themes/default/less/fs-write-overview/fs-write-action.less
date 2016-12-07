@@ -1,6 +1,6 @@
-@import url('../variables.less');
-@import url('../mixins.less');
-@import url('../addon-bar/addon-bar.less');
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+@import (reference) url('../addon-bar/addon-bar.less');
 
 
 .fs-write-action {
@@ -12,7 +12,7 @@
   &__button-close {
     .button-reset;
     .icon(
-      @icon: 'fs-write-action__button-close.svg', 
+      @icon: '../../img/fs-write-action__button-close.svg', 
       @opacity: 0.5, 
       @height: 17px, 
       @width: 17px
@@ -96,12 +96,12 @@
     }
 
     &--theme-file::before {
-      .icon(@icon: 'addon-bar__icon-file.svg');
+      .icon(@icon: '../../img/addon-bar__icon-file.svg');
       margin-right: 5px;
     }
 
     &--theme-folder::before {
-      .icon(@icon: 'addon-bar__icon-folder.svg');
+      .icon(@icon: '../../img/addon-bar__icon-folder.svg');
       margin-right: 5px;
     }
   }

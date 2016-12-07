@@ -20,7 +20,7 @@ export default class WriteAction extends React.Component {
   render() {
     
     let ActionType
-    switch (this.props.action.get('task')) {
+    switch (this.props.action.get('type')) {
       case t.TASK_MOVE:
         ActionType = WriteActionCopyMove
         break
@@ -53,7 +53,7 @@ export default class WriteAction extends React.Component {
   renderClose = () => {
     if(this.props.action.get('finished') || this.props.action.get('error')) {
       return <button className="fs-write-action__button-close" onClick={
-                () => { this.props.dispatch( FsWriteActions.removeAction(this.props.action.get('id')) ) }
+                () => { this.props.dispatch( FsWriteActions.removeAction( this.props.action.get('id') ) ) }
               }/> 
     } else {
       return null

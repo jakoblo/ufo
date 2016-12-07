@@ -37,15 +37,15 @@ export const getProgressingForFolderFactory = (state, props) => {
   return createSelector(
     [getFSWrite, getPath], (fsWrite, path) => {
     let progressingFiles = []
-    fsWrite.forEach((entry) => {
-      if(entry) {
-        entry.get('files').forEach((file) => {
-          if(nodePath.dirname(file.get('destination')) == path ) {
-            progressingFiles.push(file)
-          }
-        })
-      }
-    })
-    return (progressingFiles.length > 0) ? progressingFiles : null
+    // fsWrite.forEach((entry) => {
+    //   if(entry) {
+    //     entry.get('files').forEach((file) => {
+    //       if(nodePath.dirname(file.get('destination')) == path ) {
+    //         progressingFiles.push(file)
+    //       }
+    //     })
+    //   }
+    // })
+    return null // (progressingFiles.length > 0) ? progressingFiles : null
   })
 }

@@ -1,6 +1,6 @@
-@import url('../variables.less');
-@import url('../mixins.less');
-@import url('./folder-list-item.less');
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+@import (css) url('./folder-list-item.less');
 
 
 .folder-display-list {
@@ -53,7 +53,7 @@
 
   &__button-add-folder {
     .button-reset;
-    .icon(@icon: 'view-folder__icon-add-folder.svg', @height: 25px, @width: 25px);
+    .icon(@icon: '../../img/view-folder__icon-add-folder.svg', @height: 25px, @width: 25px);
     opacity: 0;
     display: block;
     position: absolute;
