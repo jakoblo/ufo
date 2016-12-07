@@ -2,30 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "Debug Main Process",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/src/js-dist/main.js",
-            "stopOnEntry": false,
-            "args": [],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-            "runtimeArgs": [
-                ".",
-                "--enable-logging"
-            ],
-            "env": {},
-            "console": "internalConsole",
-            "sourceMaps": false,
-            "outDir": null
+            // Use the following for Windows
+            // "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
+            "program": "${workspaceRoot}/src/js/init.js",
+            "sourceMaps": true
         },
         {
-            "name": "Debug FS Write Child Worker",
-            "type": "node",
-            "request": "attach",
-            "port": 5870,
-            "sourceMaps": false,
-            "outDir": null
+            "name": "Debug Renderer Process",
+            "type": "chrome",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+            // Use the following for Windows
+            // "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
+            "runtimeArgs": [
+                "${workspaceRoot}/src/js/init.js",
+                "--remote-debugging-port=9222"
+            ],
+            "webRoot": "${workspaceRoot}"
         }
     ]
 }

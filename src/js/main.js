@@ -19,8 +19,8 @@ function createNewBrowserWindow() {
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
   
   // Develop Help
-  browserWindow.toggleDevTools()
-  browserWindow.maximize()
+  // browserWindow.toggleDevTools()
+  // browserWindow.maximize()
 
   // Emitted when the window is closed.
   browserWindow.on('closed', () => {
@@ -267,7 +267,6 @@ if (process.platform == 'darwin') {
     }
   );
 }
-
 
   var menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);

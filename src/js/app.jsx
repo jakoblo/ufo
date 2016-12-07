@@ -16,11 +16,6 @@ import FsWrite from './filesystem/write/fs-write-index'
 import AddonBar from './addon-bar/components/addon-bar'
 import * as Utils from './utils/utils-index'
 
-if (process.env.NODE_ENV !== 'production') {
-  // execute window.devToolsSetup() on the developer console to install them
-  window.devToolsSetup = DevToolsSetup
-  require('electron-connect').client.create()
-}
 const windowID = remote.getCurrentWindow().id
 const store = storeSetup();
 

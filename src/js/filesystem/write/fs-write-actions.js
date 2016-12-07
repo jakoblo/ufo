@@ -5,6 +5,7 @@ import fs from 'mz/fs'
 import fsWatch from '../watch/fs-watch-index'
 import fsRename from '../rename/rename-index'
 import {fork} from 'child_process'
+import fsWriteWorker from './child-worker/fs-write-worker'
 import * as c from './fs-write-constants'
 import * as t from './fs-write-actiontypes'
 
@@ -41,29 +42,29 @@ export function moveToTrash(sources) {
 
 /**
  * @param  {string[]} sources
- * @param  {string} targetFolder
- * @param  {Object} options clobber & task: MOVE || COPY 
+ * @param  {string} targetFolder 
  */
-export function move(sources, targetFolder, options) {
-  startFsWorker(
-    sources,
-    targetFolder, //nodePath.join(targetFolder, nodePath.basename(src)), 
-    {clobber: false, ...options, task: t.TASK_MOVE}
-  )
+export function move(sources, targetFolder) {
+  startFsWorker({
+    sources: sources, 
+    targetFolder: targetFolder, 
+    type: t.TASK_MOVE, 
+    clobber: false
+  })
 }
 
 
 /**
  * @param  {string[]} sources
- * @param  {string} targetFolder
- * @param  {Object} options clobber & task: MOVE || COPY 
+ * @param  {string} targetFolder 
  */
-export function copy(sources, targetFolder, options) {
-    startFsWorker(
-      sources, 
-      targetFolder, // nodePath.join(targetFolder, nodePath.basename(src)), 
-      {clobber: false, ...options, task: t.TASK_COPY}
-    )
+export function copy(sources, targetFolder) {
+  startFsWorker({
+    sources: sources, 
+    targetFolder: targetFolder, 
+    type: t.TASK_COPY, 
+    clobber: false
+  })
 }
 
 
@@ -136,28 +137,24 @@ export function removeAction(id) {
  * @param  {Object} options clobber & task: MOVE || COPY 
  * @param  {number} setId optional
  */
-export function startFsWorker(sources, targetFolder, options, setId) {
+export function startFsWorker(task) {
   
-  let id = (setId != undefined) ? setId : window.store.getState()[c.NAME].size
+  task.id = task.id || window.store.getState()[c.NAME].size
 
-  var debug = typeof v8debug === 'object';
-  if (debug) {   
-      //Set an unused port number.    
-      process.execArgv.push('--debug=' + (40894));    
-  }    
+  // var fsWriteWorker = fork(__dirname + '/child-worker/fs-write-worker.js');
 
-  var fsWriteWorker = fork(__dirname + '/child-worker/fs-write-worker.js');
+  // fsWriteWorker.send({
+  //   id: id,
+  //   sources: sources,
+  //   targetFolder: targetFolder,
+  //   options
+  // })
+  
+  fsWriteWorker(task)
 
-  fsWriteWorker.send({
-    id: id,
-    sources: sources,
-    targetFolder: targetFolder,
-    options
-  })
-
-  fsWriteWorker.on('message', function(response) {
-    window.store.dispatch(response)
-  })
+  // fsWriteWorker.on('message', function(response) {
+  //   window.store.dispatch(response)
+  // })
 
   // fsWriteWorker.on('close', (code) => {
   //   console.log(`fs write worker exit: ${code}`);

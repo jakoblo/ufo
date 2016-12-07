@@ -18,12 +18,12 @@ export default class WriteActionMove extends React.Component {
 
   render() {
 
-    let title = (this.props.action.get('task') == t.TASK_MOVE) ? 'Move' : 'Copy' 
+    let title = (this.props.action.get('type') == t.TASK_MOVE) ? 'Move' : 'Copy' 
     if(this.props.action.get('clobber')) title = title + ' and overwrite'
 
     let sourceItems = []
-    this.props.action.get('sources').forEach((source) => {
-      sourceItems.push(<FsWriteActionItem type="source" key={source} path={ source } />)
+    this.props.action.get('subTasks').forEach((subTask) => {
+      sourceItems.push(<FsWriteActionItem type="source" key={subTask.get('source')} path={ subTask.get('source') } />)
     })
     
     return (
@@ -33,7 +33,7 @@ export default class WriteActionMove extends React.Component {
         <div className="fs-write-action__content">
           <ProgressArrow
             className="fs-write-action__progress-arrow"
-            sourceCount={this.props.action.get('sources').size} 
+            sourceCount={this.props.action.get('subTasks').size} 
             progress={50}
             status="progressing" 
           />
@@ -44,17 +44,21 @@ export default class WriteActionMove extends React.Component {
         </div>
         {this.renderErrorMessage()}
         {this.renderConfirm()}
-        {this.renderProgressing()}
       </div>
     )
   }
 
   renderErrorMessage = () => {
-    if(this.props.action.getIn(['error', 'code'])) {
-      console.log( this.props.action.getIn( ['error']).toJS() )
 
+    let errorList = this.props.action.getIn(['errors'])
+
+    console.log( errorList.toJS() )
+
+    let errorMessages = errorList.toSeq().map((error, index) => {
       let errorMessage, tryAgain = false
-      switch (this.props.action.getIn( ['error', 'code'])) {
+      console.log(error.get('code'))
+      console.log(c.ERROR_DEST_ALREADY_EXISTS)
+      switch (error.get('code')) {
         case c.ERROR_NOT_EXISTS:
           errorMessage = "Source or target folder are not existing. How did you create that error?"
           break;
@@ -81,15 +85,15 @@ export default class WriteActionMove extends React.Component {
           break;
       }
 
-      return  <div className="fs-write-action__error-container">
+      return  <div className="fs-write-action__error-container" key={index}>
                 <div className="fs-write-action__error-message">
                   {errorMessage}
                 </div>
                 {(tryAgain) ? this.renderTryAgain() : null}
               </div>
-    } else {
-      return null
-    }
+    })
+
+    return errorMessages
   }
 
   renderTryAgain = () => {
@@ -136,23 +140,6 @@ export default class WriteActionMove extends React.Component {
       return null
     }
   }
-
-  renderProgressing = () => {
-    if(this.props.action.get('files').size > 0){
-      return <div className="fs-write-action__error-button-overwrite">
-              {
-                this.props.action.get('files').valueSeq().map((progFile, index) => {
-                  return  <div key={index} className="progressing-file">
-                            {nodePath.basename(progFile.get('targetFolder'))}
-                            <progress max="100" value={progFile.get('progress').get('percentage')}></progress>
-                          </div>
-                })
-              }
-            </div>
-    } else {
-      return null
-    }
-  } 
 
   shouldComponentUpdate (nextProps, nextState) {
     return nextProps.action !== this.props.action // || nextState.data !== this.state.data;

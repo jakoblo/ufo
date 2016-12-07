@@ -1,6 +1,4 @@
-@import url('./variables.less');
-
-@image_dir: '../img/';
+@import (reference) url('./variables.less');
 
 .button-reset {
   border: 0;
@@ -80,14 +78,14 @@
 }
 
 
-.icon(@icon; @opacity: 1; @height: image-height('@{image_dir}@{icon}'); @width: image-width('@{image_dir}@{icon}')) { 
+.icon(@icon; @opacity: 1; @height: image-height(@icon); @width: image-width(@icon)) { 
   content: '';
   display: block;
   width: @width;
   height: @height; 
   opacity: @opacity;
-  background-image: url('@{image_dir}@{icon}');
-  background-size: image-size('@{image_dir}@{icon}');
+  background-image: url(@icon);
+  background-size: image-size(@icon);
   background-position: center;
   background-repeat: no-repeat;
   flex-shrink: 0;
