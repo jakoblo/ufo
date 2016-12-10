@@ -19,7 +19,7 @@ export default class DisplayList extends React.Component {
 
   render() {
     let actionList = ""
-    if(this.props.fsWrite) {
+    if(this.props.fsWrite && this.props.fsWrite.size > 0) {
       actionList = this.props.fsWrite.valueSeq().map((writeAction, index) => {
         return ( <WriteAction
           key={index}
@@ -27,6 +27,8 @@ export default class DisplayList extends React.Component {
           dispatch={this.props.dispatch}
         /> )
       })
+    } else {
+      actionList = <div className="noFileActions">No file movements</div>
     }
 
     return(

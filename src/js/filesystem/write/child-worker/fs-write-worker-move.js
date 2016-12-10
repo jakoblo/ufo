@@ -1,53 +1,67 @@
 var fs = require('mz/fs')
 var c = require('../fs-write-constants')
+import copy from './fs-write-worker-copy'
+import rimraf from 'rimraf'
 
-export default function move(subTask, errCallback, doneCallback) {
-  if (subTask.clobber) {
-    clobberMove(...arguments)
-  } else {
-    saveMove(...arguments)
-  } 
-}
+export default function move(subTask, handleProgress) {
 
-function saveMove(subTask, errCallback, doneCallback) {
-  fs.link(subTask.source, subTask.destination, function(err) {
-    if (err) {
-      switch (err.code) {
-        case c.ERROR_RENAME_CROSS_DEVICE:
-          copy(subTask) // cross-device link not permitted -> do a real copy
-          return
+  return new Promise( function(resolve, reject) {
 
-        case c.ERROR_IS_DIR || err.code === c.ERROR_OPERATION_NOT_PERMITTED:
-          copy(subTask);
-          return
+    if (subTask.clobber) {
+      fs.rename(subTask.source, subTask.destination, function(err) {
+        if(err) {
+          switch (err.code) {
+            case c.ERROR_RENAME_CROSS_DEVICE:
+              moveWithCopy(subTask)
+              return
+            default:
+              reject(err)
+              return
+          }
+        }
+        resolve()
+      });
+    } else {
+      fs.link(subTask.source, subTask.destination, function(err) {
+        if (err) {
+          switch (err.code) {
+            case c.ERROR_RENAME_CROSS_DEVICE: 
+              moveWithCopy(subTask)
+              return
+            case c.ERROR_IS_DIR: 
+              moveWithCopy(subTask)
+              return
+            case c.ERROR_OPERATION_NOT_PERMITTED: 
+              moveWithCopy(subTask)
+              return
 
-        default:
-          errCallback(err, subTask);
-          return;
-      }
+            default:
+              reject(err);
+              return;
+          }
+        }
+        fs.unlink(subTask.source, (err) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve()
+          }
+        });
+      });
     }
-    fs.unlink(subTask.source, (err) => {
-      if(err) {
-        errCallback(err, task)
-        return
-      }
-      doneCallback()
-    });
-  });
-}
 
-function clobberMove(subTask, errCallback, doneCallback) {
-  fs.rename(subTask.source, subTask.destination, function(err) {
-    if(err) {
-      switch (err.code) {
-        case c.ERROR_RENAME_CROSS_DEVICE:
-          errCallback(err, task)
-          return
-        default:
-          copy(subTask)
-          return
-      }
+    var moveWithCopy = (subTask) => {
+      copy(subTask, handleProgress)
+        .then(() => {
+          rimraf(subTask.source, { disableGlob: true }, (err) => {
+            if(err) {
+              reject(err);
+              return
+            }
+            resolve()
+          });
+        })
+        .catch(reject)
     }
-    doneCallback()
-  });
+  })
 }

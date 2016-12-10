@@ -1,53 +1,49 @@
 import {ncp} from 'graceful-ncp'
+import progress from 'progress-stream'
+import getSize from 'get-folder-size'
+import fs from 'mz/fs'
+import * as c from '../fs-write-constants'
+import * as t from '../fs-write-actiontypes'
 
-
-  function copy(subTask, errCallback, doneCallback) {
-    if (subTask.clobber) {
-      rimraf(subTask.destination, { disableGlob: true }, (err) => {
-        if (err) return errCallback(err, task);
-        startNcp();
-      });
-    } else {
-      startNcp(subTask);
-    }
-
-    function startNcp(subTask) {
-      var ncpOptions = {
-        stopOnErr: true,
-        clobber: false,
-        limit: 8,
-        transform: (read, write) => {
-          var str = progress({
-            length: fs.statSync(read.path).size,
-            time: 700
-          });
-          str.on('progress', (progress) => {
-            window.store.dispatch({
-              type: t.FS_WRITE_PROGRESS,
-              payload: {
-                id: id,
-                file: {
-                  source: read.path,
-                  destination: write.path,
-                  progress: progress}
-              }
-            })
-          })
-          read.pipe(str).pipe(write)
-          console.log(read)
-        } 
-      };
-
-      ncp(subTask.source, subTask.destination, ncpOptions, (errList) => {
-        if (errList) {return errCallback(errList[0], task);}
-        if(subTask.type == t.TASK_MOVE) {
-          rimraf(type.source, { disableGlob: true }, (err) => {
-            if(err) {errCallback(err, task); return}
-            doneCallback()
-          });
-        } else {
-          doneCallback()
-        }
-      });
-    }
+export default function copy(subTask, handleProgress) {
+  var fullSize = 1
+  var progressPerFileStack = []
+  var calcProgress = () => {
+    var fullProgress = 0
+    progressPerFileStack.forEach((bytes) => {
+      fullProgress = fullProgress + bytes;
+    })
+    handleProgress({
+      destination: subTask.destination,
+      percentage: Math.round(fullProgress / fullSize * 100)
+    })
   }
+
+  var ncpOptions = {
+    stopOnErr: true,
+    clobber: subTask.clobber,
+    limit: 16,
+    transform: (read, write) => {
+      var id = progressPerFileStack.length
+      progressPerFileStack[id] = 0
+      var str = progress({
+        time: 100
+      }).on('progress', (progress) => {
+        progressPerFileStack[id] = progress.transferred
+        calcProgress()
+      })
+      read.pipe(str).pipe(write)
+    }
+  };
+
+  return new Promise( (resolve, reject) => {
+    getSize(subTask.source, (err, size) => {
+      if (err) { reject(err) ; return }
+      fullSize = size
+      ncp(subTask.source, subTask.destination, ncpOptions, (errList) => {
+        if (errList) { reject(errList[0]); return}
+        resolve()
+      });
+    });
+  })
+}

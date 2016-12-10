@@ -2,11 +2,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
-import Button from '../../../general-components/button'
-import nodePath from 'path'
 import * as c from '../fs-write-constants'
 import * as t from '../fs-write-actiontypes'
 import * as FsWriteActions from '../fs-write-actions'
+import FsWriteActionItem from './fs-write-action-item'
+import ProgressArrow from './fs-write-action-progress-arrow'
+import ErrorMessages from './fs-write-action-error-messages'
 
 export default class WriteActionTrash extends React.Component {
 
@@ -15,39 +16,32 @@ export default class WriteActionTrash extends React.Component {
   }
 
   render() {
+
+    let sourceItems = []
+    this.props.action.get('sources').forEach((source) => {
+      sourceItems.push(<FsWriteActionItem type="source" key={source} path={source} />)
+    })
+
     return (
-      <div className="trash">
-        <div className="action-describe">
-          Move 
-          <b> {nodePath.basename(this.props.action.get('source'))}</b>{' to '} 
-          <b>trash</b>
+       <div className="fs-write-action__container">
+
+        <div className="fs-write-action__title">To trash</div>
+        <div className="fs-write-action__content">
+          <ProgressArrow
+            className="fs-write-action__progress-arrow"
+            sourceCount={this.props.action.get('sources').size} 
+            progress="100"
+            finished={this.props.action.get('finished')}
+            error={(this.props.action.get('errors').size > 0)}
+          />
+          <div className="fs-write-action__item-container">
+            {sourceItems}
+            <FsWriteActionItem type="targetFolder" path={ this.props.action.get('targetFolder') } />
+          </div>
         </div>
-        {this.renderErrorMessage()}
+        <ErrorMessages action={this.props.action} />      
       </div>
     )
-  }
-
-  renderErrorMessage = () => {
-    if(this.props.action.getIn(['error', 'code'])) {
-
-      let errorMessage
-      switch (this.props.action.getIn(['error', 'code'])) {
-        case 1:
-          errorMessage = "I don't have the permission to do that"
-          break;
-        default:
-          errorMessage = "Error: code "+this.props.action.getIn(['error', 'code'])+'\n'+JSON.stringify(this.props.action.get('error'))
-          break;
-      }
-
-      return  <div className="error-handling">
-                <p className="error-message">
-                  {errorMessage}
-                </p>
-              </div>
-    } else {
-      return null
-    }
   }
 
   shouldComponentUpdate (nextProps, nextState) {

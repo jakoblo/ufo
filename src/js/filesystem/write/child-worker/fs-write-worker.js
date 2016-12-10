@@ -1,14 +1,7 @@
 'use strict';
 
-/**
- * Modified from mv
- * https://www.npmjs.com/package/mv
- */
-
 var nodePath = require('path');
-var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
-var progress = require('progress-stream');
 var fs = require('mz/fs')
 var c = require('../fs-write-constants')
 var t = require('../fs-write-actiontypes')
@@ -21,136 +14,158 @@ process.on('message', (m) => {
   mv(m.id, m.sources, m.targetFolder, m.options)
 });
 
-export default function mv(task, dispatch){
+export default class FSWorker {
 
-  let subTasks = task.sources
-    .filter(source => (nodePath.dirname(source) != task.targetFolder))
-    .map( source => {
-      return {
-        source: source, 
-        destination: nodePath.join( task.targetFolder, nodePath.basename(source)), 
-        type: task.type, 
-        clobber: task.clobber,
-        done: false
-      }
-    })
-    
-  if(subTasks.length > 0) {
+  constructor(task) {
+    window.test = this
+    this.task = task
+    this.task.subTasks = this.buildSubTasks(this.task.sources)
+    if(Object.keys(this.task.subTasks).length > 0) {
+      this.start()
+      this.progressReporter = new ProgressReporter(this.task)
+    }
+  }
+
+  start = () => {
     window.store.dispatch({
       type: t.FS_WRITE_NEW,
-      payload: {
-        id: task.id,
-        clobber: task.clobber,
-        type: task.type,
-        targetFolder: task.targetFolder,
-        subTasks: subTasks
-      }
+      payload: this.task
     })
+
+    Promise.all( Object.keys(this.task.subTasks).map( 
+      key => this.validateSubTask(this.task.subTasks[key])
+    ))
+    .then(() => {
+      // validation is successfull
+      console.log('Everything fine, start')
+      Promise.all( Object.keys(this.task.subTasks).map(key => {
+        switch (this.task.subTasks[key].type) {
+          case t.TASK_MOVE:
+            return move(this.task.subTasks[key], this.storeProgress).then(() => {
+              delete this.task.subTasks[key]
+              this.progressReporter.request()
+            })
+
+          case t.TASK_COPY:
+            return copy(this.task.subTasks[key], this.storeProgress).then(() => {
+              delete this.task.subTasks[key]
+              this.progressReporter.request()
+            })
+            
+          default:
+            throw "Dont know what to do with subTask type: "+this.task.subTasks[key].type
+            break;
+        }
+      }))
+      .then(() => {
+        window.store.dispatch({
+          type: t.FS_WRITE_DONE,
+          payload: {
+            id: this.task.id
+          }
+        })
+        // process.exit()
+      }).catch(this.reportError)
+    }).catch(this.reportError)
   }
 
-  let reportError = (err) => {
+  storeProgress = (subTaskProgress) => {
+    if(this.task.subTasks[subTaskProgress.destination]) {
+      this.task.subTasks[subTaskProgress.destination].percentage = subTaskProgress.percentage
+      this.progressReporter.request(this.task)
+    }
+  }
+
+  buildSubTasks = (sources) => {
+    let subTasks = {}
+    sources
+      .filter(source => (nodePath.dirname(source) != this.task.targetFolder))
+      .forEach( source => {
+        let destination = nodePath.join( this.task.targetFolder, nodePath.basename(source)) 
+        subTasks[destination] = {
+          id: this.task.id,
+          source: source, 
+          destination: destination, 
+          type: this.task.type,
+          percentage: 1,
+          clobber: this.task.clobber
+        }
+      })
+    return subTasks
+  }
+
+  reportError = (err) => {
     window.store.dispatch({
       type: t.FS_WRITE_ERROR,
-      payload: {
-        id: task.id 
-      },
+      payload: { id: this.task.id },
       error: err
-    });
-    // process.exit()
-  }
-
-  let reportDone = () => {
-    console.log('FS done')
-    window.store.dispatch({
-      type: t.FS_WRITE_DONE,
-      payload: task
     })
     // process.exit()
   }
 
-  Promise.all( subTasks.map( 
-    subTask => validateSubTask(subTask)
-  ))
-  .then((subTasks) => {
-    // validation is successfull
-    subTasks.forEach((subTask, index) => {
-      switch (subTask.type) {
-        case t.TASK_MOVE:
-          move(subTask, reportError, reportDone)
-          return
+  validateSubTask = (subTask) => {
+    return new Promise( (resolve, reject) => {
 
-        case t.TASK_COPY:
-          copy(subTask, reportError, reportDone)
-          return
+      const sourcePermissions = (subTask.type == t.TASK_MOVE) ? fs.constants.W_OK : fs.constants.R_OK || fs.constants.W_OK
+      Promise.all([
+        fs.access(subTask.source, sourcePermissions), // Can read Source
+        fs.access(nodePath.dirname(subTask.destination), fs.constants.W_OK), // Can Write Target Parent?
+        (subTask.clobber) ? true : this.validateNotAlreadyExists(subTask),
+        (subTask.type == t.TASK_MOVE) ? this.noMoveInItSelf(subTask) : null
+      ])
+      .then(() =>{
+        resolve(subTask)
+      })
+      .catch(reject)
+    })
+  }
 
-        default:
-          throw "Dont know what to do with subTask type: "+subTask.type
-          break;
+  validateNotAlreadyExists = (subTask) => {
+    return new Promise( (resolve, reject) => {
+      fs.access(subTask.destination, fs.constants.W_OK)
+        .then(() => {
+          reject({
+            code: c.ERROR_DEST_ALREADY_EXISTS,
+            path: subTask.destination
+          })
+        }
+        )
+        .catch(resolve)
+    })
+  }
+
+  noMoveInItSelf = (subTask) => {
+    return new Promise( (resolve, reject) => {
+      if(subTask.destination.indexOf(subTask.source) > -1) {
+        reject({code: c.ERROR_MOVE_IN_IT_SELF})
+      } else {
+        resolve(subTask)
       }
     })
-  }).catch((errList) => {
-
-    console.log(errList)
-
-    // errList.forEach(reportError)
-  });
+  }
 }
 
-function validateSubTask(subTask) {  
-  return new Promise( function(resolve, reject) {
-    Promise.all([
-      validateSubTaskAccess(subTask),
-      (subTask.type == t.TASK_MOVE) ? noMoveInItSelf(subTask) : null
-    ])
-    .then(resolve(subTask))
-    .catch(reject)
-  })
-}
+class ProgressReporter {
 
-function validateSubTaskAccess (subTask) {
+  constructor(task) {
+    this.task = task
+    this.lastProgressReport = Date.now()+200
+    this.selfCallTimeout = null
+  }
 
-  const sourcePermissions = (subTask.type == t.TASK_MOVE) ? fs.constants.W_OK : fs.constants.R_OK || fs.constants.W_OK
-  const destPermissions = fs.constants.W_OK
-  
-  return new Promise( function(resolve, reject) {
-    fs.access(subTask.source, sourcePermissions) // Can Read Source? 
-      .then( () => {
-          fs.access(nodePath.dirname(subTask.destination), fs.constants.W_OK)  // Can Write Target Parent?
-            .then( () => {
-              fs.access(subTask.destination, fs.constants.W_OK) // does the Target already exists?
-                .then( () => {
-                  if(clobber) {
-                    resolve(subTask) // im allowed to overwrite the existing destionation
-                  } else {
-                    reject({  // not allowed to overwrite
-                      code: c.ERROR_DEST_ALREADY_EXISTS,
-                      source: source,
-                      destination: destination
-                    })
-                  }
-                })
-                .catch((err) => {
-                  if(err.code == c.ERROR_NOT_EXISTS) 
-                  { resolve(subTask) } // Destination does not exists -> free space -> go
-                  else 
-                  { reject(err) } // No write access or something like that
-                })
-            })
-            .catch(reject)  // can not read/write destination dir
-        })
-      .catch(reject) // can not read the source
-  })
-}
-
-function noMoveInItSelf (subTask) {
-  return new Promise( function(resolve, reject) {
-    if(subTask.destination.indexOf(subTask.source) > -1) {
-      reject({code: c.ERROR_MOVE_IN_IT_SELF})
-    } else {
-      resolve(subTask)
+  request = () => {
+    if(this.lastProgressReport+1000 > Date.now()) {
+      clearTimeout(this.selfCallTimeout)
+      this.selfCallTimeout = setTimeout(this.request, 200)
+      return
     }
-  })
-}  
-
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+    this.lastProgressReport = Date.now()
+    window.store.dispatch({
+      type: t.FS_WRITE_PROGRESS,
+      payload: {
+        id: this.task.id,
+        subTasks: this.task.subTasks
+      }
+    })
+  }
+}

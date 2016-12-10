@@ -13,17 +13,20 @@ import * as t from './fs-write-actiontypes'
  * @param  {string[]} sources
  */
 export function moveToTrash(sources) {
+
+  let id = window.store.getState()[c.NAME].size 
+  let payload = {
+    id: id,
+    type: t.TASK_TRASH,
+    sources: sources,
+    targetFolder: 'Trash',
+  }
+  window.store.dispatch({
+    type: t.FS_WRITE_NEW,
+    payload: payload
+  })
+
   sources.forEach((source) => {
-    let id = window.store.getState()[c.NAME].size 
-    let payload = {
-      id: id,
-      task: t.TASK_TRASH,
-      source: source
-    }
-    window.store.dispatch({
-      type: t.FS_WRITE_NEW,
-      payload: payload
-    })
     trash([source]).then(() => {
       window.store.dispatch({
         type: t.FS_WRITE_DONE,
@@ -33,7 +36,9 @@ export function moveToTrash(sources) {
     .catch((err) => {
       window.store.dispatch({
         type: t.FS_WRITE_ERROR,
-        payload: payload,
+        payload: {
+          id: id
+        },
         error: err
       })
     })
@@ -66,6 +71,8 @@ export function copy(sources, targetFolder) {
     clobber: false
   })
 }
+
+window.copy = copy
 
 
 /**
@@ -137,9 +144,10 @@ export function removeAction(id) {
  * @param  {Object} options clobber & task: MOVE || COPY 
  * @param  {number} setId optional
  */
+
 export function startFsWorker(task) {
   
-  task.id = task.id || window.store.getState()[c.NAME].size
+  task.id = Number.isInteger(task.id) ? task.id : window.store.getState()[c.NAME].size
 
   // var fsWriteWorker = fork(__dirname + '/child-worker/fs-write-worker.js');
 
@@ -150,7 +158,7 @@ export function startFsWorker(task) {
   //   options
   // })
   
-  fsWriteWorker(task)
+  new fsWriteWorker(task)
 
   // fsWriteWorker.on('message', function(response) {
   //   window.store.dispatch(response)

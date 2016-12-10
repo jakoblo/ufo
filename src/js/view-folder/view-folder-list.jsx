@@ -34,7 +34,6 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
-
     let items = ""
     if(this.props.folder) {
       items = this.props.folder.valueSeq().map((file, index) => {

@@ -51,7 +51,7 @@ export default class WriteAction extends React.Component {
   }
 
   renderClose = () => {
-    if(this.props.action.get('finished') || this.props.action.get('error')) {
+    if(this.props.action.get('finished') || this.props.action.get('errors').size > 0) {
       return <button className="fs-write-action__button-close" onClick={
                 () => { this.props.dispatch( FsWriteActions.removeAction( this.props.action.get('id') ) ) }
               }/> 

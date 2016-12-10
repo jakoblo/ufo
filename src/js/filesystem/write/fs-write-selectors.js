@@ -23,29 +23,28 @@ export const getForFolderFactory = (state, props) => {
   )
 }
 
-
 /**
  * get the progress objects for a folder to display progressbars 
  * @param  {Object} state of the redux store
  * @param  {Object} props {path: string}
  * @returns Immuteable Map of progress Objects
  */
-export const getProgressingForFolderFactory = (state, props) => {
+export const getSubTasksForFolderFactory = (state, props) => {
 
   let getForFolder = getForFolderFactory()
 
   return createSelector(
     [getFSWrite, getPath], (fsWrite, path) => {
     let progressingFiles = []
-    // fsWrite.forEach((entry) => {
-    //   if(entry) {
-    //     entry.get('files').forEach((file) => {
-    //       if(nodePath.dirname(file.get('destination')) == path ) {
-    //         progressingFiles.push(file)
-    //       }
-    //     })
-    //   }
-    // })
-    return null // (progressingFiles.length > 0) ? progressingFiles : null
+    fsWrite.forEach((task) => {
+      if(task.get('subTasks')) {
+        task.get('subTasks').forEach((subTask) => {
+          if(nodePath.dirname(subTask.get('destination')) == path ) {
+            progressingFiles.push(subTask)
+          }
+        })
+      }
+    })
+    return (progressingFiles.length > 0) ? progressingFiles : null
   })
 }

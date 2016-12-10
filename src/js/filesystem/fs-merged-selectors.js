@@ -14,7 +14,7 @@ import Filter from './filter/filter-index'
 export const getFilesMergedOf_Factory = () => {
 
   let getFilteredFiles = getFilteredFiles_Factory()
-  let getProgressingForFolder = Write.selectors.getProgressingForFolderFactory()
+  let getSubTasksForFolder = Write.selectors.getSubTasksForFolderFactory()
 
   /**
    * Saved Selector
@@ -25,7 +25,7 @@ export const getFilesMergedOf_Factory = () => {
       getFilteredFiles,
       Watch.selectors.getOpenFileOf,
       Selection.selectors.getSelectionOf, 
-      getProgressingForFolder,
+      getSubTasksForFolder,
       Rename.selectors.getRenamingForDirectory, 
       getPath
     ],
@@ -53,8 +53,10 @@ export const getFilesMergedOf_Factory = () => {
 
       // Merge write progress for progressbars
       if(files && write) {
-        write.forEach((progressingFile) => {
-          files = files.setIn([nodePath.basename(progressingFile.get('destination')), 'progress'], progressingFile.get('progress'))
+        write.forEach((subTask) => {
+          if(files.get(nodePath.basename(subTask.get('destination')))) {
+            files = files.setIn([nodePath.basename(subTask.get('destination')), 'progress'], subTask.get('percentage'))
+          }
         })
       }
 

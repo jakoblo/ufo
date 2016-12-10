@@ -21,6 +21,7 @@
     "electron-json-storage": "^2.0.0",
     "electron-prebuilt": "^1.4.10",
     "filesize": "^3.3.0",
+    "get-folder-size": "^1.0.0",
     "graceful-ncp": "^3.0.0",
     "immutable": "^3.8.1",
     "install": "^0.8.2",

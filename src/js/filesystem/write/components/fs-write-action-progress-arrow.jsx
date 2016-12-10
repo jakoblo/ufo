@@ -3,7 +3,13 @@ import React from 'react'
 import classnames from 'classnames'
 
 const itemHeight = 24
-const arrowWidth = 11
+const arrowWidth = 17
+const topSpacing = 11
+const bottomSpacing = 9
+const mainColor = '#3A606F';
+const errorColor = '#D1335B';
+const sallowColor = '#E1E1E1';
+const bgColor = '#FFFFFF';
 
 export default class ProgressArrow extends React.Component {
 
@@ -12,36 +18,62 @@ export default class ProgressArrow extends React.Component {
   }
 
  render() {
+  let arrow = null
 
-  let height = itemHeight * (this.props.sourceCount + 1)
-  let betweenParts = []
-  for (var index = 1; index < this.props.sourceCount; index++) {
-    betweenParts.push( this.arrowPartBetween(0, index*itemHeight) )
+  if(this.props.error) {
+    arrow = this.renderArrow( errorColor, 100, false, this.props.error )
+  } else if (this.props.finished) {
+    arrow = this.renderArrow( mainColor, 100, this.props.finished, this.props.error )
+  } else {
+    arrow = <g>
+              {this.renderArrow( sallowColor, 100 )} 
+              {this.renderArrow( mainColor, this.props.progress )}
+            </g>
   }
 
-
   return (
-      <svg width={arrowWidth+'px'} className={this.props.className} height={height+'px'} viewBox={"0 0 "+arrowWidth+' '+height} style={{
+    <div className={this.props.className} style={{
+      height: itemHeight * (this.props.sourceCount + 1),
+      width: arrowWidth
+    }}>
+      {arrow}
+    </div>
+    )
+  }
+
+  renderArrow = (color, progress, finished, error) => {
+
+    let height = itemHeight * (this.props.sourceCount + 1)
+    let progressHeight = (height-topSpacing-bottomSpacing) * (progress / 100) + topSpacing;
+    let betweenParts = []
+    for (var index = 1; index < this.props.sourceCount; index++) {
+      betweenParts.push( this.arrowPartBetween(6, index*itemHeight, color) )
+    }
+
+    return <svg width={arrowWidth+'px'} height={height+'px'} viewBox={"0 0 "+arrowWidth+' '+height} style={{
       fillRule: 'evenodd',
       clipRule: 'evenodd',
       strokeLinejoin: 'round',
       strokeMiterlimit: 1.41421
       }}>
-        {this.arrowPartStart(0, 0)}
-        {betweenParts}
-        {this.arrowPartEnd(0, itemHeight*(this.props.sourceCount))}
-
+        <clipPath id="clip"><rect x="0" y="0" width={arrowWidth} height={progressHeight}/></clipPath>
+        <g clipPath="url(#clip)">
+          {this.arrowPartStart(6, 0, color)}
+          {betweenParts}
+          {this.arrowPartEnd(6, itemHeight*(this.props.sourceCount), color)}
+          {(finished) ? 
+            this.checkIcon(0, itemHeight*(this.props.sourceCount) - 6, color, bgColor)
+          : null} 
+          {(error) ? 
+            this.errorIcon(0, itemHeight*(this.props.sourceCount) - 6, color, bgColor)
+          : null} 
+        </g>
       </svg>
-    )
   }
 
 
-  arrowPartStart = (x, y) => {
-
-    let styles = {
-      fill: '#3a606f'
-    }
-
+  arrowPartStart = (x, y, color) => {
+    let styles = {fill: color}
     return (
       <path 
         d={
@@ -52,12 +84,8 @@ export default class ProgressArrow extends React.Component {
     )
   }
 
-  arrowPartBetween = (x, y) => {
-
-    let styles = {
-      fill: '#3a606f'
-    }
-
+  arrowPartBetween = (x, y, color) => {
+    let styles = {fill: color}
     return (
       <path 
         key={y}
@@ -69,12 +97,8 @@ export default class ProgressArrow extends React.Component {
     )
   }
 
-  arrowPartEnd = (x, y) => {
-
-    let styles = {
-      fill: '#3a606f'
-    }
-
+  arrowPartEnd = (x, y, color) => {
+    let styles = {fill: color}
     return (
       <path 
         d={
@@ -82,6 +106,37 @@ export default class ProgressArrow extends React.Component {
         }
         style={styles}
       />
+    )
+  }
+
+  checkIcon = (x, y, color, bgColor) => {
+    let stylesCheck = {fill: color}
+    let stylesBg = {fill: bgColor}
+    return (
+      <g>
+        <rect x={x} y={y} width="13" height="13" style={stylesBg}/>
+        <path 
+          d={
+            "M"+(x+6.5)+","+(y+12)+"c-3.038,0 -5.5,-2.462 -5.5,-5.5c0,-3.037 2.462,-5.5 5.5,-5.5c3.037,0 5.5,2.463 5.5,5.5c0,3.038 -2.463,5.5 -5.5,5.5Zm2.897,-7.454c-0.282,-0.27 -0.738,-0.27 -1.02,0l-2.564,2.435l-0.732,-0.682c-0.282,-0.269 -0.738,-0.269 -1.02,0c-0.281,0.271 -0.281,0.709 0,0.979l1.242,1.17c0.282,0.27 0.738,0.27 1.02,0l3.074,-2.924c0.281,-0.27 0.281,-0.708 0,-0.978Z"
+          } 
+          style={stylesCheck}/>
+      </g>
+    )
+  }
+
+  errorIcon = (x, y, color, bgColor) => {
+    let stylesCheck = {fill: color}
+    let stylesBg = {fill: bgColor}
+    return (
+      <g>
+        <rect x={x} y={y} width="13" height="13" style={stylesBg}/>
+        <path 
+          d={
+            "M"+(x+9.876)+","+(y+3.124)+"c-0.462,-0.461 -1.21,-0.461 -1.672,0l-1.704,1.704l-1.704,-1.704c-0.462,-0.461 -1.21,-0.461 -1.672,0c-0.461,0.462 -0.461,1.21 0,1.671l1.704,1.705l-1.704,1.704c-0.461,0.461 -0.461,1.21 0,1.672c0.462,0.462 1.21,0.462 1.672,0l1.704,-1.704l1.704,1.704c0.462,0.462 1.21,0.462 1.672,0c0.461,-0.462 0.461,-1.211 0,-1.672l-1.704,-1.704l1.704,-1.705c0.461,-0.461 0.461,-1.209 0,-1.671Z"
+          } 
+          style={stylesCheck}
+        />
+      </g>
     )
   }
 }

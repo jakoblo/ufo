@@ -28,6 +28,11 @@ export default class FileItemComp extends React.Component {
   }
 
   render() {
+
+    if(!this.props.file.get('stats')) {
+      console.log(this.props.file.toJS())
+    }
+
     return (
       <div
         className={classNames({
@@ -48,7 +53,7 @@ export default class FileItemComp extends React.Component {
         {this.props.file.get('progress') ? 
           <ProgressPie
             className={this.props.className+'__progress-pie'}
-            progress={this.props.file.get('progress').get('percentage')}
+            progress={this.props.file.get('progress')}
             size={16}
           />
         : null }
