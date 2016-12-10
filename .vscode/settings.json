@@ -9,4 +9,6 @@
       "**/tmp": true,
       "**/js-dist": true
   }
+,
+"typescript.check.workspaceVersion": false
 }

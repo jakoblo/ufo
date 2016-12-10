@@ -54,7 +54,10 @@ export function userInputSet(inputString) {
       type: t.FILTER_USER_SET,
       payload: {
         input: inputString,
-        regEx: new RegExp('^\\.?'+inputString, "i") // RegExp = /^\.?Filename/i > match .filename & fileName
+        // Search only from start
+          //regEx: new RegExp('^\\.?'+inputString, "i") // RegExp = /^\.?Filename/i > match .filename & fileName
+        // Search Everywhere
+        regEx: new RegExp('('+inputString+')', "i") // RegExp = (Filename) match everywhere
       }
     })
 

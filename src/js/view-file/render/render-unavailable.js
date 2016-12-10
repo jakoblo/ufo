@@ -8,8 +8,8 @@ export default class DisplayUnavailable extends React.Component {
   
   render() {
     return(
-      <div className="display unavailable">
-          <h4>Sorry, no preview possible</h4>
+      <div className="render-unavailable">
+          Sorry, no preview possible 
       </div>
     )
   }

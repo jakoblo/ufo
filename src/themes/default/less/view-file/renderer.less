@@ -1,0 +1,67 @@
+@import (reference) '../variables.less';
+@import (reference) '../mixins.less';
+@import (reference) '../mixins-animation.less';
+
+.render-container {
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-direction: column;
+  padding: @padding__sidebar-horizonal;
+  justify-content: center;
+  align-items: center;
+  .nicer-scrollbars(#fff);
+  overflow: auto;
+}
+
+.render-image {
+  &__container {
+    .render-container;
+    position: relative;
+  }
+
+  &__wrapper {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__img {
+    max-width: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    border: 1px solid @color__grey-light;
+    background: url('../../img/transparent-grid.png');
+  }
+}
+
+.renderer-pdf {
+  width: 100%;
+  height: 100%;
+}
+
+.render-webview {
+  height: 100%;
+  border: 1px solid @color__grey-light;
+  margin: @padding__sidebar-horizonal;
+}
+
+.render-plain-text {
+  height: 100%;
+  padding: 10px;
+  white-space: pre;
+  box-sizing: border-box;
+  border: 1px solid @color__grey-light;
+  color: @color__main-dark;
+  font-family: @font__family-main;
+  overflow: auto;
+  margin: @padding__sidebar-horizonal;
+  .nicer-scrollbars(#fff);
+}
+
+.render-unavailable {
+  .render-container;
+}

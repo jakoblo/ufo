@@ -6,10 +6,12 @@ import FilterTypeInput from '../filesystem/filter/components/filter-type-input'
 import Filter from '../filesystem/filter/filter-index'
 import App from '../app/app-index'
 import classnames from 'classnames'
+import nodePath from 'path'
 import {Map} from 'immutable'
 import {dragndrop} from '../utils/utils-index'
 import Button from '../general-components/button'
 import fsWrite from '../filesystem/write/fs-write-index'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 @connect(() => {
   const getFilesMergedOf = FsMergedSelector.getFilesMergedOf_Factory()
@@ -32,34 +34,57 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
-    let fileList = ""
+    let items = ""
     if(this.props.folder) {
-      fileList = this.props.folder.valueSeq().map((file, index) => {
+      items = this.props.folder.valueSeq().map((file, index) => {
         return ( <FileItem
-          key={index}
+          key={file.get('path')}
           file={file}
+          className="folder-list-item"
           dispatch={this.props.dispatch}
         /> )
       })
     }
 
     return(
-      <div className={classnames({
-        'display-list': true,
-        'drag-target': this.state.data.get('dropTarget'),
-        'focused': this.props.focused
-      })}
+      <div className={
+          classnames({
+            'folder-display-list': true,
+            'folder-display-list--drop-target': this.state.data.get('dropTarget'),
+            'folder-display-list--focused': this.props.focused
+          })
+        }
         onDrop={this.onDrop}
         onDragOver={this.onDragOver}
         onDragEnter={this.onDragEnter}
         onDragLeave={this.onDragLeave}
         onMouseUp={this.focus}
-      >
-        {fileList}
-        <FilterTypeInput path={this.props.path} />
-        <Button text="new Folder" onClick={() => {
-          this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
-        }} />
+      > 
+        <div className="folder-display-list__toolbar-top">
+          <div className="folder-display-list__name">
+            {nodePath.basename(this.props.path)}
+          </div>
+        </div>
+        {(this.props.ready) ?
+          <ReactCSSTransitionGroup className="folder-display-list__item-container"
+            transitionName="folder-list-item--animation"
+            transitionEnterTimeout={250}
+            transitionLeaveTimeout={250}
+          >
+            {items}
+          </ReactCSSTransitionGroup>
+        :
+          null
+        }
+        <div className="folder-display-list__toolbar-bottom">
+          <button
+            className="folder-display-list__button-add-folder" 
+            onClick={() => {
+              this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
+            }}
+          />
+          <FilterTypeInput path={this.props.path} />
+        </div>
       </div>
     )
   }
@@ -109,6 +134,10 @@ export default class DisplayList extends React.Component {
     event.stopPropagation()
     this.setImmState((prevState) => (prevState.set('dropTarget', false)))
     dragndrop.handleFileDrop(event, this.props.path)
+  }
+
+  onMouseDown = () => {
+    
   }
   
   /**

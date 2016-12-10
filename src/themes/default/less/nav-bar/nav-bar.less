@@ -1,0 +1,26 @@
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+
+@import (css) url('nav-bar-group.less');
+@import (css) url('nav-bar-item.less');
+
+.nav-bar {
+  height: 100%; 
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 0;
+  .nicer-scrollbars(@color__main-dark);
+
+  &--drop-target {
+    position: relative;
+    &::before {
+      content: '';
+      .drop-zone;
+      z-index: 0;
+    }
+    & > * {
+      z-index: 10;
+      position: relative;
+    }
+  }
+}
