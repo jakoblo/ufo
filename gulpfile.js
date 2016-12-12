@@ -15,7 +15,7 @@ gulp.task('install', ['fonts', 'git-submodules']);
 gulp.task('git-submodules', function() {  
   // Mozilla PDF.JS branch gh-pages
   // https://github.com/mozilla/pdf.js/wiki/Setup-PDF.js-in-a-website
-  git.addSubmodule('https://github.com/mozilla/pdf.js', 'library/pdfjs-gh-pages', { args: '-b gh-pages'});
+  git.addSubmodule('https://github.com/mozilla/pdf.js', 'library/pdfjs-gh-pages', { args: '-b gh-pages -f'});
 });
 
 // Download Google Webfonts

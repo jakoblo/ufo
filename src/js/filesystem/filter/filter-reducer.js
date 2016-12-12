@@ -4,6 +4,7 @@ import * as c from './filter-constants'
 import Selection from '../selection/sel-index'
 import App from '../../app/app-index'
 import nodePath from 'path'
+import _ from 'lodash'
 import {Map, fromJS} from 'immutable'
 
 const INITIAL_STATE = {
@@ -33,6 +34,10 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       let newFocus = null
       if(action.payload.peak && action.payload.pathRoute.length > 1) {
         newFocus = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
+        if(_.last(action.payload.pathRoute) == state.get('focusedPath')) {
+          // Skip Change if filtering in the same folder is switching to a file
+          return state
+        }
       } else {
         newFocus = action.payload.pathRoute[ action.payload.pathRoute.length - 1 ]
       }
@@ -45,6 +50,7 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
     
     case Selection.actiontypes.SET_SELECTION:
       if(action.payload.root != state.get('focusedPath')) {
+        console.log(action.payload.root)
         return state.set('focusedPath', action.payload.root).deleteIn(['focused', 'userInput'])
       } else {
         return state
