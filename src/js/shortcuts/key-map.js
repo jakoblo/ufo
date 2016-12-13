@@ -34,6 +34,9 @@ export const keyMap = {
     },
     clearFilter: "Escape",
     deleteFilter: "Backspace",
+    filePreview: {
+      darwin: ' '
+    }
   },
   renameInput: {
     cancel: "Escape",
