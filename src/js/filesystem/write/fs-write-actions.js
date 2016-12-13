@@ -19,7 +19,7 @@ export function moveToTrash(sources) {
     id: id,
     type: t.TASK_TRASH,
     sources: sources,
-    targetFolder: 'Trash',
+    target: 'Trash',
   }
   window.store.dispatch({
     type: t.FS_WRITE_NEW,
@@ -47,12 +47,12 @@ export function moveToTrash(sources) {
 
 /**
  * @param  {string[]} sources
- * @param  {string} targetFolder 
+ * @param  {string} target 
  */
-export function move(sources, targetFolder) {
+export function move(sources, target) {
   startFsWorker({
     sources: sources, 
-    targetFolder: targetFolder, 
+    target: target, 
     type: t.TASK_MOVE, 
     clobber: false
   })
@@ -61,12 +61,12 @@ export function move(sources, targetFolder) {
 
 /**
  * @param  {string[]} sources
- * @param  {string} targetFolder 
+ * @param  {string} target 
  */
-export function copy(sources, targetFolder) {
+export function copy(sources, target) {
   startFsWorker({
     sources: sources, 
-    targetFolder: targetFolder, 
+    target: target, 
     type: t.TASK_COPY, 
     clobber: false
   })
@@ -83,9 +83,9 @@ export function rename(source, destination) {
 
   let payload = {
     id: window.store.getState()[c.NAME].size,
-    task: t.TASK_RENAME,
-    source: source,
-    destination: destination
+    type: t.TASK_RENAME,
+    sources: [source],
+    target: destination
   }
 
   window.store.dispatch({
@@ -154,7 +154,7 @@ export function startFsWorker(task) {
   // fsWriteWorker.send({
   //   id: id,
   //   sources: sources,
-  //   targetFolder: targetFolder,
+  //   target: target,
   //   options
   // })
   

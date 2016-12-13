@@ -104,7 +104,7 @@ class Message extends React.Component {
             FsWriteActions.startFsWorker({
               id: this.props.action.get('id'),
               sources: this.props.action.get('sources'),
-              targetFolder: this.props.action.get('targetFolder'),
+              target: this.props.action.get('target'),
               type: this.props.action.get('type'),
               clobber: this.props.action.get('clobber')
             })
@@ -124,7 +124,7 @@ class Message extends React.Component {
                   FsWriteActions.startFsWorker({
                     id: this.props.action.get('id'),
                     sources: this.props.action.get('sources').toJS(),
-                    targetFolder: this.props.action.get('targetFolder'),
+                    target: this.props.action.get('target'),
                     type: this.props.action.get('type'),
                     clobber: true
                   })

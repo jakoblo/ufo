@@ -50,7 +50,6 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
     
     case Selection.actiontypes.SET_SELECTION:
       if(action.payload.root != state.get('focusedPath')) {
-        console.log(action.payload.root)
         return state.set('focusedPath', action.payload.root).deleteIn(['focused', 'userInput'])
       } else {
         return state

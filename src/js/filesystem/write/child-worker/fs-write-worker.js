@@ -11,7 +11,7 @@ import move from './fs-write-worker-move'
 import copy from './fs-write-worker-copy'
 
 process.on('message', (m) => {
-  mv(m.id, m.sources, m.targetFolder, m.options)
+  mv(m.id, m.sources, m.target, m.options)
 });
 
 export default class FSWorker {
@@ -79,9 +79,9 @@ export default class FSWorker {
   buildSubTasks = (sources) => {
     let subTasks = {}
     sources
-      .filter(source => (nodePath.dirname(source) != this.task.targetFolder))
+      .filter(source => (nodePath.dirname(source) != this.task.target))
       .forEach( source => {
-        let destination = nodePath.join( this.task.targetFolder, nodePath.basename(source)) 
+        let destination = nodePath.join( this.task.target, nodePath.basename(source)) 
         subTasks[destination] = {
           id: this.task.id,
           source: source, 

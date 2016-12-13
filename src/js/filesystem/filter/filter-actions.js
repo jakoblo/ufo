@@ -70,17 +70,17 @@ export function userInputSet(inputString) {
     )[0]
 
     if(firstFilteredFile) {
-      let targetFolder, targetFile = null
+      let target, targetFile = null
 
       
       if(nodePath.extname(firstFilteredFile)) {
-        targetFolder = focusedDirPath 
+        target = focusedDirPath 
         targetFile = nodePath.join(focusedDirPath, firstFilteredFile) 
       } else {
-        targetFolder = nodePath.join(focusedDirPath, firstFilteredFile)
+        target = nodePath.join(focusedDirPath, firstFilteredFile)
       }
 
-      dispatch( App.actions.changeAppPath( null, targetFolder, false, true ) )
+      dispatch( App.actions.changeAppPath( null, target, false, true ) )
       if(targetFile) {
         dispatch( ViewFile.actions.showPreview(targetFile) )
       }
