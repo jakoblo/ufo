@@ -14,7 +14,7 @@ export default function reducer(state = INITIAL_STATE, action = { type: '' }) {
         clobber: action.payload.clobber,
         type: action.payload.type,
         sources: action.payload.sources,
-        targetFolder: action.payload.targetFolder,
+        target: action.payload.target,
         subTasks: action.payload.subTasks,
         errors: {},
         finished: false

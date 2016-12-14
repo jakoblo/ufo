@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "calendar": "^0.1.0",
     "chokidar": "^1.6.0",
     "classnames": "^2.2.5",
     "codemirror": "^5.18.2",

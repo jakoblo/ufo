@@ -7,6 +7,7 @@ import Selection from '../../filesystem/selection/sel-index'
 import Filter from '../../filesystem/filter/filter-index'
 import Rename from '../../filesystem/rename/rename-index'
 import App from '../app-index'
+import { remote  } from 'electron'
 
 
 export default class EventCatcher extends React.Component {
@@ -62,6 +63,12 @@ export default class EventCatcher extends React.Component {
     clearFilter: Filter.actions.userInputClear,
     // deleteFilter: Selection.actions.selectTypeInputBackspace,
     deleteFilter: Filter.actions.userInputBackspace,
+    filePreview: () => (dispatch, getState) => {
+      let selectedFile = Selection.selectors.getFocusedFile(getState()) 
+      if(selectedFile) {
+        remote.getCurrentWindow().previewFile( selectedFile )
+      }
+    }
   }
 
   stopEvent (e) {

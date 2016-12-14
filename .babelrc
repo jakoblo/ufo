@@ -6,5 +6,8 @@
     ["transform-es2015-modules-commonjs", { "loose": true }],
     "transform-react-jsx"
   ],
-  "sourceMaps": "inline"
+  "sourceMaps": "inline",
+  "ignore": [
+    "library/**/*"
+  ]
 }

@@ -36,7 +36,7 @@ export default class WriteActionTrash extends React.Component {
           />
           <div className="fs-write-action__item-container">
             {sourceItems}
-            <FsWriteActionItem type="targetFolder" path={ this.props.action.get('targetFolder') } />
+            <FsWriteActionItem type="target" path={ this.props.action.get('target') } />
           </div>
         </div>
         <ErrorMessages action={this.props.action} />      

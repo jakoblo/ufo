@@ -5,6 +5,7 @@ import nodePath from 'path'
 import * as _ from 'lodash'
 import Selection from '../selection/sel-index'
 import App from '../../app/app-index'
+import ViewFile from '../../view-file/vf-index'
 
 export function toggleHiddenFiles() {
   return function (dispatch, getState) {
@@ -69,7 +70,20 @@ export function userInputSet(inputString) {
     )[0]
 
     if(firstFilteredFile) {
-      dispatch( App.actions.changeAppPath( null, nodePath.join(focusedDirPath, firstFilteredFile), false, true ) )
+      let target, targetFile = null
+
+      
+      if(nodePath.extname(firstFilteredFile)) {
+        target = focusedDirPath 
+        targetFile = nodePath.join(focusedDirPath, firstFilteredFile) 
+      } else {
+        target = nodePath.join(focusedDirPath, firstFilteredFile)
+      }
+
+      dispatch( App.actions.changeAppPath( null, target, false, true ) )
+      if(targetFile) {
+        dispatch( ViewFile.actions.showPreview(targetFile) )
+      }
     }
   }
 }

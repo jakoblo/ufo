@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
 import { NAME, DEFAULT_VIEW_WIDTH } from '../vp-constants'
@@ -24,11 +25,18 @@ export default class ViewPlacer extends React.Component {
 
   render() {
     return (
-      <section className="view-placer">
+      <section ref="viewPlacer" className="view-placer">
         {this.renderViewFolders()}
         {this.renderViewFile()}
       </section>
     )
+  }
+
+  componentDidUpdate = () => {
+    // Scroll to Right end
+    var element = ReactDOM.findDOMNode(this.refs['viewPlacer']);
+    var elementRect = element.getBoundingClientRect();
+    element.scrollLeft = elementRect.width;
   }
 
   renderViewFile = () => {
