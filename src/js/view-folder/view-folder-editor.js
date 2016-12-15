@@ -4,6 +4,7 @@ import * as FsMergedSelector from  '../filesystem/fs-merged-selectors'
 import FileItem from '../file-item/components/file-item'
 import FilterTypeInput from '../filesystem/filter/components/filter-type-input'
 import Filter from '../filesystem/filter/filter-index'
+import nodePath from 'path'
 import {components} from '../file-item/fi-index'
 import classnames from 'classnames'
 import {Map} from 'immutable'
@@ -45,6 +46,8 @@ export default class DraftEditor extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return (
       nextProps.folder !== this.props.folder || 
+      nextProps.focused !== this.props.focused || 
+      nextProps.ready !== this.props.ready || 
       nextState.data !== this.state.data ||
       nextState.editorState !== this.state.editorState
       )
@@ -54,21 +57,41 @@ export default class DraftEditor extends React.Component {
     // console.log("FOLDER", this.props.folder)
     // return <Editor editorState={this.state.editorState} onChange={this.onChange} />
     return(
-      <div className={classnames({
-          'focused': this.props.focused
-        })}
+      <div className={
+          classnames({
+             // change to .folder-display-editor
+            'folder-display-list': true,
+            'folder-display-list--drop-target': this.state.data.get('dropTarget'),
+            'folder-display-list--focused': this.props.focused
+          })
+        }
         onKeyDown={this.onKeyDown}
         >
-        <Editor 
-          editorState={this.state.editorState}
-          blockRendererFn={this.getBlockRendererFn} 
-          onChange={this.onChange} 
-          blockStyleFn={this.getBlockStyleFn}
-          onDrop={this.onDrop}
-          onDragOver={this.onDragOver}
-          onDragEnter={this.onDragEnter}
-          onDragLeave={this.onDragLeave}
-        />
+        <div className="folder-display-list__toolbar-top">
+          <div className="folder-display-list__name">
+            {nodePath.basename(this.props.path)}
+          </div>
+        </div>
+        <div className="folder-display-list__item-container">
+          <Editor 
+            editorState={this.state.editorState}
+            blockRendererFn={this.getBlockRendererFn} 
+            onChange={this.onChange} 
+            blockStyleFn={this.getBlockStyleFn}
+            onDrop={this.onDrop}
+            onDragOver={this.onDragOver}
+            onDragEnter={this.onDragEnter}
+            onDragLeave={this.onDragLeave}
+          />
+        </div>
+        <div className="folder-display-list__toolbar-bottom">
+          <button
+            className="folder-display-list__button-add-folder" 
+            onClick={() => {
+              this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
+            }}
+          />
+        </div>
       </div>
     )
   }
@@ -187,6 +210,7 @@ const FileWrapper = (props) => {
   let item = <FileItem
     key={key}
     file={file}
+    className="folder-list-item" // Should be changed to folder-editor-item
     dispatch={dispatch}
   />
 

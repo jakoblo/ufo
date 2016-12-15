@@ -6,7 +6,7 @@ import { NAME, DEFAULT_VIEW_WIDTH } from '../vp-constants'
 import ViewWrapper from './view-wrapper'
 import Error from '../../general-components/error'
 import ViewFolderList from '../../view-folder/view-folder-list'
-import ViewDraftEditor from '../../view-draft/view-draft-editor'
+import ViewDraftEditor from '../../view-folder/view-folder-editor'
 import ViewFile from '../../view-file/vf-index'
 import FS from '../../filesystem/watch/fs-watch-index'
 
