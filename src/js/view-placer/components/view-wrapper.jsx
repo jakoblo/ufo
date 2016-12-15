@@ -8,35 +8,18 @@ export default class ViewWrapper extends React.Component {
   }
 
   render() {
-    let styles = {
-      left: this.props.cssLeft,
-      width: this.props.initWidth
-    }
-    let classes = classnames('view', {
-      ready: this.props.ready
+    let classes = classnames('view-wrapper', {
+      'view-wrapper--ready': this.props.ready
     })
     let loading
     if(!this.props.ready && !this.props.error) {
-      loading = <div className="loading-cube">
-                  <div className="sk-cube1 sk-cube"></div>
-                  <div className="sk-cube2 sk-cube"></div>
-                  <div className="sk-cube4 sk-cube"></div>
-                  <div className="sk-cube3 sk-cube"></div>
-                </div>
+      loading = null
     }
     return(
-      <div className={classes} ref={(c) => this.refView = c}  style={styles}>
-        {this.props.ready}
-        {this.props.children}
+      <div className={classes} ref={(c) => this.refView = c}>
         {loading}
-        <ResizeSensor onResize={this.resizeHandle} />
+        {this.props.children}
       </div>
     )
-  }
-
-  resizeHandle = () => {
-    if(this.refView) {
-      this.props.onResize(this.props.path, this.refView.offsetWidth)
-    }
   }
 }

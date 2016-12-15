@@ -1,0 +1,25 @@
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+
+.view-wrapper {
+  position: relative;
+  width: 235px;
+  display: flex;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-direction: column;
+  box-sizing: border-box;
+  resize: horizontal;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  will-change: transform;
+
+  &::-webkit-resizer {
+    background: url('../../img/view-wrapper__resize-arrows.svg');
+    background-repeat: no-repeat;
+    background-size: 15px 15px;
+    background-position: right;
+    width: 15px;
+    height: 15px;
+  }
+}

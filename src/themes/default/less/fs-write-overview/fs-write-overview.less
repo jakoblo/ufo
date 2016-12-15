@@ -1,0 +1,15 @@
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+
+@import (css) url('./fs-write-action.less');
+
+.fs-write-overview {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  align-items: stretch;
+
+  .noFileActions {
+    .empty-text
+  }
+}

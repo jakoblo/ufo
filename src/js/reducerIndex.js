@@ -9,6 +9,7 @@ import Filter from './filesystem/filter/filter-index'
 import Config from './config/config-index'
 import ViewFile from './view-file/vf-index'
 import Navbar from './navbar/navbar-index'
+import AddonBar from './addon-bar/addon-bar-index'
 
 export const rootReducer = combineReducers({
   [ViewFile.constants.NAME]: ViewFile.reducer,
@@ -20,4 +21,5 @@ export const rootReducer = combineReducers({
   [Config.constants.NAME]: Config.reducer,
   [Navbar.constants.NAME]: Navbar.reducer,
   [App.constants.NAME]: App.reducer,
+  [AddonBar.constants.NAME]: AddonBar.reducer,
 })
