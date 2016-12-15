@@ -34,6 +34,7 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
+
     let items = ""
     if(this.props.folder) {
       items = this.props.folder.valueSeq().map((file, index) => {
@@ -65,17 +66,23 @@ export default class DisplayList extends React.Component {
             {nodePath.basename(this.props.path)}
           </div>
         </div>
-        {(this.props.ready) ?
-          <ReactCSSTransitionGroup className="folder-display-list__item-container"
-            transitionName="folder-list-item--animation"
-            transitionEnterTimeout={250}
-            transitionLeaveTimeout={250}
-          >
-            {items}
-          </ReactCSSTransitionGroup>
-        :
-          null
-        }
+        <div className="folder-display-list__item-container">
+          {(this.props.ready) ?
+            <ReactCSSTransitionGroup
+              transitionName="folder-list-item--animation"
+              transitionEnterTimeout={250}
+              transitionLeaveTimeout={250}
+            >
+              {(items.size > 0) ? 
+                items
+                :
+                <div className="folder-display-list__empty-text">Folder is empty</div>
+              }
+            </ReactCSSTransitionGroup>
+          :
+            null
+          }
+        </div>
         <div className="folder-display-list__toolbar-bottom">
           <button
             className="folder-display-list__button-add-folder" 
@@ -93,6 +100,7 @@ export default class DisplayList extends React.Component {
     return (
       nextProps.folder !== this.props.folder || 
       nextProps.focused !== this.props.focused || 
+      nextProps.ready !== this.props.ready || 
       nextState.data !== this.state.data
     )
   }
