@@ -57,21 +57,17 @@ export function onDragOver (event)  {
 export function onDragLeave (event) {
   if( shouldHandleDrop(event, this.props.file) ) {
     event.preventDefault()
+    clearHoverState.bind(this)()
 
     // Timeout
     dragInOutCount--
-    if(dragInOutCount < 1) clearTimeout(dragHoverTimeout)
-
-    // Reset State
-    this.setImmState((prevState) => (
-      prevState
-      .set('dropTarget', false)
-      .set('dropBlocked', false)
-    ))
+    if(dragInOutCount < 1) { clearTimeout(dragHoverTimeout) }
   }
 }
 
 export function onDrop (event) {
+  clearTimeout(dragHoverTimeout)
+  clearHoverState.bind(this)()
   if( shouldHandleDrop(event, this.props.file) ) {
     event.preventDefault()
     event.stopPropagation()
@@ -97,4 +93,12 @@ function dropAllowed(event, file) {
     }
   }
   return allowed
+}
+
+function clearHoverState() {
+  this.setImmState((prevState) => (
+      prevState
+      .set('dropTarget', false)
+      .set('dropBlocked', false)
+    ))
 }

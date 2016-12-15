@@ -2,8 +2,9 @@
 import * as t from './filter-actiontypes'
 import * as c from './filter-constants'
 import Selection from '../selection/sel-index'
-import App from '../../App/app-index'
+import App from '../../app/app-index'
 import nodePath from 'path'
+import _ from 'lodash'
 import {Map, fromJS} from 'immutable'
 
 const INITIAL_STATE = {
@@ -11,7 +12,7 @@ const INITIAL_STATE = {
     notHidden: c.NOT_HIDDEN_REGEX
   },
   focused: {}, // Filter Collection for the folder in 'focusedPath'
-  focusedPath: ''
+  focusedPath: '' 
 }
 
 export default function reducer(state = fromJS(INITIAL_STATE), action = { type: '' }) {
@@ -33,6 +34,10 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
       let newFocus = null
       if(action.payload.peak && action.payload.pathRoute.length > 1) {
         newFocus = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
+        if(_.last(action.payload.pathRoute) == state.get('focusedPath')) {
+          // Skip Change if filtering in the same folder is switching to a file
+          return state
+        }
       } else {
         newFocus = action.payload.pathRoute[ action.payload.pathRoute.length - 1 ]
       }

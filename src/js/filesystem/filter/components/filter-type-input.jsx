@@ -25,12 +25,12 @@ export default class FilterTypeInput extends React.Component {
     return (
       <div
         className={classNames({
-          'filterTypeInput': true,
-          'visible': this.props.focused && this.props.input && this.props.input.length > 0
+          'filter-type': true,
+          'filter-type--active': this.props.focused && this.props.input && this.props.input.length > 0
         })}
       >
-        <label>Filter By:</label>
-        <input readOnly={true} value={this.props.input || ""} />
+        <label className="filter-type__label" >Filter By:</label>
+        <input className="filter-type__input" readOnly={true} value={this.props.input || ""} />
       </div>
     )
   }

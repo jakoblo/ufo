@@ -1,0 +1,44 @@
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+
+.filter-type {
+
+  @height_filter: 26px;
+
+  position: absolute;
+  left: @padding__sidebar-horizonal;
+  right: @padding__sidebar-horizonal;
+  bottom: -8px;
+  display: none;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid @color__main-decoration;
+  background: @color__default-bg;
+  transition: height 0.3s ease-out;
+  height: 0;
+
+  .folder-display-list--focused & {
+    display: flex;
+  }
+
+  &--active {
+    height: @height_filter;
+  }
+
+  &__label {
+    color: @color__main-decoration;
+    line-height: @height_filter;
+    padding: 0 10px;
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
+
+  &__input {
+    .input-reset;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: @height_filter;
+    padding-right: 10px;
+  }
+
+}
