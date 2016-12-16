@@ -6,10 +6,12 @@ import * as fsWriteActions from '../../filesystem/write/fs-write-actions'
  */
 export function onMouseDown (event) {
   event.stopPropagation()
-  if(event.ctrlKey || event.metaKey) {
-    this.props.dispatch( FileActions.addToSelection(this.props.file) )
-  } else if(event.shiftKey) {
-    this.props.dispatch( FileActions.expandSelection(this.props.file) )
+  if(!this.props.file.get('progress')) {
+    if(event.ctrlKey || event.metaKey) {
+      this.props.dispatch( FileActions.addToSelection(this.props.file) )
+    } else if(event.shiftKey) {
+      this.props.dispatch( FileActions.expandSelection(this.props.file) )
+    }
   }
 }
 
@@ -18,9 +20,11 @@ export function onMouseDown (event) {
  */
 export function onMouseUp (event) {
   event.stopPropagation()
-  if(!event.ctrlKey && !event.metaKey && !event.shiftKey) {
-    if(!this.props.file.get('selected')) {
-      this.props.dispatch( FileActions.show(this.props.file) )
+  if(!this.props.file.get('progress')) {
+    if(!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+      if(!this.props.file.get('selected')) {
+        this.props.dispatch( FileActions.show(this.props.file) )
+      }
     }
   }
 }
@@ -29,7 +33,7 @@ export function onMouseUp (event) {
  * Open File in Default Application
  */
 export function onDoubleClick (event) {
-  if(this.props.file.get('stats').isFile()) {
+  if(!this.props.file.get('progress') && this.props.file.get('stats').isFile()) {
 
     // Open
     this.props.dispatch( FileActions.open(this.props.file) )
@@ -49,10 +53,11 @@ export function onDoubleClick (event) {
 export function onContextMenu(event) {
   event.preventDefault()
   event.stopPropagation()
-
-  this.props.dispatch( 
-    FileActions.showContextMenu(
-      this.props.file,
-      this.renameStart
-    ))
+  if(!this.props.file.get('progress')) {
+    this.props.dispatch( 
+      FileActions.showContextMenu(
+        this.props.file,
+        this.renameStart
+      ))
+  }
 }

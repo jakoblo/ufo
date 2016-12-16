@@ -6,7 +6,9 @@ var dragInOutCount = 0
 
 export function onDragStart (event) {
   event.preventDefault()
-  this.props.dispatch( FileActions.startDrag(this.props.file) )
+  if(!this.props.file.get('progress')) {
+    this.props.dispatch( FileActions.startDrag(this.props.file) )
+  }
 }
 
 /** 
@@ -79,7 +81,7 @@ export function onDrop (event) {
  * Is a file in Drag & is the target a directory?
  */
 function shouldHandleDrop(event, file) {
-  return (dragndrop.isFileDrag(event) && file.get('stats').isDirectory())
+  return (dragndrop.isFileDrag(event) && !file.get('progress') && file.get('stats').isDirectory())
 }
 
 /**
