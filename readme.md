@@ -1,7 +1,5 @@
 # ufo filemanger
-
-![Alt text](/src/themes/img/ufologo.svg?raw=true)  
-![Alt text](/src/themes/screenshot.png?raw=true)
+![Application Screenshot](/src/themes/default/screenshot.png)
 
 ## In development:
 + works limited on Mac
@@ -10,6 +8,7 @@
 + no documentation yet
 
 ## Build with
++ electron
 + react
 + redux
 + chokidar
