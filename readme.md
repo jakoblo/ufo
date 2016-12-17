@@ -3,7 +3,7 @@
 
 ## In development:
 + works limited on Mac
-+ crashs on Windows
++ crashes on Windows
 + not really tested on Linux
 + no documentation yet
 
