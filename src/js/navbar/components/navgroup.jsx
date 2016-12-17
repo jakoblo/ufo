@@ -35,6 +35,7 @@ const groupTarget = {
     }
   }, 
   hover(props, monitor, component) {
+    console.log('hover')
     if(monitor.getItemType() !== DnDTypes.NAVGROUP) return
 
     const dragIndex = monitor.getItem().index;
