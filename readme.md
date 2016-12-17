@@ -1,4 +1,4 @@
-# ufo filemanger
+# ufo filemanager
 ![Application Screenshot](/src/themes/default/screenshot.png)
 
 ## In development:
