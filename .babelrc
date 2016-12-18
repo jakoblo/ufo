@@ -5,5 +5,9 @@
     "transform-class-properties",
     ["transform-es2015-modules-commonjs", { "loose": true }],
     "transform-react-jsx"
+  ],
+  "sourceMaps": "inline",
+  "ignore": [
+    "library/**/*"
   ]
 }

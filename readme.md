@@ -1,30 +1,21 @@
-# FileFlow - Electron File Manager 
+# ufo filemanger
 
-### + Babel, Gulp, electron-connect
+![Alt text](/src/themes/img/ufologo.svg?raw=true)  
+![Alt text](/src/themes/screenshot.png?raw=true)
 
-	> npm i
-	> npm run dev
+## In development:
++ works limited on Mac
++ crashs on Windows
++ not really tested on Linux
++ no documentation yet
 
+## Build with
++ react
++ redux
++ chokidar
 
-### Install > electron developer extensions
+## install
+> npm install
 
-execute **window.devToolsSetup()** on the Chrome developer console to install them
-
-
-### Gulp does
-
-* watch
-* autoreload
-* set node env Variables
-* compile babel js
-* compile sass
-* download google-fonts
-* download git modules
-
-
-### Atom Plugins to use
-
-* linter
-* linter-eslint
-* linter-sass-lint
-* react
+## run
+> npm start

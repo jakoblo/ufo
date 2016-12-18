@@ -9,6 +9,7 @@ import Rename from '../../filesystem/rename/rename-index'
 import App from '../app-index'
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import { remote  } from 'electron'
 
 @DragDropContext(HTML5Backend)
 export default class EventCatcher extends React.Component {
@@ -18,7 +19,7 @@ export default class EventCatcher extends React.Component {
 
   render() {
     return(
-      <div className="foundation"
+      <div className="root-event-catcher"
         onDragEnter={this.stopEvent}
         onDragOver={this.stopEvent}
         onDrop={this.stopEvent}
@@ -64,6 +65,12 @@ export default class EventCatcher extends React.Component {
     clearFilter: Filter.actions.userInputClear,
     // deleteFilter: Selection.actions.selectTypeInputBackspace,
     deleteFilter: Filter.actions.userInputBackspace,
+    filePreview: () => (dispatch, getState) => {
+      let selectedFile = Selection.selectors.getFocusedFile(getState()) 
+      if(selectedFile) {
+        remote.getCurrentWindow().previewFile( selectedFile )
+      }
+    }
   }
 
   stopEvent (e) {

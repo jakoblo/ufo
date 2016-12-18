@@ -1,0 +1,11 @@
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+@import (css) url('view-wrapper.less');
+
+.view-placer {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  overflow-x: auto;
+  .nicer-scrollbars(#fff);
+}

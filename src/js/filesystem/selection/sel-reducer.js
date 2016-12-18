@@ -4,6 +4,7 @@ import App from '../../app/app-index'
 import Preview from '../../view-file/vf-index'
 import Filter from '../filter/filter-index'
 import FS from '../watch/fs-watch-index'
+import FsWrite from '../write/fs-write-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
 import {Map, List, Seq, fromJS} from 'immutable'
@@ -61,6 +62,9 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
     case t.SELECT_TYPE_CLEAR:
       return state.set('selectTypeInput', '')
     
+    case FsWrite.actiontypes.FS_WRITE_NEW:
+      return state.set('files', List([])) // Clear selection
+
     case Filter.actiontypes.FILTER_HIDE_HIDDEN: // NOT IN USE RIGHT NOW
       return state.set('files', List([]))
     

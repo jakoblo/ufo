@@ -1,0 +1,14 @@
+@import (reference) url('./app-controls');
+
+.history-controls {
+
+  display: flex;
+  align-items: center;
+
+  &__button-back {
+    .app-controls__button-mixin(180deg);
+  }
+  &__button-forward {
+    .app-controls__button-mixin(0deg);
+  } 
+}

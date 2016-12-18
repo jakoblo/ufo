@@ -6,7 +6,9 @@ var dragInOutCount = 0
 
 export function onDragStart (event) {
   event.preventDefault()
-  this.props.dispatch( FileActions.startDrag(this.props.file) )
+  if(!this.props.file.get('progress')) {
+    this.props.dispatch( FileActions.startDrag(this.props.file) )
+  }
 }
 
 // /** 
@@ -51,27 +53,23 @@ export function onDragStart (event) {
 //   }
 // }
 
-// /**
-//  * Reset DropHover State Changes & clear timeout
-//  */
+/**
+ * Reset DropHover State Changes & clear timeout
+ */
 // export function onDragLeave (event) {
 //   if( shouldHandleDrop(event, this.props.file) ) {
 //     event.preventDefault()
+//     clearHoverState.bind(this)()
 
 //     // Timeout
 //     dragInOutCount--
-//     if(dragInOutCount < 1) clearTimeout(dragHoverTimeout)
-
-//     // Reset State
-//     this.setImmState((prevState) => (
-//       prevState
-//       .set('dropTarget', false)
-//       .set('dropBlocked', false)
-//     ))
+//     if(dragInOutCount < 1) { clearTimeout(dragHoverTimeout) }
 //   }
 // }
 
 // export function onDrop (event) {
+//   clearTimeout(dragHoverTimeout)
+//   clearHoverState.bind(this)()
 //   if( shouldHandleDrop(event, this.props.file) ) {
 //     event.preventDefault()
 //     event.stopPropagation()
@@ -83,7 +81,7 @@ export function onDragStart (event) {
 //  * Is a file in Drag & is the target a directory?
 //  */
 // function shouldHandleDrop(event, file) {
-//   return (dragndrop.isFileDrag(event) && file.get('stats').isDirectory())
+//   return (dragndrop.isFileDrag(event) && !file.get('progress') && file.get('stats').isDirectory())
 // }
 
 // /**
@@ -97,4 +95,12 @@ export function onDragStart (event) {
 //     }
 //   }
 //   return allowed
+// }
+
+// function clearHoverState() {
+//   this.setImmState((prevState) => (
+//       prevState
+//       .set('dropTarget', false)
+//       .set('dropBlocked', false)
+//     ))
 // }

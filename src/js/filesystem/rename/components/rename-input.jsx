@@ -20,7 +20,7 @@ export default class RenameInput extends React.Component {
     return (
       <input
         ref="editField"
-        className="edit"
+        className={this.props.className}
         value={this.state.fileName}
         onMouseDown={this.onMouseDown}
         onMouseUp={this.onMouseUp}
