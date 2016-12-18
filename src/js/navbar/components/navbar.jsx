@@ -13,21 +13,23 @@ import { NativeTypes } from 'react-dnd-html5-backend';
 
 const NavbarTarget = {
   drop(props, monitor) {
-  const hasDroppedOnChild = monitor.didDrop()
-  if (hasDroppedOnChild) return
-  
-  if(monitor.getItem().files.length > 0) {
-    let title = _.last(_.split(nodePath.dirname(monitor.getItem().files[0].path), nodePath.sep))
+    const hasDroppedOnChild = monitor.didDrop()
+    if (hasDroppedOnChild) return
     
-    let files = []
-    _.forIn(monitor.getItem().files, function(value, key) {
-      if(_.hasIn(value, 'path'))
-      files.push(value.path)
-    })
-    props.dispatch(Actions.addNavGroup(title, files))
+    if(monitor.getItem().files.length > 0) {
+      let title = _.last(_.split(nodePath.dirname(monitor.getItem().files[0].path), nodePath.sep))
+      
+      let files = []
+      _.forIn(monitor.getItem().files, function(value, key) {
+        if(_.hasIn(value, 'path'))
+        files.push(value.path)
+      })
+      props.dispatch(Actions.addNavGroup(title, files))
     }
   }
 }
+
+console.log(NavbarTarget)
 
 @connect((state) => {
   return {navbar: state[constants.NAME],

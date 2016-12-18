@@ -5,9 +5,64 @@ import ReactDOM from 'react-dom'
 import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
+import _ from 'lodash'
 import eventHandler from '../fi-event-handler/fi-event-handler-index'
 import RenameInput from '../../filesystem/rename/components/rename-input'
+import {dragndrop} from '../../utils/utils-index'
+import { DropTarget } from 'react-dnd'
+import { NativeTypes } from 'react-dnd-html5-backend';
 
+const FolderDropTarget = {
+  drop(props, monitor) {
+    const hasDroppedOnChild = monitor.didDrop()
+    if (hasDroppedOnChild) return
+    
+    if(monitor.getItem().files.length > 0) {
+      let files = []
+      _.forIn(monitor.getItem().files, function(value, key) {
+        if(_.hasIn(value, 'path'))
+        files.push(value.path)
+      })
+
+      console.log(files)
+
+      // props.dispatch(Actions.addNavGroup(title, files))
+    }
+  },
+  canDrop(props, monitor) {
+    let allowed = true
+    console.log(monitor.getItem().files)
+    _.forIn(monitor.getItem().files, function(value, key) {
+      if(dropFile.path == file.get('path')) {
+      if(_.hasIn(value, 'path') && value.path == this.prop.file.get('path'))
+        allowed = false // Drop on Itself
+      }
+    })
+    return allowed
+  }
+}
+
+
+function dropAllowed(event, file) {
+  let allowed = true
+  for (let dropFile of event.dataTransfer.files) {
+    if(dropFile.path == file.get('path')) {
+      allowed = false // Drop on Itself
+    }
+  }
+  return allowed
+}
+
+@DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
+  // Call this function inside render()
+  // to let React DnD handle the drag events:
+  connectDropTarget: connect.dropTarget(),
+  // You can ask the monitor about the current drag state:
+  isOver: monitor.isOver(),
+  isOverCurrent: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop(),
+  itemType: monitor.getItemType()
+}))
 export default class FileItemDisplay extends React.Component {
 
   constructor(props) {
@@ -16,8 +71,6 @@ export default class FileItemDisplay extends React.Component {
     this.state = {
       data: Map({
         renaming: false,
-        dropTarget: false,
-        dropBlocked: false,
         openAnimation: false
       })
     }
@@ -41,7 +94,7 @@ export default class FileItemDisplay extends React.Component {
       />
     }
     
-    return (
+    return this.props.connectDropTarget(
       <span
         className={classNames({
           'file-item': true,
@@ -50,12 +103,11 @@ export default class FileItemDisplay extends React.Component {
           'file': this.props.file.get('stats').isFile(),
           'active': this.props.file.get('active'),
           'selected': this.props.file.get('selected'),
-          'drag-target': this.state.data.get('dropTarget'),
-          'drag-blocked': this.state.data.get('dropBlocked'),
+          'drag-target': this.props.canDrop && this.props.isOverCurrent,
+          'drag-blocked': !this.props.canDrop && this.props.isOverCurrent,
           'open-animation': this.state.data.get('openAnimation'),
           'progress': this.props.file.get('progress')
         })}
-        ref="file"
       >
         <span className="flex-box">
           <Icon glyph={classNames({
