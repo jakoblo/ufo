@@ -21,7 +21,8 @@ const itemSource = {
   }
 }
 
-const itemTarget = {
+const itemTarget = { 
+  // Sort Navgroups by drag and drop
   drop(props, monitor, component) {
     if(monitor.getItemType() === DnDTypes.GROUPITEM) {
       props.saveFavbar()
@@ -38,7 +39,6 @@ const itemTarget = {
     if (dragIndex === hoverIndex) {
       return;
     }
-  
 
     // Determine rectangle on screen
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
@@ -81,22 +81,22 @@ const itemTarget = {
 @DropTarget([DnDTypes.GROUPITEM, NativeTypes.FILE], itemTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver() && (monitor.getItemType() === NativeTypes.FILE),
-  isOverCurrent: monitor.isOver({ shallow: true })
+  isOverCurrent: monitor.isOver({ shallow: true }) && (monitor.getItemType() === NativeTypes.FILE),
 }))
 @DragSource(DnDTypes.GROUPITEM, itemSource, (connect, monitor) => ({
-  // Call this function inside render()
-  // to let React DnD handle the drag events:
   connectDragSource: connect.dragSource(),
-  // You can ask the monitor about the current drag state:
   isDragging: monitor.isDragging(),
 }))
 export default class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
+    this.dragOverTimeout = null
+    this.state = {
+      dropTarget: false
+    }
   }
 
  render() {
-    // let icon = this.getIconComponent()
     const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
     let className = classnames(
       this.props.className,
@@ -104,11 +104,13 @@ export default class NavGroupItem extends React.Component {
       {
         "nav-bar-item": true,
         "nav-bar-item--active": this.props.active,
-        "nav-bar-item--is-dragging": isDragging
+        "nav-bar-item--is-dragging": isDragging,
+        "nav-bar-item--drop-target": this.state.dropTarget
       })
     let deleteButton = <Button className="nav-bar-item__button-remove" onClick={this.props.onItemRemove} />
     return connectDragSource(connectDropTarget(
       <div onClick={this.props.onClick} className={className}>
+        <div className="nav-bar-item__underlay" />
         <span className="nav-bar-item__text">
           {this.props.title}
         </span>
@@ -116,4 +118,36 @@ export default class NavGroupItem extends React.Component {
       </div>
     ))
   }
+
+  componentWillReceiveProps = (nextProps) => {
+    if (!this.props.isOver && nextProps.isOver) {
+      // You can use this as enter handler
+      this.dragOverTimeout = setTimeout(this.props.onClick, 1000)
+      this.setState({
+        dropTarget: true
+      })
+    }
+    if (this.props.isOver && !nextProps.isOver) {
+      // You can use this as leave handler
+      clearTimeout(this.dragOverTimeout)
+      this.setState({
+        dropTarget: false
+      })
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // immutable?
+    return(
+      this.state.dropTarget != nextState.dropTarget ||
+      this.props.active != nextProps.active ||
+      this.props.groupID != nextProps.groupID ||
+      this.props.index != nextProps.index ||
+      this.props.isDragging != nextProps.isDragging ||
+      this.props.isOver != nextProps.isOver ||
+      this.props.isOverCurrent != nextProps.isOverCurrent ||
+      this.props.title != nextProps.title
+    )
+  }
+
 }

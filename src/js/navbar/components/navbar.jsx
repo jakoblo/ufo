@@ -29,8 +29,6 @@ const NavbarTarget = {
   }
 }
 
-console.log(NavbarTarget)
-
 @connect((state) => {
   return {navbar: state[constants.NAME],
     state: state

@@ -128,6 +128,7 @@
       background: @color__main-decoration;
       opacity: 0;
       top: calc(@height__item / 2);
+      left: 0;
       transition: 
         top @drag-over-expand-time linear, 
         height @drag-over-expand-time linear, 
@@ -145,10 +146,9 @@
     &::before {
       // drag-over-expand transition
       top: 0;
-      height: @height__item;
+      height: calc(@height__item + 2px);
       opacity: 1;
     }
-    
   }
 
   &--drop-blocked &__underlay {

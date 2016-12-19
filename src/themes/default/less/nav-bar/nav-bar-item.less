@@ -9,7 +9,7 @@
 
   display: flex;
   align-items: top;
-
+  position: relative;
   height: @height_nav-bar-item;
   padding: 0 @padding__sidebar-horizonal;
   transition: background 0.3s;
@@ -96,4 +96,29 @@
     }
   }
 
+  &__underlay {
+    @drag-over-expand-time: 0.9s;
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -10;
+    width: 100%;
+    height: 0;
+    background: @color__main-decoration;
+    opacity: 0;
+    top: calc(@height_nav-bar-item / 2);
+    left: 0;
+    transition: 
+      top @drag-over-expand-time linear, 
+      height @drag-over-expand-time linear, 
+      opacity @drag-over-expand-time linear;
+  }
+  
+  &--drop-target &__underlay {
+    // drag-over-expand transition
+    top: 0;
+    height: @height_nav-bar-item;
+    opacity: 1;
+  }
+  
 }

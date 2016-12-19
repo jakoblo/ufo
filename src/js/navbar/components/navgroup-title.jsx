@@ -16,7 +16,6 @@ export default class NavGroupTitle extends React.Component {
   }
 
   render() {
-  
     let title;
     if(this.state.editGroupTitle) {
       title = <input 

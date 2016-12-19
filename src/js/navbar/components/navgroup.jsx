@@ -20,22 +20,30 @@ import NavGroupItemCollapser from './navgroup-item-collapser'
 
 const groupTarget = {
   drop(props, monitor, component) {
-    if(monitor.getItemType() === NativeTypes.FILE) {
-      if (props.isDiskGroup) return
-      if(monitor.getItem().files.length > 0) {
-        let files = []
-        _.forIn(monitor.getItem().files, function(value, key) {
-        if(_.hasIn(value, 'path'))
-        files.push(value.path)
-        })
-        props.dispatch(Actions.addGroupItems(props.groupID, files))
-      }
-    } else if(monitor.getItemType() === DnDTypes.NAVGROUP) {
-      props.dispatch(Actions.saveFavbartoStorage())
+    console.log('drop')
+    switch (monitor.getItemType()) {
+
+      case NativeTypes.FILE:
+        if (props.isDiskGroup) return
+        if(monitor.getItem().files.length > 0) {
+          let files = []
+          _.forIn(monitor.getItem().files, function(value, key) {
+          if(_.hasIn(value, 'path'))
+          files.push(value.path)
+          })
+          props.dispatch(Actions.addGroupItems(props.groupID, files))
+        }
+        return
+
+      case DnDTypes.NAVGROUP:
+        props.dispatch(Actions.saveFavbartoStorage())
+        return
+    
+      default:
+        return
     }
   }, 
   hover(props, monitor, component) {
-    console.log('hover')
     if(monitor.getItemType() !== DnDTypes.NAVGROUP) return
 
     const dragIndex = monitor.getItem().index;
@@ -170,9 +178,7 @@ export default class NavGroup extends React.Component {
   createGroupItem = (item, index) => {
     const path = item.path
     let basePath = nodePath.basename(path)
-    let active = false
-    if(path === this.props.activeItem)
-    active = true
+    let active = (path === this.props.activeItem)
     let type = "folder"
     if(this.props.isDiskGroup)
     type = 'device'
@@ -203,8 +209,10 @@ export default class NavGroup extends React.Component {
   }
 
   handleSelectionChanged = (path, e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    if(e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     this.props.dispatch(App.actions.changeAppPath(path))
   }
 
