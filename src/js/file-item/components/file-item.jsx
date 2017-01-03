@@ -18,7 +18,6 @@ const FolderDropTarget = {
   // No modifer keys available  
   // https://github.com/gaearon/react-dnd/issues/512
 }
-
 @DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver()
@@ -27,6 +26,7 @@ export default class FileItemComp extends React.Component {
 
   constructor(props) {
     super(props)
+    console.log('consturct', Date.now())
     this.dragOverTimeout = null
     this.state = {
       data: Map({
@@ -37,6 +37,7 @@ export default class FileItemComp extends React.Component {
   }
 
   render() {
+    console.log('render', Date.now())
     const connectDropTarget = (this.props.file.get('stats').isDirectory()) ? this.props.connectDropTarget : r => r
 
     return connectDropTarget(
@@ -85,6 +86,10 @@ export default class FileItemComp extends React.Component {
           />
         }
       </div>)
+  }
+
+  componentDidMount = () => {
+    console.log('done', Date.now())
   }
 
   setImmState(fn) {
