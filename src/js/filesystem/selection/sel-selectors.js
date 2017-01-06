@@ -23,7 +23,7 @@ export const getFocusedFile = (state) => {
 
 export const getSelectionOf = (state, props) => {
   if(props.path == state.selection.get('root')) {
-    return state.selection
+    return state.selection.get('files')
   } else {
     return null
   }

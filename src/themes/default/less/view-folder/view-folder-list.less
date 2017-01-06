@@ -23,11 +23,11 @@
     background: linear-gradient(to bottom, rgba(255,255,255,1) 95%, rgba(255,255,255,0) 100%);
   }
 
-  &__name {
+  &__name { 
     .view-title;
   }
 
-  &__item-container {
+  /*&__item-container {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -38,7 +38,15 @@
     overflow-x: hidden;
     will-change: transform;
     .nicer-scrollbars(#fff)
+  }*/
+
+  &__item-container {
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    will-change: transform;
+    .nicer-scrollbars(#fff)
   }
+  
 
   &__toolbar-bottom {
     position: absolute;

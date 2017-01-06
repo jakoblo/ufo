@@ -67,7 +67,6 @@ export default class ViewPlacer extends React.Component {
           <ViewWrapper 
             key={dirState.path} 
             path={dirState.path}
-            onResize={this.resizeHandle}
             ready={dirState.ready}
             error={dirState.error}
           >

@@ -42,7 +42,7 @@ export const getFilesMergedOf_Factory = () => {
 
       // Merge Selection
       if(files && selection) {
-        selection.get('files').forEach((selectedFile, index) => {
+        selection.forEach((selectedFile, index) => {
           if(files.get(selectedFile)) {
             files = files.setIn([selectedFile, 'selected'], true)
           } else {

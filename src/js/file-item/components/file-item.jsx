@@ -26,7 +26,6 @@ export default class FileItemComp extends React.Component {
 
   constructor(props) {
     super(props)
-    console.log('consturct', Date.now())
     this.dragOverTimeout = null
     this.state = {
       data: Map({
@@ -37,7 +36,6 @@ export default class FileItemComp extends React.Component {
   }
 
   render() {
-    console.log('render', Date.now())
     const connectDropTarget = (this.props.file.get('stats').isDirectory()) ? this.props.connectDropTarget : r => r
 
     return connectDropTarget(
@@ -53,6 +51,7 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
           [this.props.className+'--in-progress']: this.props.file.get('progress')
         })}
+        style={this.props.style}
       >
         <div className={this.props.className+'__underlay'} />
         {this.props.file.get('progress') ? 
@@ -86,10 +85,6 @@ export default class FileItemComp extends React.Component {
           />
         }
       </div>)
-  }
-
-  componentDidMount = () => {
-    console.log('done', Date.now())
   }
 
   setImmState(fn) {
