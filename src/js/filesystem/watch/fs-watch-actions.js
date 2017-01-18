@@ -6,6 +6,7 @@ import App from '../../app/app-index'
 const watcherSettings = {
   persistent: true,
   depth: 0,
+  followSymlinks: false, // Symlinks are annoying on windows
   alwaysStat: true
 }
 /**
