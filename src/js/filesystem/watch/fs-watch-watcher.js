@@ -103,6 +103,9 @@ class ChokidarHandler {
     if(root == path) {
       return // the file is direcotry itself. Chokidar... i don't know why
     }
+    if(stats.isSymbolicLink()) {
+      return // Ignore Symbolic Links, they are anoying... and can crash node/chokidar on windows
+    }
     if(this.watcherStack[root].ready) {
       callback(fileObj)
     } else {
