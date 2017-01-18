@@ -1,6 +1,7 @@
 "use strict"
 import { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } from 'electron'
 import { fs } from 'fs'
+import os from 'os'
 
 const appBasePath = __dirname
 var allBrowserWindows = []
@@ -12,7 +13,7 @@ function createNewBrowserWindow() {
           width : 800,
           height: 600,
           resizable: true,
-          frame: false
+          frame: (os.platform() != 'darwin')
         });
   windowID = browserWindow.id
 

@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import * as AppActions from '../app-actions'
 import * as selectors from '../app-selectors'
 import WindowControls from './window-controls'
+import os from 'os'
 
 @connect((state) => {
   return {
@@ -29,7 +30,10 @@ export default class AppControls extends React.Component {
     })
     return (
       <div className="app-controls">
-        <WindowControls />
+        {(os.platform() == 'drawin') ?
+          <WindowControls />
+        : null}
+        
         <div className="history-controls">
           <button className={buttonBackClasses} onClick={this.handleHistoryBack} />
           <button className={buttonForwardClasses} onClick={this.handleHistoryForward} />
