@@ -17,7 +17,7 @@ export default class AppControls extends React.Component {
     super(props)
   }
 
-  render() { 
+  render() {
     let historyPosition = this.props.history.get('position')
     let historySequence = this.props.history.get('sequence')
     let buttonForwardClasses = classnames({
@@ -30,10 +30,9 @@ export default class AppControls extends React.Component {
     })
     return (
       <div className="app-controls">
-        {(os.platform() == 'drawin') ?
+        {(os.platform() == 'darwin') ?
           <WindowControls />
         : null}
-        
         <div className="history-controls">
           <button className={buttonBackClasses} onClick={this.handleHistoryBack} />
           <button className={buttonForwardClasses} onClick={this.handleHistoryForward} />
