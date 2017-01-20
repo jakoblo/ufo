@@ -1,13 +1,15 @@
 {
-  "name": "fileflow",
+  "name": "ufo",
+  "productName": "ufo",
   "main": "./src/js/init.js",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
   "scripts": {
-    "start": "./node_modules/.bin/electron .",
+    "start": "NODE_ENV=development ./node_modules/.bin/electron .",
     "main-debug": "./node_modules/.bin/electron . --debug=5858",
     "install": "gulp install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/electron-packager-compile . -all --overwrite"
   },
   "author": "",
   "license": "ISC",
@@ -67,6 +69,7 @@
     "devtron": "^1.3.0",
     "electron-compilers": "^5.2.2",
     "electron-devtools-installer": "^2.0.1",
+    "electron-packager": "^8.5.0",
     "eslint": "^3.3.0",
     "eslint-plugin-react": "^6.1.0",
     "gulp": "^3.9.1",
