@@ -1,3 +1,9 @@
+/**
+ * @file Starting point for the application and the electron main process.
+ * The main task is to manage the different windows and create an communiction between them.
+ * @todo Needs a lot of cleanup and structure
+ */
+
 "use strict"
 import { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } from 'electron'
 import { fs } from 'fs'
@@ -13,29 +19,25 @@ function createNewBrowserWindow() {
           width : 800,
           height: 600,
           resizable: true,
-          frame: (os.platform() != 'darwin')
+          frame: (os.platform() != 'darwin') // Windows needs the ugly frame, linux?
         });
   windowID = browserWindow.id
 
   browserWindow.loadURL('file://' + appBasePath + '/../html/window.html');
-  
-  // Develop Help
-  // browserWindow.toggleDevTools()
-  // browserWindow.maximize()
 
   // Emitted when the window is closed.
   browserWindow.on('closed', () => {
     allBrowserWindows.splice(allBrowserWindows.indexOf(browserWindow), 1)
     // Dereference the window object, usually you would store windows in an array if your app supports multi windows, this is the time when you should delete the corresponding element.
-    browserWindow = null; // does that work?
-    
+    browserWindow = null;
   })
 
   allBrowserWindows.push(browserWindow)
 }
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
-    app.quit()
+  app.quit()
 });
 
 app.on('before-quit', function(e) {
