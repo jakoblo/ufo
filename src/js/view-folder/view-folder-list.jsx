@@ -17,6 +17,15 @@ import { DropTarget } from 'react-dnd'
 import { NativeTypes } from 'react-dnd-html5-backend'
 import { List, AutoSizer, WindowScroller } from 'react-virtualized'
 
+import Scroll from 'react-scroll';
+
+var Link       = Scroll.Link;
+var Element    = Scroll.Element;
+var Events     = Scroll.Events;
+var scroll     = Scroll.animateScroll;
+var scrollSpy  = Scroll.scrollSpy;
+
+
 const DEFAULT_WIDTH = 235
 
 const FolderDropTarget = {
@@ -46,8 +55,33 @@ export default class DisplayList extends React.Component {
       width: DEFAULT_WIDTH
     }
   }
+  componentDidMount = () => {
+
+    Events.scrollEvent.register('begin', function(to, element) {
+      console.log("begin", arguments);
+    });
+
+    Events.scrollEvent.register('end', function(to, element) {
+      console.log("end", arguments);
+    });
+
+    scrollSpy.update();
+
+  }
+
+  componentWillUnmount = () => {
+    Events.scrollEvent.remove('begin');
+    Events.scrollEvent.remove('end');
+  }
 
   render() {
+
+    if(this.props.selected && this.scrollWrapper) { 
+      var scrollheight = this.props.folder.keySeq().indexOf( this.props.selected.last() ) * 20;
+      console.log('scrollheight', scrollheight)
+      this.scrollWrapper.scrollTop = scrollheight;
+    }
+
     return this.props.connectDropTarget(
       <div className={
           classnames({
@@ -56,7 +90,6 @@ export default class DisplayList extends React.Component {
             'folder-display-list--focused': this.props.focused
           })
         }
-        
         onDrop={e => dragndrop.handleFileDrop(e, this.props.path)}
       >
         <div className="folder-display-list__toolbar-top">
@@ -64,53 +97,51 @@ export default class DisplayList extends React.Component {
             {nodePath.basename(this.props.path)}
           </div>
         </div>
-        
+        <div className="folder-display-list__item-container" ref={(e) => {this.scrollWrapper = e}}> 
           {(this.props.ready) ?
-            // <WindowScroller scrollElement={this.scrollWrapper}>
-            //   {({ height, isScrolling, scrollTop }) => {
-            //     return (
-                <AutoSizer>
-                  {({ width, height }) => (
-                    <List
-                      height={height}
-                      width={width}
-                      overscanRowCount={10}
-                      noRowsRenderer={() => (
-                        <div className="folder-display-list__empty-text">Folder is empty</div>
-                      )}
-                      rowCount={this.props.folder.size}
-                      rowHeight={20}
-                      rowRenderer={({index, isScrolling, key, style}) => (
-                        <FileItem
-                          key={key}
-                          style={style}
-                          file={this.props.folder.valueSeq().get(index)}
-                          className="folder-list-item"
-                          dispatch={this.props.dispatch}
-                        />
-                      )}
-                      scrollToIndex={ (this.props.selected) ? 
-                        this.props.folder.keySeq().indexOf( this.props.selected.last() ) : undefined 
-                      }
-                      containerStyle={{
-                        marginTop: 40,
-                        marginBottom: 40,
-                        position: 'relative'
-                      }}
-                      className="folder-display-list__item-container"
-                      // scrollTop={scrollTop}
-                      tabIndex={-1}
-                      forceToUpdate={Date.now()}
-                    />
-                  )}
-                </AutoSizer>
-            //   )}
-            // }
-            // </WindowScroller>
+            <AutoSizer>
+              {({ width }) => (
+              <WindowScroller scrollElement={this.scrollWrapper}>
+                {({ height, isScrolling, scrollTop }) => {
+
+                  console.log(height, width, scrollTop)
+
+                  return (<List
+                    autoHeight
+                    height={height}
+                    scrollTop={scrollTop}
+                    width={width}
+                    overscanRowCount={10}
+                    noRowsRenderer={() => (
+                      <div className="folder-display-list__empty-text">Folder is empty</div>
+                    )}
+                    rowCount={this.props.folder.size}
+                    rowHeight={20}
+                    rowRenderer={({index, isScrolling, key, style}) => (
+                      <FileItem
+                        key={key}
+                        style={style}
+                        file={this.props.folder.valueSeq().get(index)}
+                        className="folder-list-item"
+                        dispatch={this.props.dispatch}
+                      />
+                    )}
+                    containerStyle={{
+                      marginTop: 50,
+                      marginBottom: 50,
+                      position: 'relative'
+                    }}
+                    tabIndex={-1}
+                    forceToUpdate={Date.now()}
+                  />)
+                }}
+              </WindowScroller>
+            )}
+          </AutoSizer>
           :
             null
           }
-        
+        </div>
         <div className="folder-display-list__toolbar-bottom">
           <button
             className="folder-display-list__button-add-folder" 
