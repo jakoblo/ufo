@@ -5,10 +5,23 @@ import ReactDOM from 'react-dom'
 import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
-import eventHandler from '../fi-event-handler/fi-event-handler-index'
+import _ from 'lodash'
 import RenameInput from '../../filesystem/rename/components/rename-input'
 import ProgressPie from '../../general-components/progress-pie'
+import {dragndrop} from '../../utils/utils-index'
+import { DropTarget } from 'react-dnd'
+import { NativeTypes } from 'react-dnd-html5-backend';
+import * as FileActions from '../fi-actions'
 
+const FolderDropTarget = {
+  // reactDnD drop not useable
+  // No modifer keys available  
+  // https://github.com/gaearon/react-dnd/issues/512
+}
+@DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver()
+}))
 export default class FileItemComp extends React.Component {
 
   constructor(props) {
@@ -17,23 +30,15 @@ export default class FileItemComp extends React.Component {
     this.state = {
       data: Map({
         renaming: false,
-        dropTarget: false,
-        dropBlocked: false,
         openAnimation: false
       })
     }
-    this.clickHandler = eventHandler.getClick(this)
-    this.dragndropHandler = eventHandler.getDragnDrop(this)
-    this.renameHandler = eventHandler.getRename(this)
   }
 
   render() {
+    const connectDropTarget = (this.props.file.get('stats').isDirectory()) ? this.props.connectDropTarget : r => r
 
-    if(!this.props.file.get('stats')) {
-      console.log(this.props.file.toJS())
-    }
-
-    return (
+    return connectDropTarget(
       <div
         className={classNames({
           [this.props.className]: true,
@@ -42,12 +47,11 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--theme-file']: this.props.file.get('stats').isFile(),
           [this.props.className+'--active']: this.props.file.get('active'),
           [this.props.className+'--selected']: this.props.file.get('selected'),
-          [this.props.className+'--drop-target']: this.state.data.get('dropTarget'),
-          [this.props.className+'--drop-blocked']: this.state.data.get('dropBlocked'),
+          [this.props.className+'--drop-target']: this.props.isOver,
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
           [this.props.className+'--in-progress']: this.props.file.get('progress')
         })}
-        ref="file"
+        style={this.props.style}
       >
         <div className={this.props.className+'__underlay'} />
         {this.props.file.get('progress') ? 
@@ -65,14 +69,22 @@ export default class FileItemComp extends React.Component {
             path={this.props.file.get('path')}
             dispatch={this.props.dispatch}
           />
-        : null}
-        <div className={this.props.className+'__event-catcher'} 
-          draggable={true}
-          {...this.clickHandler}
-          {...this.dragndropHandler}
-        />
-      </div>
-    )
+        : 
+          <div className={this.props.className+'__event-catcher'} 
+            draggable={true}
+            onMouseDown={this.onMouseDown}
+            onMouseUp={this.onMouseUp}
+            onDoubleClick={this.onDoubleClick}
+            onContextMenu={this.onContextMenu}
+            onDragStart={this.onDragStart}
+            onDrop={(e) => {
+              if(this.props.file.get('stats').isDirectory()) {
+                dragndrop.handleFileDrop(e, this.props.file.get('path'))}
+              }
+            }
+          />
+        }
+      </div>)
   }
 
   setImmState(fn) {
@@ -82,7 +94,90 @@ export default class FileItemComp extends React.Component {
     }));
   }
 
+  componentWillReceiveProps = (nextProps) => {
+    if (!this.props.isOver && nextProps.isOver) {
+      // You can use this as enter handler
+      this.dragOverTimeout = setTimeout(() => {
+        this.props.dispatch( FileActions.show(this.props.file) )
+      }, 1000)
+    }
+    if (this.props.isOver && !nextProps.isOver) {
+      // You can use this as leave handler
+      clearTimeout(this.dragOverTimeout)
+    }
+  }
+
   shouldComponentUpdate (nextProps, nextState) {
-    return nextProps.file !== this.props.file || nextState.data !== this.state.data;
+    return (
+      nextProps.file !== this.props.file || 
+      nextProps.isOver !== this.props.isOver || 
+      nextProps.isOverCurrent !== this.props.isOverCurrent || 
+      nextState.data !== this.state.data
+    );
+  }
+
+  onDragStart = (event) => {
+    event.preventDefault()
+    if(!this.props.file.get('progress')) {
+      this.props.dispatch( FileActions.startDrag(this.props.file) )
+    }
+  }
+
+  /**
+   * Adding file to Selection
+   */
+  onMouseDown = (event) => {
+    event.stopPropagation()
+    if(!this.props.file.get('progress')) {
+      if(event.ctrlKey || event.metaKey) {
+        this.props.dispatch( FileActions.addToSelection(this.props.file) )
+      } else if(event.shiftKey) {
+        this.props.dispatch( FileActions.expandSelection(this.props.file) )
+      }
+    }
+  }
+
+  /**
+   * Show Folder or File in Preview
+   */
+  onMouseUp = (event) => {
+    event.stopPropagation()
+    if(!this.props.file.get('progress')) {
+      if(!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+        if(!this.props.file.get('selected')) {
+          this.props.dispatch( FileActions.show(this.props.file) )
+        }
+      }
+    }
+  }
+
+  /**
+   * Open File in Default Application
+   */
+  onDoubleClick = (event) => {
+    if(!this.props.file.get('progress') && this.props.file.get('stats').isFile()) {
+      // Open
+      this.props.dispatch( FileActions.open(this.props.file) )
+
+      this.setImmState((prevState) => (prevState.set('openAnimation', true)))
+      setTimeout(() => {
+        this.setImmState((prevState) => (prevState.set('openAnimation', false)))
+      }, 1000);
+    }
+  }
+
+  /**
+   * Right Click menu
+   */
+  onContextMenu = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if(!this.props.file.get('progress')) {
+      this.props.dispatch( 
+        FileActions.showContextMenu(
+          this.props.file,
+          this.renameStart
+        ))
+    }
   }
 }

@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "transform-async-to-generator",
     "transform-decorators-legacy",
     "transform-object-rest-spread",
     "transform-class-properties",

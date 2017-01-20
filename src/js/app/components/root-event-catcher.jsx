@@ -7,9 +7,11 @@ import Selection from '../../filesystem/selection/sel-index'
 import Filter from '../../filesystem/filter/filter-index'
 import Rename from '../../filesystem/rename/rename-index'
 import App from '../app-index'
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import { remote  } from 'electron'
 
-
+@DragDropContext(HTML5Backend)
 export default class EventCatcher extends React.Component {
   constructor(props) {
     super(props)
@@ -37,7 +39,7 @@ export default class EventCatcher extends React.Component {
   keyAction = (action, event) => {
     if(this.actionMap[action]) {
       window.store.dispatch( this.actionMap[action]() )
-    } else if( 
+    } else if(
       event.key.length == 1 &&
       !event.metaKey &&
       !event.ctrlKey 

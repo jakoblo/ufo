@@ -16,7 +16,7 @@ export default class ViewWrapper extends React.Component {
       loading = null
     }
     return(
-      <div className={classes} ref={(c) => this.refView = c}>
+      <div className={classes}>
         {loading}
         {this.props.children}
       </div>

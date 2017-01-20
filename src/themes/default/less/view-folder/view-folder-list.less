@@ -23,20 +23,16 @@
     background: linear-gradient(to bottom, rgba(255,255,255,1) 95%, rgba(255,255,255,0) 100%);
   }
 
-  &__name {
+  &__name { 
     .view-title;
   }
 
   &__item-container {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    height: 100%;
-    padding-top: calc(@height__top-toolbar + @padding__sidebar-horizonal);
-    padding-bottom: 30px;
-    overflow-y: scroll;
+    overflow-y: scroll !important;
     overflow-x: hidden;
+    height: 100%;
     will-change: transform;
+    outline: none;
     .nicer-scrollbars(#fff)
   }
 
@@ -70,6 +66,7 @@
   &--drop-target::after {
     content: '';
     .drop-zone;
+    z-index: -10;
     right: 7px;
     top: calc(@height__top-toolbar + 2px);
   }

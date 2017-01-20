@@ -3,86 +3,109 @@ import { connect } from 'react-redux'
 import * as FsMergedSelector from  '../filesystem/fs-merged-selectors'
 import FileItem from '../file-item/components/file-item'
 import FilterTypeInput from '../filesystem/filter/components/filter-type-input'
+import Selection from '../filesystem/selection/sel-index'
 import Filter from '../filesystem/filter/filter-index'
 import App from '../app/app-index'
 import classnames from 'classnames'
+import _ from 'lodash'
 import nodePath from 'path'
 import {Map} from 'immutable'
-import {dragndrop} from '../utils/utils-index'
 import Button from '../general-components/button'
 import fsWrite from '../filesystem/write/fs-write-index'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import { dragndrop } from '../utils/utils-index'
+import { DropTarget } from 'react-dnd'
+import { NativeTypes } from 'react-dnd-html5-backend'
+import { List, AutoSizer, WindowScroller } from 'react-virtualized'
+
+const DEFAULT_WIDTH = 235
+const PADDING_TOP = 50
+const PADDING_BOTTOM = 30
+
+const FolderDropTarget = {
+  // reactDnD drop not useable
+  // No modifer keys available
+  // https://github.com/gaearon/react-dnd/issues/512
+}
 
 @connect(() => {
   const getFilesMergedOf = FsMergedSelector.getFilesMergedOf_Factory()
   return (state, props) => {
     return {
       focused: Filter.selectors.isFocused(state, props),
-      folder: getFilesMergedOf(state, props)
+      folder: getFilesMergedOf(state, props),
+      selected: Selection.selectors.getSelectionOf(state, props)
     }
   }
 })
+@DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOverCurrent: monitor.isOver({ shallow: true })
+}))
 export default class DisplayList extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: Map({
-        dropTarget: false
-      })
+      width: DEFAULT_WIDTH
     }
-    this.dragInOutCount = 0
   }
 
   render() {
-
-    let items = ""
-    if(this.props.folder) {
-      items = this.props.folder.valueSeq().map((file, index) => {
-        return ( <FileItem
-          key={file.get('path')}
-          file={file}
-          className="folder-list-item"
-          dispatch={this.props.dispatch}
-        /> )
-      })
-    }
-
-    return(
+    return this.props.connectDropTarget(
       <div className={
           classnames({
             'folder-display-list': true,
-            'folder-display-list--drop-target': this.state.data.get('dropTarget'),
+            'folder-display-list--drop-target': this.props.isOverCurrent,
             'folder-display-list--focused': this.props.focused
           })
         }
-        onDrop={this.onDrop}
-        onDragOver={this.onDragOver}
-        onDragEnter={this.onDragEnter}
-        onDragLeave={this.onDragLeave}
-        onMouseUp={this.focus}
-      > 
+        onDrop={e => dragndrop.handleFileDrop(e, this.props.path)}
+      >
         <div className="folder-display-list__toolbar-top">
           <div className="folder-display-list__name">
             {nodePath.basename(this.props.path)}
           </div>
         </div>
-        <div className="folder-display-list__item-container">
           {(this.props.ready) ?
-            <ReactCSSTransitionGroup
-              transitionName="folder-list-item--animation"
-              transitionEnterTimeout={250}
-              transitionLeaveTimeout={250}
-            >
-              {(items.size > 0) ? 
-                items
-                :
-                <div className="folder-display-list__empty-text">Folder is empty</div>
-              }
-            </ReactCSSTransitionGroup>
+            <AutoSizer>
+              {({ width, height }) => (
+                <List
+                  height={(height - PADDING_TOP - PADDING_BOTTOM)}
+                  width={width}
+                  style={{
+                    // I overwrite the box-sizing to content-box to able to use the height without the padding
+                    boxSizing: 'content-box',
+                    // now we add padding and the file height of the list, will be the same as the Autosizer
+                    paddingTop: PADDING_TOP,
+                    paddingBottom: PADDING_BOTTOM
+                  }}
+                  containerStyle={{position: 'relative'}} // With position relative, the items position themselves at the innercontainer
+                  className="folder-display-list__item-container"
+                  overscanRowCount={10}
+                  noRowsRenderer={() => (
+                    <div className="folder-display-list__empty-text">Folder is empty</div>
+                  )}
+                  rowCount={this.props.folder.size}
+                  rowHeight={20}
+                  rowRenderer={({index, isScrolling, key, style}) => (
+                    <FileItem
+                      key={key}
+                      style={style}
+                      file={this.props.folder.valueSeq().get(index)}
+                      className="folder-list-item"
+                      dispatch={this.props.dispatch}
+                    />
+                  )}
+                  scrollToIndex={ (this.props.selected) ? 
+                    this.props.folder.keySeq().indexOf( this.props.selected.last() ) : undefined 
+                  }
+                  tabIndex={-1}
+                  forceToUpdate={Date.now()}
+                />
+            )}
+            </AutoSizer>
           :
             null
           }
-        </div>
         <div className="folder-display-list__toolbar-bottom">
           <button
             className="folder-display-list__button-add-folder" 
@@ -92,7 +115,7 @@ export default class DisplayList extends React.Component {
           />
           <FilterTypeInput path={this.props.path} />
         </div>
-      </div>
+      </div>  
     )
   }
 
@@ -100,8 +123,7 @@ export default class DisplayList extends React.Component {
     return (
       nextProps.folder !== this.props.folder || 
       nextProps.focused !== this.props.focused || 
-      nextProps.ready !== this.props.ready || 
-      nextState.data !== this.state.data
+      nextProps.ready !== this.props.ready
     )
   }
   
@@ -112,42 +134,6 @@ export default class DisplayList extends React.Component {
     }));
   }
 
-
-  /**
-   * Filedrop to this Folder
-   * with Hover drop-target state
-  **/
-  onDragOver = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    event.dataTransfer.dropEffect = "copy"
-    this.setImmState((prevState) => (prevState.set('dropTarget', true)))
-  }
-  onDragEnter = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    this.dragInOutCount++
-    this.setImmState((prevState) => (prevState.set('dropTarget', true)))
-  }
-  onDragLeave = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    this.dragInOutCount--
-    if(this.dragInOutCount < 1) {
-      this.setImmState((prevState) => (prevState.set('dropTarget', false)))
-    }
-  }
-  onDrop = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    this.setImmState((prevState) => (prevState.set('dropTarget', false)))
-    dragndrop.handleFileDrop(event, this.props.path)
-  }
-
-  onMouseDown = () => {
-    
-  }
-  
   /**
    * focus
    * @memberOf DisplayList
