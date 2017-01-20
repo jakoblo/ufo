@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {storeSetup} from './store-setup'
-import {DevToolsSetup} from './utils/devtools-setup'
 import Config from './config/config-index'
 import { ipcRenderer, remote  } from 'electron'
 // React
