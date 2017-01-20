@@ -27,27 +27,14 @@
     .view-title;
   }
 
-  /*&__item-container {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    height: 100%;
-    padding-top: calc(@height__top-toolbar + @padding__sidebar-horizonal);
-    padding-bottom: 30px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    will-change: transform;
-    .nicer-scrollbars(#fff)
-  }*/
-
   &__item-container {
     overflow-y: scroll !important;
     overflow-x: hidden;
     height: 100%;
     will-change: transform;
+    outline: none;
     .nicer-scrollbars(#fff)
   }
-  
 
   &__toolbar-bottom {
     position: absolute;
