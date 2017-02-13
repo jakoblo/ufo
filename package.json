@@ -71,6 +71,7 @@
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^8.5.0",
     "eslint": "^3.3.0",
+    "eslint-plugin-jsdoc": "^2.4.0",
     "eslint-plugin-react": "^6.1.0",
     "gulp": "^3.9.1",
     "gulp-git": "^1.11.0",

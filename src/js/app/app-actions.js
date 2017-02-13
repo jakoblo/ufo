@@ -7,13 +7,15 @@ import FileSystem from '../filesystem/watch/fs-watch-index'
 let pathRoute = []
 
 /**
- * change the path of folders that is displayed in the app
- * Should be called by user actions (Click on a folder) or by walking through the history
+ * Change the path of folders that is displayed in the app.
+ * Should be called by user actions (Click on a folder) or by walking through the history.
  * If you call it the first the, you need to Provied fromPath and toPath.
  * After that only of them is possible.
  * 
- * @param  {string} fromPath The first folder of the pathRout that will be displayed is optional
- * @param  {string} toPath   The last folder of the pathRout that will be displayed is optional
+ * @param  {string} [fromPath] - The first folder of the pathRout that will be displayed is optional
+ * @param  {string} [toPath] - The last folder of the pathRout that will be displayed is optional
+ * @param  {boolean} [historyJump=false] - true will not create a new history point
+ * @param  {boolean} [peak=false] - The toPath is only a kind of preview and is not focused (keyboard arrow up/down navigation)
  */
 export function changeAppPath(fromPath, toPath, historyJump = false, peak = false) {
 
@@ -65,13 +67,13 @@ export function navigateToParentFolder() {
 
 export function historyBack() {
   return (dispatch, getState) => {
-      dispatch( historyJump(-1) )
+    dispatch( historyJump(-1) )
   }
 }
 
 export function historyForward() {
   return (dispatch, getState) => {
-      dispatch( historyJump(+1) )
+    dispatch( historyJump(+1) )
   }
 }
 
