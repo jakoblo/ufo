@@ -19,7 +19,7 @@
     "codemirror": "^5.18.2",
     "drivelist": "^5.0.4",
     "electron-compile": "^5.1.2",
-    "electron-json-storage": "^2.0.0",
+    "electron-json-storage": "^3.0.1",
     "electron-prebuilt": "^1.4.10",
     "filesize": "^3.3.0",
     "get-folder-size": "^1.0.0",
