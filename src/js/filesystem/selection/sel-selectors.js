@@ -3,6 +3,7 @@ import FS from '../watch/fs-watch-index'
 import nodePath from 'path'
 
 export const getSelection = (state) => state.selection
+export const getSelectionRoot = (state) => state.selection.get('root')
 export const getSelectionPathArray = (state) => {
   let root = state.selection.get('root')
   let files = state.selection.get('files')
