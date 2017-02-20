@@ -50,6 +50,7 @@
     "redux-undo": "^1.0.0-beta9",
     "reselect": "^2.5.3",
     "rimraf": "^2.5.4",
+    "slate": "^0.16.18",
     "trash": "^4.0.0",
     "underscore": "^1.8.3"
   },
