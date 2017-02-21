@@ -23,7 +23,7 @@ export default class EventCatcher extends React.Component {
         onDragEnter={this.stopEvent}
         onDragOver={this.stopEvent}
         onDrop={this.stopEvent}
-        onKeyDown={keyEventHandler( keyMap.global, this.keyAction )}
+        /*onKeyDown={keyEventHandler( keyMap.global, this.keyAction )}*/
         tabIndex={-1}
         ref="eventCatcher"
       >{this.props.children}</div>
