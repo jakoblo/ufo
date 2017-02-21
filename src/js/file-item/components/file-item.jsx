@@ -47,6 +47,7 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--theme-file']: this.props.file.get('stats').isFile(),
           [this.props.className+'--active']: this.props.file.get('active'),
           [this.props.className+'--selected']: this.props.file.get('selected'),
+          [this.props.className+'--is-focused']: this.props.isFocused,
           [this.props.className+'--drop-target']: this.props.isOver,
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
           [this.props.className+'--in-progress']: this.props.file.get('progress')
@@ -112,6 +113,7 @@ export default class FileItemComp extends React.Component {
       nextProps.file !== this.props.file || 
       nextProps.isOver !== this.props.isOver || 
       nextProps.isOverCurrent !== this.props.isOverCurrent || 
+      nextProps.isFocused !== this.props.isFocused || 
       nextState.data !== this.state.data
     );
   }
