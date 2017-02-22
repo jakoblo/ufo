@@ -14,6 +14,7 @@ import {ipcRenderer} from 'electron'
 /**
  * Sets set selection to the given file
  * used by all selecion actions
+ * 
  * @param  {string[]} pathArray
  */
 export function set(pathArray) {

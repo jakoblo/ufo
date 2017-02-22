@@ -40,9 +40,10 @@ function getDirDirection(state, props, direction) {
 /**
  * openFile
  * is the file/folder which is opend in the next View
+ * 
  * @param  {store} state
  * @param  {path: string} props
- * @returns string
+ * @returns {string}
  */
 export function getOpenFileOf(state, props) {
   let nextDir = getDirNext(state, props)

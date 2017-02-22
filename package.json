@@ -46,6 +46,7 @@
     "react-shortcuts": "^1.1.0",
     "react-virtualized": "^8.11.0",
     "redux": "^3.5.2",
+    "redux-logger": "^2.8.1",
     "redux-thunk": "^2.1.0",
     "redux-undo": "^1.0.0-beta9",
     "reselect": "^2.5.3",

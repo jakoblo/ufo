@@ -9,10 +9,12 @@ const watcherSettings = {
   followSymlinks: false, // Symlinks are annoying on windows
   alwaysStat: true
 }
+
 /**
  * Creats a new FileSystem watcher with async Callbacks
  * they will dispatch further actions
- * @param  {String} path
+ * 
+ * @param  {string} path
  */
 export function watcherRequest(path) {
   return function (dispatch) {
@@ -33,7 +35,8 @@ export function watcherRequest(path) {
 
 /**
  * Close/Unwatch the FileSystem watcher for the given path
- * @param  {String} path
+ * 
+ * @param  {string} path
  * @returns {Object}
  */
 export function watcherClose(path) {
@@ -48,7 +51,8 @@ export function watcherClose(path) {
 
 /**
  * Action Creator
- * @param  {String} path
+ * 
+ * @param  {string} path
  * @returns {Object}
  */
 let watcherReading = (path) => {
@@ -62,8 +66,9 @@ let watcherReading = (path) => {
 
 /**
  * Action Creator
- * @param  {String} path the path where the watcher is looking into
- * @param  {[Object]} files Array of all fileObj which the watch found
+ * 
+ * @param  {string} path - the path where the watcher is looking into
+ * @param  {Array} files - Array of all fileObj which the watch found
  * @returns {Object}
  */
 function watcherReady(path, files) {
@@ -89,6 +94,7 @@ function watcherError(error, path) {
 
 /**
  * Action Creator
+ * 
  * @param  {Object} fileObj
  * @returns {Object}
  */
@@ -123,6 +129,7 @@ function fileUnlink(fileObj, activeWatcher) {
 
 /**
  * Action Creator
+ * 
  * @param  {Object} fileObj
  * @returns {Object}
  */

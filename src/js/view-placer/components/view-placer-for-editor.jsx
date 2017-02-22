@@ -6,7 +6,7 @@ import { NAME, DEFAULT_VIEW_WIDTH } from '../vp-constants'
 import ViewWrapper from './view-wrapper'
 import Error from '../../general-components/error'
 import ViewFolderList from '../../view-folder/view-folder-list'
-import FolderEditor from '../../view-folder/view-folder-editor'
+import FolderEditor from '../../folder-editor/folder-editor-index'
 import ViewFile from '../../view-file/vf-index'
 import Selection from '../../filesystem/selection/sel-index'
 import FS from '../../filesystem/watch/fs-watch-index'
@@ -60,7 +60,7 @@ export default class ViewPlacer extends React.Component {
           if(dirState.error) {
             return <Error error={dirState.error} />
           } else {
-            return <FolderEditor path={dirState.path} ready={dirState.ready} />
+            return <FolderEditor.components.editor path={dirState.path} ready={dirState.ready} />
           }
         }
 
