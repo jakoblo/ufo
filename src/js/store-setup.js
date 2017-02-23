@@ -27,7 +27,7 @@ function getMiddleware() {
   let middleware = [
     // promiseMiddleware,
     thunk,
-    // logger
+    logger
   ];
 
   if (process.env.NODE_ENV !== 'production') {

@@ -31,7 +31,6 @@ export default class FolderEditor extends React.Component {
 
   constructor(props) {
     super(props)
-    
   }
 
   render() {

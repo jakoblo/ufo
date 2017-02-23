@@ -101,6 +101,7 @@ export function mapFilesToEditor(props) {
  * 
  * @param {State} state - redux store state
  * @param {Props} props - component props
+ * @param {Immuteable} editorState
  * @returns {ActionCreator}
  */
 function mapFilesToEditorState(state, props, editorState) {
@@ -111,9 +112,10 @@ function mapFilesToEditorState(state, props, editorState) {
   const filesNotInEditor = _.difference(fileList, filesInEditor)
 
   if(filesNotInEditor.length > 0) {
-    filesNotInEditor.forEach((base, index) => {
-      editorState = insertFile(editorState, base)
-    })
+    editorState = newStateWithFileNodes(filesNotInEditor)
+    // filesNotInEditor.forEach((base, index) => {
+    //   editorState = insertFile(editorState, base)
+    // })
   }
   return editorState
 }
@@ -124,10 +126,9 @@ function mapFilesToEditorState(state, props, editorState) {
  * Insert an file with `path` at the current selection.
  *
  * @param {State} editorState
- * @param {String} base filename with suffix
- * @return {State}
+ * @param {string} base - filename with suffix
+ * @returns {State}
  */
-
 function insertFile(editorState, base) {
   return editorState
     .transform()
@@ -137,4 +138,31 @@ function insertFile(editorState, base) {
       data: { base }
     })
     .apply()
+}
+
+
+// Faster than block transforms, but still slow
+function newStateWithFileNodes(filesNotInEditor) {
+  const nodes = []
+
+  filesNotInEditor.forEach((base, index) => {
+    nodes.push({
+      kind: 'block',
+      type: 'file',
+      isVoid: true,
+      data: { base }
+    })
+  })
+
+  // Add empty line at the end
+  nodes.push({
+    kind: 'block',
+    type: 'paragraph',
+  })
+
+  console.time('Create Slate State')
+  const editorState = Raw.deserialize({ nodes }, { terse: true }) 
+  console.timeEnd('Create Slate State')
+
+  return editorState
 }
