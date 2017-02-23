@@ -10,8 +10,8 @@ import * as FilterSelectors from '../filter-selectors'
 @connect(() => {
   return (state, props) => {
     return {
-      focused: FilterSelectors.isFocused(state, props),
-      input: FilterSelectors.getUserInput(state, props)
+      focused: FilterSelectors.isFocused(state, props.path),
+      input: FilterSelectors.getUserInput(state, props.path)
     }
   }
 })

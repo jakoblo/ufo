@@ -82,7 +82,7 @@ export function showContextMenu(file, startRename) {
 
 function getPathArray(file, getState) {
   if(file.get('selected')) {
-    return Selection.selectors.getSelectionPathArray(getState()).toJS()
+    return Selection.selectors.getSelectionPathList(getState()).toJS()
   } else {
     return [file.get('path')]
   }

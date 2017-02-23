@@ -8,7 +8,7 @@ import {Map} from 'immutable'
 @connect(() => {
   return (state, props) => {
     return {
-      fsWrite: Selectors.getFSWrite(state, props)
+      fsWrite: Selectors.getFSWrite(state)
     }
   }
 })

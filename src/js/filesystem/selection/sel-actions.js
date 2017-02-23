@@ -92,7 +92,7 @@ export function expandToFile(path) {
 
     if(selection.root == root) {
       // @TODO Use Existing Factory somehow
-      let filesSeq = fsMergedSelector.getFiltedFilesSeq_Factory()(state, {path: root})
+      let filesSeq = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(state, root)
       let lastSelectionIndex  = filesSeq.indexOf( _.last(selection.files) )
       let currentIndex        = filesSeq.indexOf( filename )
       let start, length
@@ -121,7 +121,7 @@ export function expandToFile(path) {
 export function dirNext() {
   return function (dispatch, getState) {
     let currentSelection = selectors.getSelection(getState())
-    let nextFolder = fsWatch.selectors.getDirNext(getState(), {path: currentSelection.get('root')})
+    let nextFolder = fsWatch.selectors.getDirNext(getState(), currentSelection.get('root'))
     if(nextFolder) dispatch( dirSet( nextFolder ))
   }
 }
@@ -132,7 +132,7 @@ export function dirNext() {
 export function dirPrevious() {
   return function (dispatch, getState) {
     let currentSelection = selectors.getSelection(getState())
-    let prevFolder = fsWatch.selectors.getDirPrevious(getState(), {path: currentSelection.get('root')})
+    let prevFolder = fsWatch.selectors.getDirPrevious(getState(), currentSelection.get('root'))
     if(prevFolder) dispatch(  dirSet( prevFolder ))
   }
 }
@@ -144,9 +144,9 @@ export function dirPrevious() {
  */
 export function dirSet(root) {
   return function (dispatch, getState) {
-    let openFile = fsWatch.selectors.getOpenFileOf(getState(), {path: root})
+    let openFile = fsWatch.selectors.getOpenFileOf(getState(), root)
     // @TODO Use Existing Factory somehow
-    let firstFile =  fsMergedSelector.getFiltedFilesSeq_Factory()(getState(), {path: root})[0]  
+    let firstFile =  fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(getState(), root)[0]  
     if(openFile) {
       dispatch( set( [nodePath.join( root, openFile )] ))
     } else if(firstFile) {
@@ -171,7 +171,7 @@ export function selectAll() {
     let state = getState()
     let root  = state[c.NAME].get('root')
     // @TODO Use Existing Factory somehow
-    let allFiles = fsMergedSelector.getFiltedFilesSeq_Factory()(state, {path: root}).map((filename) => {
+    let allFiles = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(state, root).map((filename) => {
       return nodePath.join(root, filename)
     })
     dispatch( set( allFiles ) )
@@ -191,13 +191,13 @@ function fileNav(direction) {
             fsWatch.selectors.getDirSeq( getState() )[0] // or First Folder
     } 
     // @TODO Use Existing Factory somehow
-    let indexedFiles =     fsMergedSelector.getFiltedFilesSeq_Factory()( getState() , props)
+    let indexedFiles =     fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()( getState() , props)
     let currentFileIndex = fsMergedSelector.getFocusedFileIndexOf_Factory()( getState() , props)
     
     let newActiveName =    indexedFiles[currentFileIndex + direction]
     if(newActiveName) {
       dispatch( FileActions.show(
-        fsWatch.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)}), 
+        fsWatch.selectors.getFile( getState(), nodePath.join(props.path, newActiveName)), 
         true
       ))
     }
@@ -213,7 +213,7 @@ function filesAddFromCurrent(direction) {
     
     let selection = selectors.getSelection( getState() )
     let props = { path: selection.get('root') }
-    let indexedFiles = fsMergedSelector.getFiltedFilesSeq_Factory()( getState(), props )
+    let indexedFiles = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()( getState(), props )
     let currentFileIndex = fsMergedSelector.getFocusedFileIndexOf_Factory()( getState(), props )
     let newSelectedName = indexedFiles[currentFileIndex + direction]
     if(newSelectedName) {
@@ -225,7 +225,7 @@ function filesAddFromCurrent(direction) {
 export function toTrash() {
   return function (dispatch, getState) {
     fsWrite.actions.moveToTrash(
-      selectors.getSelectionPathArray(getState())
+      selectors.getSelectionPathList(getState())
     )
   }
 }
@@ -243,64 +243,65 @@ export function startDrag() {
 
 /**
  * USER SEARCH INPUT SELECTION
+ * REPLACED BY FILTER RIGHT NOW, BUT WE WILL SWITCH MAYBE BACK
  */
 
-export function selectTypeInputAppend(append) { 
-  return function (dispatch, getState) {
-    let existingFilterString = selectors.getSelectTypeInput(getState())
-    let newFilterString = (existingFilterString) ? existingFilterString + append : append; 
-    dispatch(
-      selectTypeInputSet( newFilterString )
-    )
-  }
-}
+// export function selectTypeInputAppend(append) { 
+//   return function (dispatch, getState) {
+//     let existingFilterString = selectors.getSelectTypeInput(getState())
+//     let newFilterString = (existingFilterString) ? existingFilterString + append : append; 
+//     dispatch(
+//       selectTypeInputSet( newFilterString )
+//     )
+//   }
+// }
 
-export function selectTypeInputBackspace() {
-  return function (dispatch, getState) {
+// export function selectTypeInputBackspace() {
+//   return function (dispatch, getState) {
     
-    let existingFilterString = selectors.getSelectTypeInput(getState())
+//     let existingFilterString = selectors.getSelectTypeInput(getState())
     
-    if(existingFilterString && existingFilterString.length > 0) {
-      dispatch(
-        selectTypeInputSet( existingFilterString.slice(0, -1) )
-      )
-    } else {
-      dispatch( selectTypeInputClear() )
-    }
-  }
-}
+//     if(existingFilterString && existingFilterString.length > 0) {
+//       dispatch(
+//         selectTypeInputSet( existingFilterString.slice(0, -1) )
+//       )
+//     } else {
+//       dispatch( selectTypeInputClear() )
+//     }
+//   }
+// }
 
 
-export function selectTypeInputSet(inputString) {
-  return function (dispatch, getState) {
+// export function selectTypeInputSet(inputString) {
+//   return function (dispatch, getState) {
 
-    console.log(inputString)
+//     console.log(inputString)
 
-    dispatch({
-      type: t.SELECT_TYPE_SET,
-      payload: {
-        input: inputString
-      }
-    })
+//     dispatch({
+//       type: t.SELECT_TYPE_SET,
+//       payload: {
+//         input: inputString
+//       }
+//     })
 
-    let regEx = new RegExp('^\\.?'+inputString, "i") // RegExp = /^\.?Filename/i > match .filename & fileName
+//     let regEx = new RegExp('^\\.?'+inputString, "i") // RegExp = /^\.?Filename/i > match .filename & fileName
 
-    let focusedDirPath = selectors.getFocused(getState())
-    let firstFileMatch = fsMergedSelector.getFiltedFilesSeq_Factory()(
-      getState(), 
-      { path: focusedDirPath }
-    ).find((filename) => {
-      return filename.match(regEx)
-    })
+//     let focusedDirPath = selectors.getFocused(getState())
+//     let firstFileMatch = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(
+//       getState(), 
+//       { path: focusedDirPath }
+//     ).find((filename) => {
+//       return filename.match(regEx)
+//     })
 
-    if(firstFileMatch) {
-      dispatch( App.actions.changeAppPath( null, nodePath.join(focusedDirPath, firstFileMatch) ) )
-    }
-  }
-}
+//     if(firstFileMatch) {
+//       dispatch( App.actions.changeAppPath( null, nodePath.join(focusedDirPath, firstFileMatch) ) )
+//     }
+//   }
+// }
 
-export function selectTypeInputClear() {
-  return {
-    type: t.SELECT_TYPE_CLEAR
-  }
-}
+// export function selectTypeInputClear() {
+//   return {
+//     type: t.SELECT_TYPE_CLEAR
+//   }
+// }

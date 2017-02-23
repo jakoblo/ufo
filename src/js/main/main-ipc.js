@@ -5,7 +5,7 @@ export default function ipcListener(handleNewWindow) {
   ipcMain.on('ondragstart', (event, filePath) => {
     event.sender.startDrag({
       files: filePath,
-      icon: appBasePath + '/../../themes/default/img/multiDragPlaceholder.png'
+      icon: __dirname + '/../../themes/default/img/multiDragPlaceholder.png'
     })
   })
 
