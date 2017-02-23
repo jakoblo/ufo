@@ -92,7 +92,7 @@ export function expandToFile(path) {
 
     if(selection.root == root) {
       // @TODO Use Existing Factory somehow
-      let filesSeq = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(state, {path: root})
+      let filesSeq = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(state, root)
       let lastSelectionIndex  = filesSeq.indexOf( _.last(selection.files) )
       let currentIndex        = filesSeq.indexOf( filename )
       let start, length
@@ -121,7 +121,7 @@ export function expandToFile(path) {
 export function dirNext() {
   return function (dispatch, getState) {
     let currentSelection = selectors.getSelection(getState())
-    let nextFolder = fsWatch.selectors.getDirNext(getState(), {path: currentSelection.get('root')})
+    let nextFolder = fsWatch.selectors.getDirNext(getState(), currentSelection.get('root'))
     if(nextFolder) dispatch( dirSet( nextFolder ))
   }
 }
@@ -132,7 +132,7 @@ export function dirNext() {
 export function dirPrevious() {
   return function (dispatch, getState) {
     let currentSelection = selectors.getSelection(getState())
-    let prevFolder = fsWatch.selectors.getDirPrevious(getState(), {path: currentSelection.get('root')})
+    let prevFolder = fsWatch.selectors.getDirPrevious(getState(), currentSelection.get('root'))
     if(prevFolder) dispatch(  dirSet( prevFolder ))
   }
 }
@@ -144,9 +144,9 @@ export function dirPrevious() {
  */
 export function dirSet(root) {
   return function (dispatch, getState) {
-    let openFile = fsWatch.selectors.getOpenFileOf(getState(), {path: root})
+    let openFile = fsWatch.selectors.getOpenFileOf(getState(), root)
     // @TODO Use Existing Factory somehow
-    let firstFile =  fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(getState(), {path: root})[0]  
+    let firstFile =  fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(getState(), root)[0]  
     if(openFile) {
       dispatch( set( [nodePath.join( root, openFile )] ))
     } else if(firstFile) {
@@ -171,7 +171,7 @@ export function selectAll() {
     let state = getState()
     let root  = state[c.NAME].get('root')
     // @TODO Use Existing Factory somehow
-    let allFiles = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(state, {path: root}).map((filename) => {
+    let allFiles = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(state, root).map((filename) => {
       return nodePath.join(root, filename)
     })
     dispatch( set( allFiles ) )
@@ -197,7 +197,7 @@ function fileNav(direction) {
     let newActiveName =    indexedFiles[currentFileIndex + direction]
     if(newActiveName) {
       dispatch( FileActions.show(
-        fsWatch.selectors.getFile( getState() , {path: nodePath.join(props.path, newActiveName)}), 
+        fsWatch.selectors.getFile( getState(), nodePath.join(props.path, newActiveName)), 
         true
       ))
     }

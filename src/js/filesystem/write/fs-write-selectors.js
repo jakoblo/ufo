@@ -2,18 +2,37 @@ import { createSelector } from 'reselect'
 import * as c from './fs-write-constants'
 import nodePath from 'path'
 
-export const getFSWrite = (state, props) => state[c.NAME]
-export const getPath = (state, props) => props.path
+/**
+ * Get FsWriteStoreState
+ * 
+ * @param  {State} state - redux store state
+ * @returns {ImmuteableOrderedMap} - of Write Tasks
+ */
+export const getFSWrite = (state) => state[c.NAME]
 
-export const getProgressOfFile__Factory = (state, props) => {
+/**
+ * Get the write percentage progress of the file
+ * 
+ * @param  {State} state - redux store state
+ * @param  {string} path - of the File
+ * @returns {int | false} - percentage progress in int or false if no progress
+ */
+export const getProgressOfFile__Factory = (state, path) => {
   return createSelector(
-    [getProgressList, getPath],
+    [getProgressList, (state, path) => path],
     (progressList, path) => {
       return (progressList[path] || false)
     }
   )
 }
 
+/**
+ * Get the percentage of the files which are currently in progress
+ * 
+ * @param  {State} state - redux store state
+ * @param  {string} path - of the File
+ * @returns {Array} - percentage progress in int
+ */
 const getProgressList = createSelector(
   [getFSWrite], 
   (fsWrite, path) => {
@@ -33,10 +52,10 @@ const getProgressList = createSelector(
 /**
  * get the fs write entrys for a Folder
  * @param  {Object} state of the redux store
- * @param  {Object} props {path: string}
+ * @param  {Object} path {path: string}
  * @returns Immuteable Map of fs write entry Objects
  */
-// const getOfFolderFactory = (state, props) => {
+// const getOfFolderFactory = (state, path) => {
 //   return createSelector(
 //     [getFSWrite, getPath], (fsWrite, path) => {
 //       return fsWrite.map((entry) => {
@@ -52,10 +71,10 @@ const getProgressList = createSelector(
  * get the progress objects for a folder to display progressbars 
  * 
  * @param  {Object} state of the redux store
- * @param  {Object} props {path: string}
+ * @param  {Object} path {path: string}
  * @returns Immuteable Map of progress Objects
  */
-// const getSubTasksOfFolderFactory = (state, props) => {
+// const getSubTasksOfFolderFactory = (state, path) => {
 
 //   let getOfFolder = getOfFolderFactory()
 

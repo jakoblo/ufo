@@ -27,9 +27,7 @@ const FolderDropTarget = {
   const getFile = FsMergedSelector.getFile_Factory()
 
   return (state, props) => {
-    // console.log('get store props', props.path)
-    const file = getFile(state, props)
-    // console.log(file.toJS())
+    const file = getFile(state, props.path)
 
     return {
       file: file

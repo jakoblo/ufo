@@ -30,10 +30,11 @@ const FolderDropTarget = {
 @connect(() => {
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
   return (state, props) => {
+    const {path} = props
     return {
-      focused: Filter.selectors.isFocused(state, props),
-      fileList: getFiltedBaseArrayOfFolder(state, props),
-      selected: Selection.selectors.getSelectionOfFolder(state, props)
+      focused: Filter.selectors.isFocused(state, path),
+      fileList: getFiltedBaseArrayOfFolder(state, path),
+      selected: Selection.selectors.getSelectionOfFolder(state, path)
     }
   }
 })

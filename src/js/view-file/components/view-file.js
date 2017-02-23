@@ -9,7 +9,7 @@ import getRenderer from '../render/get-renderer'
 @connect(() => {
   return (state, props) => {
     return {
-      file: FS.selectors.getFile(state, props)
+      file: FS.selectors.getFile(state, props.path)
     }
   }
 })

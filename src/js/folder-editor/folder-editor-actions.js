@@ -107,7 +107,7 @@ function mapFilesToEditorState(state, props, editorState) {
 
   const {fileList} = props
 
-  const filesInEditor = selectors.getFilesInEditor_Factory()(state, props)
+  const filesInEditor = selectors.getFilesInEditor_Factory()(state, props.path)
   const filesNotInEditor = _.difference(fileList, filesInEditor)
 
   if(filesNotInEditor.length > 0) {

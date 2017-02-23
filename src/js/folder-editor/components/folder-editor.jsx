@@ -21,8 +21,8 @@ import Filter from '../../filesystem/filter/filter-index'
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
   return (state, props) => {
     return {
-      focused: Filter.selectors.isFocused(state, props),
-      fileList: getFiltedBaseArrayOfFolder(state, props),
+      focused: Filter.selectors.isFocused(state, props.path),
+      fileList: getFiltedBaseArrayOfFolder(state, props.path),
       editorState: state[c.NAME].get(props.path)
     }
   }

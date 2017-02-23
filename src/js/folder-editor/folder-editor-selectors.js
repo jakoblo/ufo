@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import * as c from './folder-editor-constants'
 
-export const getEditorState = (state, props) => state[c.NAME].get(props.path)
+export const getEditorState = (state, path) => state[c.NAME].get(path)
 
 /**
  * Factroy for Selector that returns the editorState

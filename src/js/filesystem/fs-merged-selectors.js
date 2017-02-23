@@ -6,6 +6,13 @@ import Selection from './selection/sel-index'
 import Rename from './rename/rename-index'
 import Filter from './filter/filter-index'
 
+/**
+ * Get the all information to file which are availible 
+ * 
+ * @param  {State} state - redux store state
+ * @param  {string} path - of the File
+ * @returns {ImmuteableMap}
+ */
 export const getFile_Factory = () => {
 
   const getProgressOfFile = Write.selectors.getProgressOfFile__Factory()
@@ -35,7 +42,13 @@ export const getFile_Factory = () => {
   )
 }
 
-
+/**
+ * Get all filtered filepaths which are in the Folder
+ * 
+ * @param  {State} state - redux store state
+ * @param  {string} path - of the File
+ * @returns {Array} - of file bases / filenames
+ */
 export const getFiltedBaseArrayOfFolder_Factory = () => {
   let getFilteredFiles = getFilteredFilesOfFolder_Factory()
   return createSelector(
@@ -104,15 +117,15 @@ export const getFocusedFileIndexOf_Factory = () => {
  * Current Files the Last Selected or the Active one
  * 
  * @param  {Store} state
- * @param  {path: string} props
- * @returns string
+ * @param  {string} path
+ * @returns {string}
  */
-const getFocusedFileOf = (state, props) => {
+const getFocusedFileOf = (state, path) => {
   let lastestSelected = undefined
-  let selection = Selection.selectors.getSelection(state, props)
-  if(selection.get('root') == props.path) {
+  let selection = Selection.selectors.getSelection(state, path)
+  if(selection.get('root') == path) {
     lastestSelected = selection.get('files').last()
   }
-  let openFile = Watch.selectors.getOpenFileOf(state, props)
+  let openFile = Watch.selectors.getOpenFileOf(state, path)
   return lastestSelected || openFile
 }

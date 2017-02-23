@@ -17,7 +17,7 @@ import _ from 'lodash'
     let dirs = FS.selectors.getDirSeq(state)
     return {
       viewFolderList: dirs.map((dir, index) => {
-        return FS.selectors.getDirState(state, {path: dir})
+        return FS.selectors.getDirState(state, dir)
       }),
       viewFilePath: ViewFile.selectors.getViewFilePath(state),
       selectionRoot: Selection.selectors.getSelectionRoot(state)
