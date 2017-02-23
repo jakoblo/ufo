@@ -4,7 +4,6 @@ import {Raw} from 'slate'
 import _ from 'lodash'
 
 const INITIAL_STATE = Map({})
-
 const INITIAL_EDITOR_STATE = Raw.deserialize({
   nodes: [
     {
@@ -25,13 +24,16 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
   switch (action.type) {
 
     case FolderEditor.actiontypes.FOLDER_EDITOR_INIT:
-      return state.set(action.payload.path, INITIAL_EDITOR_STATE)
+      return state.set(action.payload.path, action.payload.editorState)
 
     case FolderEditor.actiontypes.FOLDER_EDITOR_CHANGE:
       return state.set(action.payload.path, action.payload.editorState)
 
     case FolderEditor.actiontypes.FOLDER_EDITOR_FILEMAPPING:
       return state.set(action.payload.path, action.payload.editorState)
+
+    case FolderEditor.actiontypes.FOLDER_EDITOR_CLOSE:
+      return state.delete(action.payload.path)
 
     default:
       return state;

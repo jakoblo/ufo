@@ -44,7 +44,7 @@ export const isFocused = (state, props) => (getFocused(state) == props.path)
  * to filter the files for the given folder
  * @returns {Function} reselect
  */
-export const getFiterRegExForFolder_Factory = () => {
+export const getFiterRegExOfFolder_Factory = () => {
   return createSelector(
     [getGlobal, getLocal],
     (globFilter, localFilter) => {

@@ -3,9 +3,13 @@ import nodePath from 'path'
 import FsWrite from '../write/fs-write-index'
 import ViewFile from '../../view-file/vf-index'
 
-export const getFile = (state, props) => getFilesOf(state, {path: nodePath.dirname(props.path)}).get( nodePath.basename(props.path) )
+export const getFile = (state, props) => {
+  const dir = nodePath.dirname(props.path)
+  const base = nodePath.basename(props.path)
+  return state.fs.getIn([dir, 'files', base])
+}
 
-export const getFilesOf = (state, props)  => {
+export const getFilesOfFolder = (state, props)  => {
   let dir = state.fs.getIn([props.path, 'files'])
   if(dir) {
     return dir
@@ -15,7 +19,7 @@ export const getFilesOf = (state, props)  => {
   }
 }
 
-export const getFilesSeqOf = (state, props) => getFilesOf(state, props).keySeq().toJS()
+export const getFilesSeqOf = (state, props) => getFilesOfFolder(state, props).keySeq().toJS()
 
 export const getDirSeq = (state) => state.fs.keySeq().toJS()
 export const getDirNext = (state, props) => getDirDirection(state, props, +1)
@@ -58,4 +62,9 @@ export function getOpenFileOf(state, props) {
   }
 }
 
-const getCurrentPath =   (state, props)  => props.path
+export function isFileOpen(state, props) {
+  const dir = nodePath.dirname(props.path)
+  const base = nodePath.basename(props.path)
+  const openFile = getOpenFileOf(state, {path: dir})
+  return (base == openFile)
+}

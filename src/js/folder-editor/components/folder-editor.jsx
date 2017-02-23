@@ -8,6 +8,7 @@
 import React from 'react'
 import FileItem from '../../file-item/components/file-item'
 import classnames from 'classnames'
+import nodePath from 'path'
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import { Editor, Raw, Plain } from 'slate'
@@ -17,11 +18,11 @@ import * as Actions from  '../folder-editor-actions'
 import Filter from '../../filesystem/filter/filter-index'
 
 @connect(() => {
-  const getFilesMergedOf = FsMergedSelector.getFilesMergedOf_Factory()
+  const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
   return (state, props) => {
     return {
       focused: Filter.selectors.isFocused(state, props),
-      folder: getFilesMergedOf(state, props),
+      fileList: getFiltedBaseArrayOfFolder(state, props),
       editorState: state[c.NAME].get(props.path)
     }
   }
@@ -30,6 +31,7 @@ export default class FolderEditor extends React.Component {
 
   constructor(props) {
     super(props)
+    
   }
 
   render() {
@@ -45,19 +47,15 @@ export default class FolderEditor extends React.Component {
         null
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.props.dispatch(
-      Actions.folderEditorInit(this.props.path)
+      Actions.folderEditorInit(this.props)
     )
   }
 
-  componentWillReceiveProps(nextProps) {
-    if(this.props.ready == false && nextProps.ready == true) {
-      this.props.dispatch(
-        Actions.mapFilesToEditor(nextProps)
-      )
-    }
-  }
+  componentDidMount() {}
+
+  componentWillReceiveProps(nextProps) {}
 
   onChange = (editorState) => {
     this.props.dispatch(
@@ -66,8 +64,16 @@ export default class FolderEditor extends React.Component {
   }
 
   onDocumentChange = (document, editorState) => {
-    this.dispatch(
-      Actions.mapFilesToEditor(this.props)
+    // this.props.dispatch(
+    //   Actions.mapFilesToEditor(nextProps)
+    // )
+  }
+
+  componentWillReceiveProps(nextProps) {}
+
+  componentWillUnmount() {
+    this.props.dispatch(
+      Actions.folderEditorClose(this.props.path)
     )
   }
   
@@ -85,16 +91,14 @@ export default class FolderEditor extends React.Component {
         const { node, state } = editorProps
         const isFocused = state.selection.hasEdgeIn(node)
         const base = node.data.get('base')
-        if(this.props.folder) {
-          return (
-            <FileItem
-              file={this.props.folder.get(base)}
-              className='folder-list-item'
-              isFocused={isFocused}
-              dispatch={this.props.dispatch}
-            />
-          )
-        }
+        return (
+          <FileItem
+            className='folder-list-item'
+            isFocused={isFocused}
+            path={nodePath.join(this.props.path, base)}
+            dispatch={this.props.dispatch}
+          />
+        )
       }
     }
   }

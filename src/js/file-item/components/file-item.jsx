@@ -2,6 +2,7 @@
 import {remote, Menu, MenuItem} from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { connect } from 'react-redux'
 import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
@@ -13,11 +14,28 @@ import { DropTarget } from 'react-dnd'
 import { NativeTypes } from 'react-dnd-html5-backend';
 import * as FileActions from '../fi-actions'
 
+import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
+
 const FolderDropTarget = {
   // reactDnD drop not useable
   // No modifer keys available  
   // https://github.com/gaearon/react-dnd/issues/512
 }
+
+@connect(() => {
+
+  const getFile = FsMergedSelector.getFile_Factory()
+
+  return (state, props) => {
+    // console.log('get store props', props.path)
+    const file = getFile(state, props)
+    // console.log(file.toJS())
+
+    return {
+      file: file
+    }
+  }
+})
 @DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver()
@@ -29,7 +47,6 @@ export default class FileItemComp extends React.Component {
     this.dragOverTimeout = null
     this.state = {
       data: Map({
-        renaming: false,
         openAnimation: false
       })
     }

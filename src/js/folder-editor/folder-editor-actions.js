@@ -1,16 +1,56 @@
 import * as t from './folder-editor-actiontypes'
 import * as selectors from './folder-editor-selectors'
 import _ from 'lodash'
+import {Raw} from 'slate'
+
+const INITIAL_EDITOR_STATE = Raw.deserialize({
+  nodes: [
+    {
+      kind: 'block',
+      type: 'paragraph',
+      nodes: [
+        {
+          kind: 'text',
+          text: 'Empty'
+        }
+      ]
+    }
+  ]
+}, { terse: true })
 
 /**
  * @param {string} path
  * @returns {action}
  */
-export function folderEditorInit(path) {
+export function folderEditorInit(props) {
+  return (dispatch, getState) => {
+
+    const {path} = props
+
+    let editorState = INITIAL_EDITOR_STATE
+    editorState = mapFilesToEditorState(getState(), props, editorState)
+
+    dispatch({
+      type: t.FOLDER_EDITOR_INIT,
+      payload: {
+        path : path,
+        editorState: editorState
+      }
+    })
+  }
+}
+
+/**
+ * @param {string} path
+ * @returns {action}
+ */
+export function folderEditorClose(path) {
   return {
-    type: t.FOLDER_EDITOR_INIT,
-    payload: {path : path}
-  };
+    type: t.FOLDER_EDITOR_CLOSE,
+    payload: {
+      path : path
+    }
+  }
 }
 
 /**
@@ -28,36 +68,21 @@ export function folderEditorChange(path, editorState) {
   };
 }
 
-export function actionCreator() {
-  return (dispatch, getState) => {
-    
-    dispatch( )
-  }
-}
-
 
 /**
  * Will create file blocks for each file 
  * which is in the props.folder and not jet in the Editor
  * 
- * @param {Props} props
+ * @param {Props} props - component props
  * @returns {ActionCreator}
  */
 export function mapFilesToEditor(props) {
   return (dispatch, getState) => {
 
-    const {folder, path} = props
-    let {editorState} = props
+    const {editorState} = props
+    const newEditorState = mapFilesToEditorState(state, props)
 
-    const filesInEditor = selectors.getFilesInEditor_Factory()(getState(), props)
-    const filesOnDisk = folder.keySeq().toJS()
-
-    const filesNotInEditor = _.difference(filesOnDisk, filesInEditor)
-
-    if(filesNotInEditor.length > 0) {
-      filesNotInEditor.forEach((base, index) => {
-        editorState = insertFile(editorState, base)
-      })
+    if(editorState != newEditorState) {
       dispatch({
         type: t.FOLDER_EDITOR_FILEMAPPING,
         payload: {
@@ -68,6 +93,32 @@ export function mapFilesToEditor(props) {
     }
   }
 }
+
+
+/**
+ * Will create file blocks for each file 
+ * which is in the props.folder and not jet in the Editor
+ * 
+ * @param {State} state - redux store state
+ * @param {Props} props - component props
+ * @returns {ActionCreator}
+ */
+function mapFilesToEditorState(state, props, editorState) {
+
+  const {fileList} = props
+
+  const filesInEditor = selectors.getFilesInEditor_Factory()(state, props)
+  const filesNotInEditor = _.difference(fileList, filesInEditor)
+
+  if(filesNotInEditor.length > 0) {
+    filesNotInEditor.forEach((base, index) => {
+      editorState = insertFile(editorState, base)
+    })
+  }
+  return editorState
+}
+
+
 
 /**
  * Insert an file with `path` at the current selection.

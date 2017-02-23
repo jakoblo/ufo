@@ -64,7 +64,7 @@ export function userInputSet(inputString) {
 
     // FROM HERE VERY VERY VERY DIRY!
     let focusedDirPath = selectors.getFocused(getState())
-    let firstFilteredFile = fsMergedSelector.getFiltedFilesSeq_Factory()(
+    let firstFilteredFile = fsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(
       getState(), 
       { path: focusedDirPath }
     )[0]

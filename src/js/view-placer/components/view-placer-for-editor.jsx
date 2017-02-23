@@ -13,13 +13,15 @@ import FS from '../../filesystem/watch/fs-watch-index'
 import _ from 'lodash'
 
 @connect((state) => {
-  let dirs = FS.selectors.getDirSeq(state)
-  return {
-    viewFolderList: dirs.map((dir, index) => {
-      return FS.selectors.getDirState(state, {path: dir})
-    }),
-    viewFilePath: ViewFile.selectors.getViewFilePath(state),
-    selectionRoot: Selection.selectors.getSelectionRoot(state)
+  return (state, props) => {
+    let dirs = FS.selectors.getDirSeq(state)
+    return {
+      viewFolderList: dirs.map((dir, index) => {
+        return FS.selectors.getDirState(state, {path: dir})
+      }),
+      viewFilePath: ViewFile.selectors.getViewFilePath(state),
+      selectionRoot: Selection.selectors.getSelectionRoot(state)
+    }
   }
 })
 export default class ViewPlacer extends React.Component {
@@ -57,7 +59,10 @@ export default class ViewPlacer extends React.Component {
         prevFolder = dirState.path
         
         let view = (dirState) => {
-          if(dirState.error) {
+          if(!dirState.ready) {
+            return null
+          }
+          else if(dirState.error) {
             return <Error error={dirState.error} />
           } else {
             return <FolderEditor.components.editor path={dirState.path} ready={dirState.ready} />

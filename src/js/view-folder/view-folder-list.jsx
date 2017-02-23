@@ -28,12 +28,12 @@ const FolderDropTarget = {
 }
 
 @connect(() => {
-  const getFilesMergedOf = FsMergedSelector.getFilesMergedOf_Factory()
+  const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
   return (state, props) => {
     return {
       focused: Filter.selectors.isFocused(state, props),
-      folder: getFilesMergedOf(state, props),
-      selected: Selection.selectors.getSelectionOf(state, props)
+      fileList: getFiltedBaseArrayOfFolder(state, props),
+      selected: Selection.selectors.getSelectionOfFolder(state, props)
     }
   }
 })
@@ -65,7 +65,6 @@ export default class DisplayList extends React.Component {
             {nodePath.basename(this.props.path)}
           </div>
         </div>
-          {(this.props.ready) ?
             <AutoSizer>
               {({ width, height }) => (
                 <List
@@ -84,28 +83,25 @@ export default class DisplayList extends React.Component {
                   noRowsRenderer={() => (
                     <div className="folder-display-list__empty-text">Folder is empty</div>
                   )}
-                  rowCount={this.props.folder.size}
+                  rowCount={this.props.fileList.length}
                   rowHeight={20}
                   rowRenderer={({index, isScrolling, key, style}) => (
                     <FileItem
                       key={key}
                       style={style}
-                      file={this.props.folder.valueSeq().get(index)}
+                      path={nodePath.join(this.props.path, this.props.fileList[index])}
                       className="folder-list-item"
                       dispatch={this.props.dispatch}
                     />
                   )}
                   scrollToIndex={ (this.props.selected) ? 
-                    this.props.folder.keySeq().indexOf( this.props.selected.last() ) : undefined 
+                    this.props.fileList.indexOf( this.props.selected.last() ) : undefined 
                   }
                   tabIndex={-1}
                   forceToUpdate={Date.now()}
                 />
             )}
             </AutoSizer>
-          :
-            null
-          }
         <div className="folder-display-list__toolbar-bottom">
           <button
             className="folder-display-list__button-add-folder" 
@@ -121,9 +117,8 @@ export default class DisplayList extends React.Component {
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
-      nextProps.folder !== this.props.folder || 
-      nextProps.focused !== this.props.focused || 
-      nextProps.ready !== this.props.ready
+      nextProps.fileList !== this.props.fileList || 
+      nextProps.focused !== this.props.focused
     )
   }
   
