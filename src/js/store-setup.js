@@ -22,7 +22,10 @@ const store = createStore(
 
 function getMiddleware() {
 
-  const logger = createLogger();
+  const logger = createLogger({
+    collapsed: true,
+    timestamp: false
+  });
 
   let middleware = [
     // promiseMiddleware,
