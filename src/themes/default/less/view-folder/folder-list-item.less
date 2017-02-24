@@ -11,6 +11,10 @@
   position: relative;
   box-sizing: border-box;
 
+  .slate-editor & {
+    margin-left: -@editor-padding-left;
+    margin-right: -@editor-padding-right;
+  }
 
   &--is-focused {
     border-top: 2px solid #0af;

@@ -35,9 +35,9 @@ export default function FilePlugin(options) {
       * |
       * [FileItem]
       */
-      if(event.key == "Backspace" || event.key == "Delete") {
+      if (event.key == "Backspace" || event.key == "Delete") {
         // Line without text between FileBlocks
-        if(prevBlockIsFile && onStartOfBlock && nextBlockIsFile && onEndOfBlock) {
+        if (prevBlockIsFile && onStartOfBlock && nextBlockIsFile && onEndOfBlock) {
           // Remove Empty Line
           return state.transform().removeNodeByKey(startBlock.get('key')).apply()
         }
@@ -47,8 +47,8 @@ export default function FilePlugin(options) {
       * [FileItem]
       * |text
       */
-      if(event.key == "Backspace") {
-        if(prevBlockIsFile && onStartOfBlock) {
+      if (event.key == "Backspace") {
+        if (prevBlockIsFile && onStartOfBlock) {
           return state // Chancel Backspace - would delete previous file block
         }
       }
@@ -57,14 +57,14 @@ export default function FilePlugin(options) {
       * text| 
       * [FileItem]
       */
-      if(event.key == "Delete") {
-        if(nextBlockIsFile && onEndOfBlock) {
+      if (event.key == "Delete") {
+        if (nextBlockIsFile && onEndOfBlock) {
           return state // Chancel Delete - would delete next file block
         }
       }
 
       // Selection is expanded arround FileBlock(s)
-      if(selectionIsOnFile(state)) {
+      if (selectionIsOnFile(state)) {
         return state // Chancel Delete - would delete selected file block
       }
     },
@@ -72,7 +72,7 @@ export default function FilePlugin(options) {
     schema: { // https://docs.slatejs.org/reference/models/schema.html
       nodes: {
         // Render FileItems in blocks with type file
-        [BLOCK_TYPE]: function(editorProps) {
+        [BLOCK_TYPE]: function (editorProps) {
           const { node, state } = editorProps
           const isFocused = state.selection.hasEdgeIn(node)
           const base = node.data.get('base')
@@ -98,7 +98,7 @@ export default function FilePlugin(options) {
     * | FileItem |
     */
     onBeforeInput(event, data, state) {
-      if(selectionIsOnFile(state)) {
+      if (selectionIsOnFile(state)) {
         return insetLineAboveFileBlock(state)
       }
     }

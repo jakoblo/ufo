@@ -10,6 +10,9 @@ import * as Actions from  '../folder-editor-actions'
 import Filter from '../../filesystem/filter/filter-index'
 import FilePlugin from './slate-file-plugin'
 
+import FilterTypeInput from '../../filesystem/filter/components/filter-type-input'
+import fsWrite from '../../filesystem/write/fs-write-index'
+
 @connect(() => {
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
   return (state, props) => {
@@ -31,26 +34,55 @@ export default class FolderEditor extends React.Component {
   }
 
   render() {
-    return  (this.props.editorState) ?
-        <Editor
-          state={this.props.editorState}
-          plugins={ [this.filePlugin] }
-          onChange={this.onChange}
-          onDocumentChange={this.onDocumentChange}
-        />
-      : 
-        null
+    return ( 
+      <div className={
+          classnames({
+            'folder-display-list': true,
+            'folder-display-list--drop-target': this.props.isOverCurrent,
+            'folder-display-list--focused': this.props.focused
+          })
+        }
+        onDrop={e => dragndrop.handleFileDrop(e, this.props.path)}
+      >
+        <div className="folder-display-list__toolbar-top">
+          <div className="folder-display-list__name">
+            {nodePath.basename(this.props.path)}
+          </div>
+        </div>
+        <div className="folder-display-list__editor-container">
+        {
+          (this.props.editorState) ?
+            <Editor
+              state={this.props.editorState}
+              className="slate-editor"
+              plugins={ [this.filePlugin] }
+              onChange={this.onChange}
+              onDocumentChange={this.onDocumentChange}
+            />
+          : 
+            <div className="noFileActions">
+              Loading...
+            </div>
+        }
+        </div>
+        <div className="folder-display-list__toolbar-bottom">
+          <button
+            className="folder-display-list__button-add-folder" 
+            onClick={() => {
+              this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
+            }}
+          />
+          <FilterTypeInput path={this.props.path} />
+        </div>
+      </div>
+    )
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.dispatch(
       Actions.folderEditorInit(this.props)
     )
   }
-
-  componentDidMount() {}
-
-  componentWillReceiveProps(nextProps) {}
 
   onChange = (editorState) => {
     this.props.dispatch(

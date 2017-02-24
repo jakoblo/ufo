@@ -27,13 +27,18 @@
     .view-title;
   }
 
-  &__item-container {
+  &__item-container,
+  &__editor-container {
     overflow-y: scroll !important;
     overflow-x: hidden;
     height: 100%;
     will-change: transform;
     outline: none;
     .nicer-scrollbars(#fff)
+  }
+
+  &__editor-container {
+    padding: 50px @editor-padding-right 30px @editor-padding-left;
   }
 
   &__toolbar-bottom {
