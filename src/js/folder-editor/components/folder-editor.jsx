@@ -61,6 +61,9 @@ export default class FolderEditor extends React.Component {
 
   onDocumentChange = (document, editorState) => {
     console.log("DOCUMENT onChange")
+    this.props.dispatch(
+      Actions.saveEditorStateToFile(this.props.path, editorState)
+    )
     // this.props.dispatch(
     //   Actions.mapFilesToEditor(nextProps)
     // )

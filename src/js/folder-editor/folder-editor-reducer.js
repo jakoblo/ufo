@@ -35,6 +35,9 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
     case FolderEditor.actiontypes.FOLDER_EDITOR_CLOSE:
       return state.delete(action.payload.path)
 
+    case FolderEditor.actiontypes.FOLDER_EDITOR_SAVE_SUCCESS:
+      return state.set(action.payload.path, action.payload.editorState)
+
     default:
       return state;
   }

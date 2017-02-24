@@ -1,8 +1,9 @@
 import * as t from './folder-editor-actiontypes'
 import * as selectors from './folder-editor-selectors'
-import * as c from  './folder-editor-constants'
+import * as c from './folder-editor-constants'
 import _ from 'lodash'
-import {Raw} from 'slate'
+import { Raw } from 'slate'
+import * as Utils from '../utils/utils-index'
 
 const INITIAL_EDITOR_STATE = Raw.deserialize({
   nodes: [
@@ -34,7 +35,7 @@ export function folderEditorInit(props) {
     dispatch({
       type: t.FOLDER_EDITOR_INIT,
       payload: {
-        path : path,
+        path: path,
         editorState: editorState
       }
     })
@@ -49,7 +50,7 @@ export function folderEditorClose(path) {
   return {
     type: t.FOLDER_EDITOR_CLOSE,
     payload: {
-      path : path
+      path: path
     }
   }
 }
@@ -63,7 +64,7 @@ export function folderEditorChange(path, editorState) {
   return {
     type: t.FOLDER_EDITOR_CHANGE,
     payload: {
-      path : path,
+      path: path,
       editorState: editorState
     }
   };
@@ -82,11 +83,11 @@ export function mapFilesToEditor(props) {
     const {editorState} = props
     const newEditorState = mapFilesToEditorState(state, props)
 
-    if(editorState != newEditorState) {
+    if (editorState != newEditorState) {
       dispatch({
         type: t.FOLDER_EDITOR_FILEMAPPING,
         payload: {
-          path : path,
+          path: path,
           editorState: editorState
         }
       })
@@ -110,7 +111,7 @@ function mapFilesToEditorState(state, props, editorState) {
   const filesInEditor = selectors.getFilesInEditor_Factory()(state, props.path)
   const filesNotInEditor = _.difference(fileList, filesInEditor)
 
-  if(filesNotInEditor.length > 0) {
+  if (filesNotInEditor.length > 0) {
     editorState = newStateWithFileNodes(filesNotInEditor)
     // filesNotInEditor.forEach((base, index) => {
     //   editorState = insertFile(editorState, base)
@@ -159,8 +160,56 @@ function newStateWithFileNodes(filesNotInEditor) {
   })
 
   console.time('Create Slate State')
-  const editorState = Raw.deserialize({ nodes }, { terse: true }) 
+  const editorState = Raw.deserialize({ nodes }, { terse: true })
   console.timeEnd('Create Slate State')
 
   return editorState
+}
+
+/**
+ * Save editorState to File
+ *
+ * @param {string} path - folder path to save file
+ * @param {State} editorState
+ * @returns {State}
+ */
+export function saveEditorStateToFile(basePath, editorState) {
+  console.log("SAVE TO FILE " + basePath)
+
+  return (dispatch) => {
+    dispatch({
+      type: t.FOLDER_EDITOR_SAVE_INIT,
+      payload: {
+        path: basePath,
+        editorState: editorState
+      }
+    })
+    let data = Raw.serialize(editorState)
+
+    const success = Utils.folderEditor.saveFileToDisk(basePath, JSON.stringify(data));
+
+    if (success) {
+      dispatch({
+        type: t.FOLDER_EDITOR_SAVE_SUCCESS,
+        payload: {
+          path: basePath,
+          editorState: editorState
+        }
+      })
+    } else {
+      dispatch({
+        type: t.FOLDER_EDITOR_SAVE_ERROR,
+        payload: {
+          path: basePath,
+          editorState: editorState
+        }
+      })
+    }
+  }
+}
+
+export function loadEditorStateFromFile() {
+  const success = Utils.folderEditor.loadFilefromDisk(basePath);
+
+
 }
