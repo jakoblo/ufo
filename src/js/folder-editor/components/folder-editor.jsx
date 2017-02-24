@@ -9,6 +9,7 @@ import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import Filter from '../../filesystem/filter/filter-index'
 import FilePlugin from './slate-file-plugin'
+import MarkdownPlugin from './slate-markdown-plugin'
 
 @connect(() => {
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
@@ -34,7 +35,7 @@ export default class FolderEditor extends React.Component {
     return  (this.props.editorState) ?
         <Editor
           state={this.props.editorState}
-          plugins={ [this.filePlugin] }
+          plugins={ [this.filePlugin, MarkdownPlugin({})] }
           onChange={this.onChange}
           onDocumentChange={this.onDocumentChange}
         />
@@ -59,6 +60,7 @@ export default class FolderEditor extends React.Component {
   }
 
   onDocumentChange = (document, editorState) => {
+    console.log("DOCUMENT onChange")
     // this.props.dispatch(
     //   Actions.mapFilesToEditor(nextProps)
     // )
