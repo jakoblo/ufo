@@ -1,5 +1,6 @@
 import * as t from './folder-editor-actiontypes'
 import * as selectors from './folder-editor-selectors'
+import * as c from  './folder-editor-constants'
 import _ from 'lodash'
 import {Raw} from 'slate'
 
@@ -68,7 +69,6 @@ export function folderEditorChange(path, editorState) {
   };
 }
 
-
 /**
  * Will create file blocks for each file 
  * which is in the props.folder and not jet in the Editor
@@ -93,7 +93,6 @@ export function mapFilesToEditor(props) {
     }
   }
 }
-
 
 /**
  * Will create file blocks for each file 
@@ -121,7 +120,6 @@ function mapFilesToEditorState(state, props, editorState) {
 }
 
 
-
 /**
  * Insert an file with `path` at the current selection.
  *
@@ -133,7 +131,7 @@ function insertFile(editorState, base) {
   return editorState
     .transform()
     .insertBlock({
-      type: 'file',
+      type: c.BLOCK_TYPE_FILE,
       isVoid: true,
       data: { base }
     })
@@ -148,7 +146,7 @@ function newStateWithFileNodes(filesNotInEditor) {
   filesNotInEditor.forEach((base, index) => {
     nodes.push({
       kind: 'block',
-      type: 'file',
+      type: c.BLOCK_TYPE_FILE,
       isVoid: true,
       data: { base }
     })
