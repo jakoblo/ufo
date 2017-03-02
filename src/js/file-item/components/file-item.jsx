@@ -70,7 +70,7 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--active']: this.props.file.get('active'),
           [this.props.className+'--selected']: this.props.file.get('selected'),
           [this.props.className+'--is-focused']: this.props.isFocused,
-          [this.props.className+'--drop-target']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
+          [this.props.className+'--drop-target']: (this.props.file.get('stats').isDirectory() && this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
           [this.props.className+'--drop-target-top']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
           [this.props.className+'--drop-target-bottom']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),

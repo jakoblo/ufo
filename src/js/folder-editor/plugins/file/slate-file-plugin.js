@@ -1,28 +1,20 @@
 import React from 'react'
-import FileItem from '../../file-item/components/file-item'
+import FileItem from '../../../file-item/components/file-item'
 import nodePath from 'path'
 import {Block, Selection} from 'slate'
-import * as c from '../folder-editor-constants'
-import * as dragndrop from '../../utils/dragndrop'
+import * as c from '../../folder-editor-constants'
+import * as dragndrop from '../../../utils/dragndrop'
 
 export default function FilePlugin(options) {
 
   const { BLOCK_TYPE, folderPath } = options
-  const insetLineAboveFileBlock = (editorState) => {
-    return editorState
-      .transform()
-      .splitBlock()
-      .setBlock({
-        type: 'paragraph',
-        isVoid: false,
-        data: {}
-      })
-      .apply()
-  }
+
   const selectionIsOnFile = (state) => state.blocks.some(block => block.type == BLOCK_TYPE)
 
-  function getBlockByKey(state, key) {
-    return state.get('document').getChild(key)              
+  function getFileBlockByBase(state, base) {
+    return state.get('document').findDescendant((node) => {
+      return (node.getIn(['data', 'base']) == base)
+    })
   }
 
   function getSelectionForFileNode(node) {
@@ -35,6 +27,44 @@ export default function FilePlugin(options) {
       isBackward: false,
       isFocused: true
     })
+  }
+
+  const getFileBlockProperties = (basename) => {
+    return {
+      type: c.BLOCK_TYPE_FILE,
+      isVoid: true,
+      data: {
+        base: basename
+      }
+    }
+  }
+
+  const fileBlockTransforms = {
+    removeExisting: (transforming, basename) => {
+      const existingFileBlock = getFileBlockByBase(transforming.state, basename)
+      if(existingFileBlock) {
+        transforming = transforming
+          .removeNodeByKey(existingFileBlock.get('key'))
+      }
+      return transforming
+    },
+
+    insertFileOnTop: (transforming, basename) => transforming
+        .splitBlock()
+        .setBlock(getFileBlockProperties(basename)),    
+
+    insertFileBelow: (transforming, basename) => transforming
+        .insertBlock(getFileBlockProperties(basename)),
+    
+    insetLineAboveFileBlock: (transforming) => {
+      return transforming.splitBlock()
+        .setBlock({
+          type: 'paragraph',
+          isVoid: false,
+          data: {}
+        })
+  }
+
   }
 
   return {
@@ -94,46 +124,29 @@ export default function FilePlugin(options) {
         [BLOCK_TYPE]: function (editorProps) {
           const { node, state, editor } = editorProps
           const isFocused = state.selection.hasEdgeIn(node)
-          const base = node.key
+          const base = node.getIn(['data', 'base'])
           return (
             <FileItem
               className='folder-list-item'
               isFocused={isFocused}
               path={nodePath.join(folderPath, base)}
               onDrop={(cursorPosition, event) => {
-                
-                //console.log(arguments)
-                //console.log(editor)
-                console.log(node.toJS())
-                window.node = node
-                //console.log(base)
-                //console.log(isFocused)
-                //console.log(state)
-                //console.log(state.toJS())
 
                 const fileList = dragndrop.getFilePathArray(event)
                 let transforming = state.transform().select( getSelectionForFileNode(node) )
 
                 fileList.forEach((filePath) => {
                   const basename = nodePath.basename(filePath)
-                  const existingFileBlock = getBlockByKey(state, basename)
-                  const newFileBlock = Block.create({
-                    type: c.BLOCK_TYPE_FILE,
-                    isVoid: true,
-                    key: basename
-                  })
-
-                  if(existingFileBlock) {
-                    transforming = transforming
-                      .removeNodeByKey(existingFileBlock.get('key'))
-                  }
-                  transforming = transforming
-                    .insertBlock(newFileBlock)
-
+                  transforming = fileBlockTransforms.removeExisting(transforming, basename)
+                  transforming = 
+                    (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ?
+                      fileBlockTransforms.insertFileOnTop(transforming, basename)
+                    :
+                      fileBlockTransforms.insertFileBelow(transforming, basename)
                 }) 
 
                 editor.onChange(transforming.apply())
-                dragndrop.executeFileDrop(event, folderPath)
+                dragndrop.executeFileDropOnDisk(event, folderPath)
 
               }}
             />
@@ -154,44 +167,33 @@ export default function FilePlugin(options) {
     */
     onBeforeInput: (event, data, state) => {
       if (selectionIsOnFile(state)) {
-        return insetLineAboveFileBlock(state)
+        return  fileBlockTransforms
+                .insetLineAboveFileBlock( state.transform() )
+                .apply()
       }
     },
 
     onDrop: (event, data, state, editor) => {
-      console.log('EDITOR DROP')
       event.preventDefault()
       event.stopPropagation()
       
       if(dragndrop.shouldAcceptDrop(event, [dragndrop.constants.TYPE_FILE])) {
         const fileList = dragndrop.getFilePathArray(event)
 
-        console.log(
-          data.target.toJS()
-        )
         // Transform selection
-        let transforming = state.transform().unsetSelection().moveTo(data.target)
+        let transforming = state.transform().deselect().select(data.target)
       
         // Insert File Blocks
         fileList.forEach((filePath) => {
-          const fileBase = nodePath.basename(filePath)
-          const existsAlready = state.getIn(['document', 'nodes']).find((node) => {
-            return (node.get('key') == fileBase)
-          })
-          if(existsAlready) {
-            transforming = transforming.removeNodeByKey(fileBase)
-          }
-          transforming = transforming.insertBlock({
-            type: c.BLOCK_TYPE_FILE,
-            isVoid: true,
-            key: fileBase
-          })
+          const basename = nodePath.basename(filePath)
+          transforming = fileBlockTransforms.removeExisting(transforming, basename)
+          transforming = fileBlockTransforms.insertFileBelow(transforming, basename)
         })
 
-        state = transforming.apply()
-
+        state = transforming.deselect().apply()
+        
         // Move Files
-        dragndrop.handleFileDrop(event, folderPath)
+        dragndrop.executeFileDropOnDisk(event, folderPath)
 
         return state
       }

@@ -16,10 +16,6 @@
     margin-right: -@editor-padding-right;
   }
 
-  &--is-focused {
-    border-top: 2px solid #0af;
-  }
-
   .animation__shrink-and-fade(@height__item, 250ms);
 
   // -----------------------------------
@@ -183,6 +179,17 @@
     bottom: -2px;
   }
 
+   .slate-editor &--is-focused &__underlay {
+      border-top: 1px solid #000;
+      left: 0;
+      top: -1px;
+      position: absolute;
+      width: 100%;
+      height: @height__item;
+      animation: cursor-border 1s infinite
+    }
+
+
   // -----------------------------------
   // Other Modifier
   // ---
@@ -217,5 +224,20 @@
     transform: scale(1);
     transform-origin: 10% 50%;
     opacity: 1;
+  }
+}
+
+@keyframes cursor-border {
+  0% {
+    border-color: #000
+  }
+  50% { 
+    border-color: #000
+  }
+  51% {
+    border-color: transparent
+  }
+  100% {
+    border-color: transparent
   }
 }

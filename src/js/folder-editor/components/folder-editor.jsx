@@ -8,7 +8,7 @@ import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
 import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import Filter from '../../filesystem/filter/filter-index'
-import FilePlugin from './slate-file-plugin'
+import FilePlugin from '../plugins/file/slate-file-plugin'
 
 import FilterTypeInput from '../../filesystem/filter/components/filter-type-input'
 import fsWrite from '../../filesystem/write/fs-write-index'
@@ -57,6 +57,10 @@ export default class FolderEditor extends React.Component {
               plugins={ [this.filePlugin] }
               onChange={this.onChange}
               onDrop={this.onDrop}
+              /*ref={(e) => {this.editor = e}} */
+              onBlur={() => {
+                console.log('blur')
+              }}
               onDocumentChange={this.onDocumentChange}
             />
           : 
@@ -76,15 +80,6 @@ export default class FolderEditor extends React.Component {
         </div>
       </div>
     )
-  }
-  
-  onDrop(e, data, state, editor) {
-    console.log(e, data, state, editor)
-
-    // switch (data.type) {
-    //   case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
-    //   case 'node': return this.onDropNode(e, data, state)
-    // }
   }
   
   stopEvent (e) {

@@ -129,7 +129,9 @@ function newStateWithFileNodes(filesNotInEditor) {
       kind: 'block',
       type: c.BLOCK_TYPE_FILE,
       isVoid: true,
-      key: base
+      data: {
+        base: base
+      }
     })
   })
 

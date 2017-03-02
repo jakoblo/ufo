@@ -3,11 +3,23 @@ import _ from 'lodash'
 
 let dragOverCache
 
+/**
+ * @param  {DragEvent} event
+ * @returns {Array<string>} - full file paths
+ */
 export function getFilePathArray(event) {
   return Object.keys(event.dataTransfer.files).map(key => event.dataTransfer.files[key].path)
 }
 
-export function executeFileDrop(event, targetPath) {
+
+/**
+ * Copy or Moves (event modifier key) the files of the drag event
+ * to the given Folder if possible
+ * 
+ * @param {DragEvent} event
+ * @param {string} targetPath - full folder path
+ */
+export function executeFileDropOnDisk(event, targetPath) {
   if(shouldAcceptDrop(event, [constants.TYPE_FILE])) {
     let pathArray = getFilePathArray(event)
     if(event.altKey) {
@@ -18,10 +30,26 @@ export function executeFileDrop(event, targetPath) {
   }
 }
 
+
+/**
+ * Check if dataTransfer.types is in the given values
+ * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
+ * 
+ * @param {DragEvent} event
+ * @param {Array<string>} acceptableTypes
+ * @returns {boolean}
+ */
 export function shouldAcceptDrop(event, acceptableTypes) {
   return (_.intersection(event.dataTransfer.types, acceptableTypes).length > 0)
 }
 
+
+/**
+ * Is the mouse cursor close to the upper or lower edge of the drop target 
+ * 
+ * @param {DragEvent} event
+ * @returns {CURSOR_POSITION_BOTTOM || CURSOR_POSITION_TOP}
+ */
 function getCursorPosition(event) {
   if(event.clientY - event.currentTarget.getBoundingClientRect().top > event.currentTarget.offsetHeight / 2) {
     return constants.CURSOR_POSITION_BOTTOM
@@ -30,6 +58,21 @@ function getCursorPosition(event) {
   }
 }
 
+
+
+/**
+ * Drag & Drop events are anoying...
+ * This function will return drag & drop listeners which will handle the anoying things 
+ * and then call the given callbacks in a clean way
+ * 
+ * @param {Object}        options
+ * @param {Array<string>} options.acceptableTypes - e.g. constants.TYPE_FILE
+ * @param {string}        options.possibleEffects - see constants.effects
+ * @param {dragCallback}  options.dragHover - normalized dragEnter, calls again if the cursor position changes
+ * @param {dragCallback}  options.dragOut - normalized dragLeave
+ * @param {dragCallback}  options.drop - onDrop with cursorPosition
+ * @returns {Object<Listeners>}
+ */
 export function getEnhancedDropZoneListener(options) {
 
   const {
@@ -76,10 +119,18 @@ export function getEnhancedDropZoneListener(options) {
     onDrop: function (event) {
       event.preventDefault()
       event.stopPropagation()
+      dragOverCache = false
+      dragOut(dragOverCache, ...arguments)
       drop(getCursorPosition(event), ...arguments)
     }
   }
 }
+
+/**
+ * @callback dragCallback
+ * @param {string} cursorPosition
+ * @param {DragEvent} event
+ */
 
 export const constants = {
   TYPE_FILE: 'Files',
