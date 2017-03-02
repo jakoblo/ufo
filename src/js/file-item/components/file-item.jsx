@@ -11,17 +11,9 @@ import RenameInput from '../../filesystem/rename/components/rename-input'
 import ProgressPie from '../../general-components/progress-pie'
 import FileItemUnkown from './file-item-unknown'
 import * as DnD from '../../utils/dragndrop'
-import { DropTarget } from 'react-dnd'
-import { NativeTypes } from 'react-dnd-html5-backend';
 import * as FileActions from '../fi-actions'
 
 import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
-
-const FolderDropTarget = {
-  // reactDnD drop not useable
-  // No modifer keys available  
-  // https://github.com/gaearon/react-dnd/issues/512
-}
 
 @connect(() => {
 
@@ -35,16 +27,12 @@ const FolderDropTarget = {
     }
   }
 })
-// @DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
-//   connectDropTarget: connect.dropTarget(),
-//   isOver: monitor.isOver()
-// }))
 export default class FileItemComp extends React.Component {
 
   constructor(props) {
     super(props)
     this.dragOverTimeout = null
-    this.setDropHover = (cursorPosition, event) => {
+    this.setDropHover = (event, cursorPosition) => {
       this.setImmState((prevState) => (prevState.set('dropTarget', cursorPosition)))
     }
     this.state = {
@@ -150,19 +138,19 @@ export default class FileItemComp extends React.Component {
     acceptableTypes: [DnD.constants.TYPE_FILE],
     possibleEffects: DnD.constants.effects.COPY_MOVE,
 
-    dragHover: (cursorPosition, event)  => {
+    dragHover: (event, cursorPosition)  => {
       this.startPeakTimeout()
-      this.setDropHover(cursorPosition, event) 
+      this.setDropHover(event, cursorPosition) 
     },
 
-    dragOut: (cursorPosition, event)  => {
+    dragOut: (event, cursorPosition)  => {
       this.cancelPeakTimeout()
-      this.setDropHover(cursorPosition, event)
+      this.setDropHover(event, cursorPosition)
     },
 
-    drop: (cursorPosition, event) => {
+    drop: (event, cursorPosition) => {
       if(this.props.onDrop) {
-        this.props.onDrop(cursorPosition, event)
+        this.props.onDrop(event, cursorPosition)
       }
     }
   })

@@ -36,10 +36,13 @@ export function executeFileDropOnDisk(event, targetPath) {
  * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
  * 
  * @param {DragEvent} event
- * @param {Array<string>} acceptableTypes
+ * @param {Array<string> || string} acceptableTypes
  * @returns {boolean}
  */
 export function shouldAcceptDrop(event, acceptableTypes) {
+  if(typeof acceptableTypes == "string") {
+    acceptableTypes = [acceptableTypes]
+  }
   return (_.intersection(event.dataTransfer.types, acceptableTypes).length > 0)
 }
 
@@ -92,18 +95,13 @@ export function getEnhancedDropZoneListener(options) {
         
         const cursorPosition = getCursorPosition(event)
         if(cursorPosition != dragOverCache) {
-          dragHover(cursorPosition, ...arguments)
+          dragHover(event, cursorPosition)
           dragOverCache = cursorPosition
         }
       }
     },
 
-    onDragEnd: function(event) {
-      dragOverCache = false
-      dragOut(dragOverCache, ...arguments)
-    },
-
-    onDragLeave: function(event) {
+    onDragLeave: (event) => {
       const x = event.clientX
         , y = event.clientY
         , top    = event.currentTarget.offsetTop
@@ -112,16 +110,16 @@ export function getEnhancedDropZoneListener(options) {
         , right  = left + event.currentTarget.offsetWidth;
       if(y <= top || y >= bottom || x <= left || x >= right) { 
         dragOverCache = false
-        dragOut(dragOverCache, ...arguments)
+        dragOut(dragOverCache, event)
       }
     },
     
-    onDrop: function (event) {
+    onDrop: (event) => {
       event.preventDefault()
       event.stopPropagation()
       dragOverCache = false
-      dragOut(dragOverCache, ...arguments)
-      drop(getCursorPosition(event), ...arguments)
+      dragOut(dragOverCache, event)
+      drop(event, getCursorPosition(event))
     }
   }
 }

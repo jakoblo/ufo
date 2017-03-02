@@ -130,7 +130,7 @@ export default function FilePlugin(options) {
               className='folder-list-item'
               isFocused={isFocused}
               path={nodePath.join(folderPath, base)}
-              onDrop={(cursorPosition, event) => {
+              onDrop={(event, cursorPosition) => {
 
                 const fileList = dragndrop.getFilePathArray(event)
                 let transforming = state.transform().select( getSelectionForFileNode(node) )
