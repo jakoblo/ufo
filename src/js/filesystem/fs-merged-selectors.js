@@ -5,6 +5,12 @@ import Write from './write/fs-write-index'
 import Selection from './selection/sel-index'
 import Rename from './rename/rename-index'
 import Filter from './filter/filter-index'
+import {Map} from 'immutable'
+
+const unknownFile = Map({
+      name: '?',
+      type: 'unknown',
+})
 
 /**
  * Get the all information to file which are availible 
@@ -33,6 +39,7 @@ export const getFile_Factory = () => {
       progress,
       renaming
     ) => {
+      if(!file) {return unknownFile}
       return file
         .set('active', open)
         .set('selected', selected)

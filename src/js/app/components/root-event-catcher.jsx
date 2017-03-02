@@ -7,11 +7,11 @@ import Selection from '../../filesystem/selection/sel-index'
 import Filter from '../../filesystem/filter/filter-index'
 import Rename from '../../filesystem/rename/rename-index'
 import App from '../app-index'
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+// import { DragDropContext } from 'react-dnd';
+// import HTML5Backend from 'react-dnd-html5-backend';
 import { remote  } from 'electron'
 
-@DragDropContext(HTML5Backend)
+// @DragDropContext(HTML5Backend)
 export default class EventCatcher extends React.Component {
   constructor(props) {
     super(props)
@@ -20,9 +20,6 @@ export default class EventCatcher extends React.Component {
   render() {
     return(
       <div className="root-event-catcher"
-        onDragEnter={this.stopEvent}
-        onDragOver={this.stopEvent}
-        onDrop={this.stopEvent}
         //onKeyDown={keyEventHandler( keyMap.global, this.keyAction )}
         tabIndex={-1}
         ref="eventCatcher"
@@ -34,6 +31,7 @@ export default class EventCatcher extends React.Component {
     // Focus to catch events
     var node = ReactDOM.findDOMNode(this.refs["eventCatcher"]);
     node.focus();
+
   }
 
   keyAction = (action, event) => {
@@ -71,10 +69,5 @@ export default class EventCatcher extends React.Component {
         remote.getCurrentWindow().previewFile( selectedFile )
       }
     }
-  }
-
-  stopEvent (e) {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = "none"
   }
 }

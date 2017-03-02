@@ -7,63 +7,36 @@ import NavGroup from './navgroup'
 import nodePath from 'path'
 import _ from 'lodash'
 import {remote} from 'electron'
-import { DropTarget } from 'react-dnd'
 import classnames from 'classnames'
-import { NativeTypes } from 'react-dnd-html5-backend';
-
-const NavbarTarget = {
-  drop(props, monitor) {
-    const hasDroppedOnChild = monitor.didDrop()
-    if (hasDroppedOnChild) return
-    
-    if(monitor.getItem().files.length > 0) {
-      let title = _.last(_.split(nodePath.dirname(monitor.getItem().files[0].path), nodePath.sep))
-      
-      let files = []
-      _.forIn(monitor.getItem().files, function(value, key) {
-        if(_.hasIn(value, 'path'))
-        files.push(value.path)
-      })
-      props.dispatch(Actions.addNavGroup(title, files))
-    }
-  }
-}
+import * as dragndrop from '../../utils/dragndrop'
 
 @connect((state) => {
   return {navbar: state[constants.NAME],
     state: state
   }
 })
-@DropTarget(NativeTypes.FILE, NavbarTarget, (connect, monitor) => ({
-  // Call this function inside render()
-  // to let React DnD handle the drag events:
-  connectDropTarget: connect.dropTarget(),
-  // You can ask the monitor about the current drag state:
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop(),
-  itemType: monitor.getItemType()
-}))
 export default class Navbar extends React.Component {
   constructor(props) {
     super(props)
+    this.state = {
+      dragOver: false,
+      draggingGroup: false
+    }
   }
 
   render() {
     let navgroups = null
     if(this.props.navbar.has('groupItems')) 
     navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
-    
-    const { isOver, canDrop, connectDropTarget, isOverCurrent } = this.props;
 
     let classname = classnames({
       'nav-bar': true,
       'nav-bar--hide': this.props.hidden, // For what, hä?
-      'nav-bar--drop-target': isOverCurrent
+      'nav-bar--drop-target': this.state.dragOver
     })
 
-    return connectDropTarget(
-      <div className={classname}>
+    return (
+      <div className={classname} {...this.dropZoneListener}>
         {navgroups}
       </div>
     )
@@ -80,7 +53,51 @@ export default class Navbar extends React.Component {
       hidden={item.hidden}
       isDiskGroup={item.id === 0 ? true : false} // Devices/Disk Group-ID is always 0
       dispatch={this.props.dispatch}
+      draggingGroup={this.state.draggingGroup}
+      setDraggingGroup={this.setDraggingGroup}
+      clearDraggingGroup={this.clearDraggingGroup}
+      // Clear the stored
+      onDragStop={() => {
+        debugger
+        this.props.clearDragginGroup()
+      }}
       />)
   }
+
+  setDraggingGroup = (dragData) => {
+    this.setState({draggingGroup: dragData})
+  }
+
+  clearDraggingGroup = () => {
+    this.setState({
+      draggingGroup: false
+    })
+  }
+
+  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+    acceptableTypes: [dragndrop.constants.TYPE_FILE],
+    possibleEffects: dragndrop.constants.effects.ALL,
+
+    dragHover: () => {
+      this.setState({
+        dragOver: true
+      })
+    },
+
+    dragOut: () => {
+      this.setState({
+        dragOver: false
+      })
+    },
+
+    drop: (event, cursorPosition) => {
+      const fileList = dragndrop.getFilePathArray(event)
+
+      if(fileList.length > 0) {
+        let title = _.last(_.split(nodePath.dirname(fileList[0]), nodePath.sep))
+        this.props.dispatch(Actions.addNavGroup(title, fileList))
+      }
+    }
+  })
 }
 

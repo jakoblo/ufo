@@ -8,7 +8,7 @@ import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
 import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import Filter from '../../filesystem/filter/filter-index'
-import FilePlugin from './slate-file-plugin'
+import FilePlugin from '../plugins/file/slate-file-plugin'
 
 import FilterTypeInput from '../../filesystem/filter/components/filter-type-input'
 import fsWrite from '../../filesystem/write/fs-write-index'
@@ -42,7 +42,6 @@ export default class FolderEditor extends React.Component {
             'folder-display-list--focused': this.props.focused
           })
         }
-        onDrop={e => dragndrop.handleFileDrop(e, this.props.path)}
       >
         <div className="folder-display-list__toolbar-top">
           <div className="folder-display-list__name">
@@ -57,6 +56,11 @@ export default class FolderEditor extends React.Component {
               className="slate-editor"
               plugins={ [this.filePlugin] }
               onChange={this.onChange}
+              onDrop={this.onDrop}
+              /*ref={(e) => {this.editor = e}} */
+              onBlur={() => {
+                console.log('blur')
+              }}
               onDocumentChange={this.onDocumentChange}
             />
           : 
@@ -76,6 +80,12 @@ export default class FolderEditor extends React.Component {
         </div>
       </div>
     )
+  }
+  
+  stopEvent (e) {
+    console.log('stop')
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "move"
   }
 
   componentDidMount() {

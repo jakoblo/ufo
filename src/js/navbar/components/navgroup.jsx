@@ -11,127 +11,41 @@ import * as Actions from '../navbar-actions'
 import { DnDTypes } from '../navbar-constants'
 import _ from 'lodash'
 const {Menu, MenuItem} = remote
-import { DropTarget, DragSource } from 'react-dnd'
 import { findDOMNode } from 'react-dom'
-import { NativeTypes } from 'react-dnd-html5-backend'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import NavGroupItemCollapser from './navgroup-item-collapser'
+import * as dragndrop from '../../utils/dragndrop'
 
 
-const groupTarget = {
-  drop(props, monitor, component) {
-    console.log('drop')
-    switch (monitor.getItemType()) {
-
-      case NativeTypes.FILE:
-        if (props.isDiskGroup) return
-        if(monitor.getItem().files.length > 0) {
-          let files = []
-          _.forIn(monitor.getItem().files, function(value, key) {
-          if(_.hasIn(value, 'path'))
-          files.push(value.path)
-          })
-          props.dispatch(Actions.addGroupItems(props.groupID, files))
-        }
-        return
-
-      case DnDTypes.NAVGROUP:
-        props.dispatch(Actions.saveFavbartoStorage())
-        return
-    
-      default:
-        return
-    }
-  }, 
-  hover(props, monitor, component) {
-    if(monitor.getItemType() !== DnDTypes.NAVGROUP) return
-
-    const dragIndex = monitor.getItem().index;
-    const hoverIndex = props.index;
-
-    // Don't replace items with themselves
-    if (dragIndex === hoverIndex) {
-      return;
-    }
-
-    // Determine rectangle on screen
-    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-
-    // Get vertical middle
-    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-    // Determine mouse position
-    const clientOffset = monitor.getClientOffset();
-
-    // Get pixels to the top
-    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-    // Only perform the move when the mouse has crossed half of the items height
-    // When dragging downwards, only move when the cursor is below 50%
-    // When dragging upwards, only move when the cursor is above 50%
-
-    // Dragging downwards
-    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-      return;
-    }
-
-    // Dragging upwards
-    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-      return;
-    }
-
-    // Time to actually perform the action
-    //props.moveCard(dragIndex, hoverIndex);
-    props.dispatch(Actions.moveNavGroup(dragIndex, hoverIndex))
-
-    // Note: we're mutating the monitor item here!
-    // Generally it's better to avoid mutations,
-    // but it's good here for the sake of performance
-    // to avoid expensive index searches.
-    monitor.getItem().index = hoverIndex;
-  }
-}
-
-const groupSource = {
-  beginDrag(props) {
-    return {
-      id: props.groupID,
-      index: props.index
-    };
-  }
-}
-
-//https://gaearon.github.io/react-dnd/examples-sortable-simple.html
-@DropTarget([DnDTypes.NAVGROUP, NativeTypes.FILE], groupTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver() && (monitor.getItemType() === NativeTypes.FILE),
-  isOverCurrent: monitor.isOver({ shallow: true })
-}))
-@DragSource(DnDTypes.NAVGROUP, groupSource, (connect, monitor) => ({
-  // Call this function inside render()
-  // to let React DnD handle the drag events:
-  connectDragSource: connect.dragSource(),
-  // You can ask the monitor about the current drag state:
-  isDragging: monitor.isDragging(),
-}))
 export default class NavGroup extends React.Component {
   constructor(props) {
     super(props)
+    this.state = {
+      isDragging: false,
+      dragOver: false,
+      draggingItem: false
+    }
   }
 
   render() {
-    const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
+    const { dragOver, isDragging } = this.state;
     const dg = this.props.isDiskGroup
-
     let classname = classnames({
       'nav-bar-group': true,
       'nav-bar-group--collapsed': this.props.hidden,
-      'nav-bar-group--is-dragging': isDragging,
-      'nav-bar-group--drop-target': isOver,
+      'nav-bar-group--is-dragging': (!dg && this.props.groupID == this.props.draggingGroup.id),
+      'nav-bar-group--drop-target': dragOver,
     })
 
-    return connectDragSource(connectDropTarget(
-      <div className={classname}>
+    return (
+      <div 
+        className={classname}
+        draggable={true}
+        onDragStart={this.onDragStart}
+        onDragEnd={this.onDragEnd}
+        data-key={this.props.index}
+        {...this.dropZoneListener}
+      >
         <NavGroupTitle 
           title={this.props.title}
           isDiskGroup={dg}
@@ -150,7 +64,7 @@ export default class NavGroup extends React.Component {
           </ReactCSSTransitionGroup>
         </NavGroupItemCollapser>
       </div>
-    ))
+    )
   }
 
   // GROUP EVENTS
@@ -173,7 +87,6 @@ export default class NavGroup extends React.Component {
    * 
    * GROUP ITEM
    * 
-   * @memberOf NavGroup
    */
   createGroupItem = (item, index) => {
     const path = item.path
@@ -188,14 +101,17 @@ export default class NavGroup extends React.Component {
         key={item.id}
         index={index}
         groupID={this.props.groupID}
-        onClick={this.handleSelectionChanged.bind(this, path)}
-        onItemRemove={this.handleOnItemRemove.bind(this, index)}
         title={basePath}
-        isDiskGroup={this.props.isDiskGroup}
         active={active}
         type={type}
+        isDiskGroup={this.props.isDiskGroup}
+        onClick={this.handleSelectionChanged.bind(this, path)}
+        onItemRemove={this.handleOnItemRemove.bind(this, index)}
         onMoveGroupItem={this.handleMoveGroupItem}
         saveFavbar={this.handleSaveFavbar}
+        draggingItem={this.state.draggingItem}
+        setDraggingItem={this.setDraggingItem}
+        clearDraggingItem={this.clearDraggingItem}
         >
       </NavGroupItem>)
   }
@@ -224,4 +140,118 @@ export default class NavGroup extends React.Component {
     this.props.dispatch(Actions.saveFavbartoStorage())
   }
 
+
+
+  /**
+   * Drag Listener
+   * to Drag the Group arround the sort them in the other Group
+   */
+
+  onDragStart = (event) => {
+    // Store ids of this Group, to access them in other Groups onDragOver
+    const dragData = {
+      id: this.props.groupID,
+      index: this.props.index
+    }
+    this.props.setDraggingGroup(dragData)
+    event.dataTransfer.setData(
+      DnDTypes.NAVGROUP,
+      JSON.stringify(dragData)
+    )
+  }
+
+  // Clear the stored
+  onDragEnd = () => {
+    this.props.clearDraggingGroup()
+  }
+
+
+  /**
+   * Dropzone
+   * the Navbar-Group can handle two type of Drops
+   * the first is a file drop: The files will be added to to the Items of the Group
+   * the second is a Navbar-Group Drag for sorting the Navbars.
+   */
+
+  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+    acceptableTypes: [ DnDTypes.NAVGROUP, (!this.props.isDiskGroup) ? dragndrop.constants.TYPE_FILE : null],
+    possibleEffects: dragndrop.constants.effects.ALL,
+
+    dragHover: (event, cursorPosition) => {
+      
+      if(dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)) {
+        
+        // File DROP
+        this.setState({
+          dragOver: true
+        })
+
+      } else if (dragndrop.shouldAcceptDrop(event, DnDTypes.NAVGROUP)) {
+        
+        // Navgroup Drag
+        const dragIndex = this.props.draggingGroup.index
+        const hoverIndex = this.props.index;
+
+        // Don't replace items with themselves
+        if (dragIndex === hoverIndex) {
+          return
+        }
+
+        if (dragIndex < hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) {
+          return // Not over 50% Group height downwards, do nothing for now
+        }
+        if (dragIndex > hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_BOTTOM) {
+          return // Not over 50% Group height upwards, do nothing for now
+        }
+
+        // Time to actually perform the action
+        this.props.setDraggingGroup({
+          id: this.props.draggingGroup.id, 
+          index: hoverIndex
+        })
+        this.props.dispatch(Actions.moveNavGroup(dragIndex, hoverIndex))
+      }
+    },
+
+    dragOut: () => {
+      this.setState({
+        dragOver: false
+      })
+    },
+
+    drop: (event, cursorPosition) => {
+      this.props.clearDraggingGroup()
+        
+      if(dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)) {
+        
+        // Filedrop, add File to Group
+        if (this.props.isDiskGroup) return
+        const fileList = dragndrop.getFilePathArray(event)
+        if(fileList.length > 0) {
+          this.props.dispatch(Actions.addGroupItems(this.props.groupID, fileList))
+        }
+
+      } else if (dragndrop.shouldAcceptDrop(event, DnDTypes.NAVGROUP)) {
+
+        // Navgroup Drop Done, lets save that
+        this.props.dispatch(Actions.saveFavbartoStorage())
+      
+      }
+    }
+
+  })
+
+  setDraggingItem = (dragData) => {
+    this.setState({
+      draggingItem: dragData
+    })
+  }
+
+  clearDraggingItem = () => {
+    this.setState({
+      draggingItem: false
+    })
+  }
 }
+
+
