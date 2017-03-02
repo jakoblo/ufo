@@ -29,6 +29,12 @@ export default class WindowManager {
     })
     browserWindow.loadURL('file://' + __dirname + '/../../html/window.html');
     browserWindow.on('closed', this.handleWindowClose);
+    browserWindow.webContents.on('will-navigate', (event) => {
+      // Disable Navigation
+      // prevent Drop files on window
+      event.preventDefault()
+    });
+    
     this.windows.push(browserWindow)
   }
 

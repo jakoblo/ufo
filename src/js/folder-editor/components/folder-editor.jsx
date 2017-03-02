@@ -42,7 +42,6 @@ export default class FolderEditor extends React.Component {
             'folder-display-list--focused': this.props.focused
           })
         }
-        onDrop={e => dragndrop.handleFileDrop(e, this.props.path)}
       >
         <div className="folder-display-list__toolbar-top">
           <div className="folder-display-list__name">
@@ -57,6 +56,7 @@ export default class FolderEditor extends React.Component {
               className="slate-editor"
               plugins={ [this.filePlugin] }
               onChange={this.onChange}
+              onDrop={this.onDrop}
               onDocumentChange={this.onDocumentChange}
             />
           : 
@@ -76,6 +76,21 @@ export default class FolderEditor extends React.Component {
         </div>
       </div>
     )
+  }
+  
+  onDrop(e, data, state, editor) {
+    console.log(e, data, state, editor)
+
+    // switch (data.type) {
+    //   case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+    //   case 'node': return this.onDropNode(e, data, state)
+    // }
+  }
+  
+  stopEvent (e) {
+    console.log('stop')
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "move"
   }
 
   componentDidMount() {

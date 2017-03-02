@@ -9,7 +9,8 @@ import {Map} from 'immutable'
 import _ from 'lodash'
 import RenameInput from '../../filesystem/rename/components/rename-input'
 import ProgressPie from '../../general-components/progress-pie'
-import {dragndrop} from '../../utils/utils-index'
+import FileItemUnkown from './file-item-unknown'
+import * as DnD from '../../utils/dragndrop'
 import { DropTarget } from 'react-dnd'
 import { NativeTypes } from 'react-dnd-html5-backend';
 import * as FileActions from '../fi-actions'
@@ -34,26 +35,32 @@ const FolderDropTarget = {
     }
   }
 })
-@DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver()
-}))
+// @DropTarget(NativeTypes.FILE, FolderDropTarget, (connect, monitor) => ({
+//   connectDropTarget: connect.dropTarget(),
+//   isOver: monitor.isOver()
+// }))
 export default class FileItemComp extends React.Component {
 
   constructor(props) {
     super(props)
     this.dragOverTimeout = null
+    this.setDropHover = (cursorPosition, event) => {
+      this.setImmState((prevState) => (prevState.set('dropTarget', cursorPosition)))
+    }
     this.state = {
       data: Map({
-        openAnimation: false
+        openAnimation: false,
+        dropTarget: false
       })
     }
   }
 
   render() {
-    const connectDropTarget = (this.props.file.get('stats').isDirectory()) ? this.props.connectDropTarget : r => r
+    if(this.props.file.get('type') == "unknown") {
+      return <FileItemUnkown className={this.props.className} />
+    }
 
-    return connectDropTarget(
+    return(
       <div
         className={classNames({
           [this.props.className]: true,
@@ -63,7 +70,9 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--active']: this.props.file.get('active'),
           [this.props.className+'--selected']: this.props.file.get('selected'),
           [this.props.className+'--is-focused']: this.props.isFocused,
-          [this.props.className+'--drop-target']: this.props.isOver,
+          [this.props.className+'--drop-target']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
+          [this.props.className+'--drop-target-top']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
+          [this.props.className+'--drop-target-bottom']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
           [this.props.className+'--in-progress']: this.props.file.get('progress')
         })}
@@ -93,14 +102,11 @@ export default class FileItemComp extends React.Component {
             onDoubleClick={this.onDoubleClick}
             onContextMenu={this.onContextMenu}
             onDragStart={this.onDragStart}
-            onDrop={(e) => {
-              if(this.props.file.get('stats').isDirectory()) {
-                dragndrop.handleFileDrop(e, this.props.file.get('path'))}
-              }
-            }
+            {...this.enhancedDropZoneListener}
           />
         }
-      </div>)
+      </div>
+      )
   }
 
   setImmState(fn) {
@@ -138,6 +144,40 @@ export default class FileItemComp extends React.Component {
     if(!this.props.file.get('progress')) {
       this.props.dispatch( FileActions.startDrag(this.props.file) )
     }
+  }
+
+  enhancedDropZoneListener = DnD.getEnhancedDropZoneListener({
+    acceptableTypes: [DnD.constants.TYPE_FILE],
+    possibleEffects: DnD.constants.effects.COPY_MOVE,
+
+    dragHover: (cursorPosition, event)  => {
+      this.startPeakTimeout()
+      this.setDropHover(cursorPosition, event) 
+    },
+
+    dragOut: (cursorPosition, event)  => {
+      this.cancelPeakTimeout()
+      this.setDropHover(cursorPosition, event)
+    },
+
+    drop: (cursorPosition, event) => {
+      if(this.props.onDrop) {
+        this.props.onDrop(cursorPosition, event)
+      }
+    }
+  })
+
+  startPeakTimeout = () => {
+    if(this.props.file.get('stats').isDirectory() && this.dragOverTimeout == null) {
+      this.dragOverTimeout = setTimeout(() => {
+        this.props.dispatch( FileActions.show(this.props.file) )
+      }, 1000)
+    }
+  }
+
+  cancelPeakTimeout = () => {
+    clearTimeout(this.dragOverTimeout)
+    this.dragOverTimeout = null
   }
 
   /**

@@ -161,6 +161,21 @@
     }
   }
 
+  &--drop-target-top &__underlay,
+  &--drop-target-bottom &__underlay {
+    border-top: 2px solid @color__main-decoration;
+    left: 0;
+    top: -1px;
+    position: absolute;
+    width: 100%;
+    height: @height__item;
+  }
+
+  &--drop-target-bottom &__underlay {
+    border-top: 0;
+    border-bottom: 2px solid @color__main-decoration;
+  }
+
   &--drop-blocked &__underlay {
     .drop-blocked;
     display: block;

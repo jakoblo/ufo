@@ -1,6 +1,7 @@
 import * as t from './folder-editor-actiontypes'
 import * as selectors from './folder-editor-selectors'
 import * as c from  './folder-editor-constants'
+import * as Helper from  './folder-editor-helper'
 import _ from 'lodash'
 import {Raw} from 'slate'
 
@@ -119,26 +120,6 @@ function mapFilesToEditorState(state, props, editorState) {
   return editorState
 }
 
-
-/**
- * Insert an file with `path` at the current selection.
- *
- * @param {State} editorState
- * @param {string} base - filename with suffix
- * @returns {State}
- */
-function insertFile(editorState, base) {
-  return editorState
-    .transform()
-    .insertBlock({
-      type: c.BLOCK_TYPE_FILE,
-      isVoid: true,
-      data: { base }
-    })
-    .apply()
-}
-
-
 // Faster than block transforms, but still slow
 function newStateWithFileNodes(filesNotInEditor) {
   const nodes = []
@@ -148,14 +129,14 @@ function newStateWithFileNodes(filesNotInEditor) {
       kind: 'block',
       type: c.BLOCK_TYPE_FILE,
       isVoid: true,
-      data: { base }
+      key: base
     })
   })
 
   // Add empty line at the end
   nodes.push({
     kind: 'block',
-    type: 'paragraph',
+    type: 'paragraph'
   })
 
   console.time('Create Slate State')
