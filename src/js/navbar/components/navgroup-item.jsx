@@ -32,6 +32,7 @@ export default class NavGroupItem extends React.Component {
     return (
       <div 
         className={className} 
+        onClick={this.props.onClick} 
         draggable={true} 
         onDragStart={this.onDragStart} 
         onDragEnd={this.onDragEnd} 
