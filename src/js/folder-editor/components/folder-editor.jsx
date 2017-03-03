@@ -7,8 +7,10 @@ import { Editor, Raw, Plain } from 'slate'
 import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
 import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
+import * as selectors from  '../folder-editor-selectors'
 import Filter from '../../filesystem/filter/filter-index'
 import FilePlugin from '../plugins/file/slate-file-plugin'
+import Config from '../../config/config-index'
 
 import FilterTypeInput from '../../filesystem/filter/components/filter-type-input'
 import fsWrite from '../../filesystem/write/fs-write-index'
@@ -19,7 +21,8 @@ import fsWrite from '../../filesystem/write/fs-write-index'
     return {
       focused: Filter.selectors.isFocused(state, props.path),
       fileList: getFiltedBaseArrayOfFolder(state, props.path),
-      editorState: state[c.NAME].get(props.path)
+      editorState: selectors.getEditorState(state, props.path),
+      readOnly: Config.selectors.getReadOnlyState(state)
     }
   }
 })
@@ -39,7 +42,8 @@ export default class FolderEditor extends React.Component {
           classnames({
             'folder-display-list': true,
             'folder-display-list--drop-target': this.props.isOverCurrent,
-            'folder-display-list--focused': this.props.focused
+            'folder-display-list--focused': this.props.focused,
+            'folder-display-list--readOnly': this.props.readOnly
           })
         }
       >
@@ -57,6 +61,7 @@ export default class FolderEditor extends React.Component {
               plugins={ [this.filePlugin] }
               onChange={this.onChange}
               onDrop={this.onDrop}
+              readOnly={this.props.readOnly}
               /*ref={(e) => {this.editor = e}} */
               onBlur={() => {
                 console.log('blur')

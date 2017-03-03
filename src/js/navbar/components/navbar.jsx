@@ -56,11 +56,6 @@ export default class Navbar extends React.Component {
       draggingGroup={this.state.draggingGroup}
       setDraggingGroup={this.setDraggingGroup}
       clearDraggingGroup={this.clearDraggingGroup}
-      // Clear the stored
-      onDragStop={() => {
-        debugger
-        this.props.clearDragginGroup()
-      }}
       />)
   }
 

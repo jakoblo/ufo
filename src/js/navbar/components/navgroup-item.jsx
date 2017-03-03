@@ -7,85 +7,6 @@ import { findDOMNode } from 'react-dom'
 import { DnDTypes } from '../navbar-constants'
 import * as dragndrop from '../../utils/dragndrop'
 
-// const itemSource = {
-//   canDrag(props, monitor) {
-//     return !props.isDiskGroup
-//   },
-//   beginDrag(props) {
-//     return {
-//       id: props.index,
-//       index: props.index,
-//       groupID: props.groupID
-//     };
-//   }
-// }
-
-// const itemTarget = { 
-//   // Sort Navgroups by drag and drop
-//   drop(props, monitor, component) {
-//     if(monitor.getItemType() === DnDTypes.GROUPITEM) {
-//       props.saveFavbar()
-//     }
-//   },
-//   hover(props, monitor, component) {
-//     if(monitor.getItemType() !== DnDTypes.GROUPITEM) return
-//     if(props.groupID !== monitor.getItem().groupID) return
-
-//     const dragIndex = monitor.getItem().index;
-//     const hoverIndex = props.index;
-
-//     // Don't replace items with themselves
-//     if (dragIndex === hoverIndex) {
-//       return;
-//     }
-
-//     // Determine rectangle on screen
-//     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-
-//     // Get vertical middle
-//     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-//     // Determine mouse position
-//     const clientOffset = monitor.getClientOffset();
-
-//     // Get pixels to the top
-//     const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-//     // Only perform the move when the mouse has crossed half of the items height
-//     // When dragging downwards, only move when the cursor is below 50%
-//     // When dragging upwards, only move when the cursor is above 50%
-
-//     // Dragging downwards
-//     if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-//       return;
-//     }
-
-//     // Dragging upwards
-//     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-//       return;
-//     }
-
-//     // Time to actually perform the action
-//     //props.moveCard(dragIndex, hoverIndex);
-//     props.onMoveGroupItem(dragIndex, hoverIndex)
-
-//     // Note: we're mutating the monitor item here!
-//     // Generally it's better to avoid mutations,
-//     // but it's good here for the sake of performance
-//     // to avoid expensive index searches.
-//     monitor.getItem().index = hoverIndex;
-//   }
-// }
-
-// @DropTarget([DnDTypes.GROUPITEM, NativeTypes.FILE], itemTarget, (connect, monitor) => ({
-//   connectDropTarget: connect.dropTarget(),
-//   isOver: monitor.isOver() && (monitor.getItemType() === NativeTypes.FILE),
-//   isOverCurrent: monitor.isOver({ shallow: true }) && (monitor.getItemType() === NativeTypes.FILE),
-// }))
-// @DragSource(DnDTypes.GROUPITEM, itemSource, (connect, monitor) => ({
-//   connectDragSource: connect.dragSource(),
-//   isDragging: monitor.isDragging(),
-// }))
 export default class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
@@ -170,11 +91,14 @@ export default class NavGroupItem extends React.Component {
       index: this.props.index,
       groupID: this.props.groupID
     }
-    this.props.setDraggingItem(dragData)
+    setTimeout(() => {
+      // Wait, to do not apply the dragging css to the dragging image
+      this.props.setDraggingItem(dragData)
+    }, 1)
     event.dataTransfer.setData( DnDTypes.GROUPITEM, JSON.stringify(dragData) )
   }
 
-  // Clear the stored
+  // Clear the stored dragging item
   onDragEnd = () => {
     this.props.clearDraggingItem()
   }
@@ -189,15 +113,15 @@ export default class NavGroupItem extends React.Component {
     possibleEffects: dragndrop.constants.effects.ALL,
 
     dragHover: (event, cursorPosition) => {
+
+      if(!this.props.draggingItem) return // no needed data, jet
       if(this.props.groupID !== this.props.draggingItem.groupID) return
-    
+
       const dragIndex = this.props.draggingItem.index
       const hoverIndex = this.props.index;
 
       // Don't replace items with themselves
-      if (dragIndex === hoverIndex) {
-        return
-      }
+      if (dragIndex === hoverIndex) return
 
       if (dragIndex+1 == hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) {
         return // Not over 50% Group height downwards, do nothing for now
@@ -227,6 +151,5 @@ export default class NavGroupItem extends React.Component {
     }
 
   })
-
 
 }

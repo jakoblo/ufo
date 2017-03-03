@@ -153,7 +153,10 @@ export default class NavGroup extends React.Component {
       id: this.props.groupID,
       index: this.props.index
     }
-    this.props.setDraggingGroup(dragData)
+    setTimeout(() => {
+      // Wait, to do not apply the dragging css to the dragging image
+      this.props.setDraggingGroup(dragData)
+    }, 1)
     event.dataTransfer.setData(
       DnDTypes.NAVGROUP,
       JSON.stringify(dragData)
@@ -189,6 +192,11 @@ export default class NavGroup extends React.Component {
       } else if (dragndrop.shouldAcceptDrop(event, DnDTypes.NAVGROUP)) {
         
         // Navgroup Drag
+
+        if(!this.props.draggingGroup) {
+          return // no needed data, jet
+        }
+
         const dragIndex = this.props.draggingGroup.index
         const hoverIndex = this.props.index;
 

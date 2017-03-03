@@ -2,6 +2,7 @@ import * as t from './config-actiontypes'
 import App from '../app/app-index'
 import Navbar from '../navbar/navbar-index'
 import * as Utils from '../utils/utils-index'
+import * as selectors from './config-selectors'
 import { List, Map } from 'immutable'
 import os from 'os' 
 import _ from 'lodash'
@@ -43,9 +44,13 @@ export function loadPreviousState(windowID) {
   }
 }
 
-export function toggleEditMode(editMode) { // Action Creator
-  return { // action
-    type: t.APP_TOGGLE_EDIT_MODE,
-    payload: {editMode : editMode}
-  };
+export function toggleReadOnly() {
+  return (dispatch, getState) => {
+    dispatch({
+      type: t.APP_READ_ONLY_TOGGLE,
+      payload: {
+        readOnly: ( !selectors.getReadOnlyState(getState()) )
+      }
+    })
+  }
 }

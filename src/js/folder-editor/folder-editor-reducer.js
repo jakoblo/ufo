@@ -3,7 +3,7 @@ import FolderEditor from '../folder-editor/folder-editor-index'
 import {Raw} from 'slate'
 import _ from 'lodash'
 
-const INITIAL_STATE = Map({})
+const INITIAL_STATE = fromJS({})
 const INITIAL_EDITOR_STATE = Raw.deserialize({
   nodes: [
     {

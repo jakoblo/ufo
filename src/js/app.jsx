@@ -13,7 +13,7 @@ import * as Utils from './utils/utils-index'
 import {Provider} from 'react-redux'
 import EventCatcher from './app/components/root-event-catcher'
 import AppControls from './app/components/app-controls'
-import ToggleBar from './app/components/togglebar'
+import ReadOnlyToggle from './app/components/read-only-toggle'
 import Sidebar from './general-components/sidebar'
 import Navbar from './navbar/navbar-index'
 import ViewPlacer from './view-placer/vp-index'
@@ -40,7 +40,7 @@ ReactDOM.render(
       <Sidebar>
         <AppControls />
         <Navbar.components.parent />
-        <ToggleBar />
+        <ReadOnlyToggle />
       </Sidebar>
       <ViewPlacer.components.parent />
       <AddonBar/>
