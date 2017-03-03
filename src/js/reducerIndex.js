@@ -10,7 +10,7 @@ import Config from './config/config-index'
 import ViewFile from './view-file/vf-index'
 import Navbar from './navbar/navbar-index'
 import AddonBar from './addon-bar/addon-bar-index'
-import FolderEditor from './folder-editor/folder-editor-index'
+import FolderEditor from './view-folder/view-folder-editor/folder-editor-index'
 
 export const rootReducer = combineReducers({
   [FolderEditor.constants.NAME]: FolderEditor.reducer,

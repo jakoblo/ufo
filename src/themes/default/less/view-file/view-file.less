@@ -16,6 +16,12 @@
   min-width: 350px;
   overflow-x: hidden;
   overflow-y: auto;
+
+  .view-placer--display-single & {
+    width: 100%;
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
  
   &__top-toolbar {
     min-height: @height__top-toolbar;

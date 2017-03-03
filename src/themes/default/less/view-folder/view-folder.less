@@ -1,0 +1,178 @@
+@import (reference) url('../variables.less');
+@import (reference) url('../mixins.less');
+@import (css) url('./view-folder-item.less');
+
+
+.view-folder {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+
+  &__toolbar-top {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    -webkit-app-region: drag;
+    left: 0;
+    right: 5px;
+    z-index: 10;
+    height: @height__top-toolbar;
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 95%, rgba(255,255,255,0) 100%);
+  }
+
+  &:hover &__toolbar-top {
+    border-bottom: 1px solid darken(#fff, 10%);
+  }
+
+  &__name { 
+    .view-title;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+  }
+
+  &:hover &__name {
+    opacity: 0;
+  }
+
+  &__type-toggle {
+    @toggle-distance: 12px;
+    height: 100%;
+    width: 100px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 82px 13px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    transition: opacity 0.3s ease-out;
+    
+    &__bullet {
+      transition: margin 0.3s ease-out;
+      width: 13px;
+      height: 13px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 3.3px rgba(0,0,0, 0.5);
+    }
+
+    &:active &__bullet {
+      background: @color__main-decoration;
+    }
+
+    &--list {
+      background-image: url('../../img/view-folder__type-toggle--list.svg');
+    }
+    &--editor {
+      background-image: url('../../img/view-folder__type-toggle--editor.svg');
+    }
+
+    &--list &__bullet {
+      margin-left: -@toggle-distance;
+    }
+    &--editor &__bullet {
+      margin-left: @toggle-distance;
+    }
+  }
+
+  &:hover &__type-toggle {
+    opacity: 1;
+  }
+
+  &__display-toggle {
+    height: 100%;
+    width: 70px;
+    position: absolute;
+    top: 0;
+    right: @editor-padding-right;
+    opacity: 0;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 20px 15px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    transition: opacity 0.3s ease-out;
+
+    &--single {
+      background-image: url('../../img/view-folder__display-toggle--column.svg');
+    }
+    &--columns {
+      background-image: url('../../img/view-folder__display-toggle--single.svg');
+    }
+  }
+
+  &:hover &__display-toggle {
+    opacity: 0.3;
+  }
+
+  &:hover &__display-toggle:hover {
+    opacity: 0.5;
+  }
+  
+  &:active &__display-toggle {
+    opacity: 0.7;
+  }
+
+
+  &__item-container,
+  &__editor-container {
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    height: 100%;
+    will-change: transform;
+    outline: none;
+    .nicer-scrollbars(#fff)
+  }
+
+  &__editor-container {
+    padding: 50px @editor-padding-right 30px @editor-padding-left;
+  }
+
+  &__toolbar-bottom {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    left: 0;
+    right: 5px;
+    bottom: 0;
+    z-index: 10;
+    height: 25px;
+    background: linear-gradient(to top, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+  }
+
+  &__button-add-folder {
+    .button-reset;
+    .icon(@icon: '../../img/view-folder__icon-add-folder.svg', @height: 25px, @width: 25px);
+    opacity: 0;
+    display: block;
+    position: absolute;
+    bottom: -6px;
+    left: calc(@padding__sidebar-horizonal - 2px);
+    background-color: #fff;
+    transition: opacity 0.3s ease-out;
+  }
+  &:hover &__button-add-folder {
+    opacity: 1;
+  }
+
+  &--drop-target::after {
+    content: '';
+    .drop-zone;
+    z-index: -10;
+    right: 7px;
+    top: calc(@height__top-toolbar + 2px);
+  }
+
+  &__empty-text {
+    .empty-text
+  }
+}

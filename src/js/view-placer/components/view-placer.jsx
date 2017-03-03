@@ -2,10 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
+import classnames from 'classnames'
 import { NAME, DEFAULT_VIEW_WIDTH } from '../vp-constants'
-import ViewWrapper from './view-wrapper'
+import ViewFolder from '../../view-folder/view-folder'
 import Error from '../../general-components/error'
-import ViewFolderList from '../../view-folder/view-folder-list'
+import App from '../../app/app-index'
 import ViewFile from '../../view-file/vf-index'
 import Selection from '../../filesystem/selection/sel-index'
 import FS from '../../filesystem/watch/fs-watch-index'
@@ -19,7 +20,8 @@ import _ from 'lodash'
         return FS.selectors.getDirState(state, dir)
       }),
       viewFilePath: ViewFile.selectors.getViewFilePath(state),
-      selectionRoot: Selection.selectors.getSelectionRoot(state)
+      selectionRoot: Selection.selectors.getSelectionRoot(state),
+      displayType: App.selectors.getDisplayType(state)
     }
   }
 })
@@ -29,8 +31,15 @@ export default class ViewPlacer extends React.Component {
   }
 
   render() {
+
+    const classes = classnames({
+      'view-placer': true,
+      'view-placer--display-columns': (this.props.displayType == App.constants.DISPLAY_TYPE_COLUMNS),
+      'view-placer--display-single': (this.props.displayType == App.constants.DISPLAY_TYPE_SINGLE)
+    })
+
     return (
-      <section ref="viewPlacer" className="view-placer">
+      <section ref="viewPlacer" className={classes}>
         {this.renderViewFolders()}
         {this.renderViewFile()}
       </section>
@@ -48,39 +57,22 @@ export default class ViewPlacer extends React.Component {
   }
 
   renderViewFolders = () => {
-    let views = null
-    
-    if(this.props.viewFolderList.length > 0) {
-
-      let prevFolder = null
-
-      views = this.props.viewFolderList.map((dirState, index) => {
-        prevFolder = dirState.path
-        
-        let view = (dirState) => {
-          if(!dirState.ready) {
-            return null
-          }
-          else if(dirState.error) {
-            return <Error error={dirState.error} />
-          } else {
-            return <ViewFolderList path={dirState.path} ready={dirState.ready} />
-          }
-        }
-
-        return ( 
-          <ViewWrapper 
-            key={dirState.path} 
-            path={dirState.path}
-            error={dirState.error}
-          >
-            {view(dirState)}
-          </ViewWrapper>
-        )
-      })
+    if(!this.props.viewFolderList.length > 0) return null
+    let views = this.props.viewFolderList.map((dirState, index) => {
+      return ( 
+        <ViewFolder 
+          key={dirState.path} 
+          path={dirState.path}
+          error={dirState.error}
+          fsWatchState={dirState}
+        />
+      )
+    })
+    if((this.props.displayType == App.constants.DISPLAY_TYPE_SINGLE)) {
+      return _.last(views)
+    } else {
+      return views
     }
-
-    return views
   }
 
   ajustHorizonalScrollPosition = (currentProps, prevProps) => {

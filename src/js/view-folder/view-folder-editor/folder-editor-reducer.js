@@ -1,5 +1,5 @@
 import { fromJS, Map } from 'immutable'
-import FolderEditor from '../folder-editor/folder-editor-index'
+import * as t from './folder-editor-actiontypes'
 import {Raw} from 'slate'
 import _ from 'lodash'
 
@@ -23,16 +23,16 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
   switch (action.type) {
 
-    case FolderEditor.actiontypes.FOLDER_EDITOR_INIT:
+    case t.FOLDER_EDITOR_INIT:
       return state.set(action.payload.path, action.payload.editorState)
 
-    case FolderEditor.actiontypes.FOLDER_EDITOR_CHANGE:
+    case t.FOLDER_EDITOR_CHANGE:
       return state.set(action.payload.path, action.payload.editorState)
 
-    case FolderEditor.actiontypes.FOLDER_EDITOR_FILEMAPPING:
+    case t.FOLDER_EDITOR_FILEMAPPING:
       return state.set(action.payload.path, action.payload.editorState)
 
-    case FolderEditor.actiontypes.FOLDER_EDITOR_CLOSE:
+    case t.FOLDER_EDITOR_CLOSE:
       return state.delete(action.payload.path)
 
     default:

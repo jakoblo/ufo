@@ -1,9 +1,9 @@
 import React from 'react'
-import FileItem from '../../../file-item/components/file-item'
+import FileItem from '../../../../file-item/components/file-item'
 import nodePath from 'path'
 import {Block, Selection} from 'slate'
 import * as c from '../../folder-editor-constants'
-import * as dragndrop from '../../../utils/dragndrop'
+import * as dragndrop from '../../../../utils/dragndrop'
 
 export default function FilePlugin(options) {
 
@@ -127,7 +127,7 @@ export default function FilePlugin(options) {
           const base = node.getIn(['data', 'base'])
           return (
             <FileItem
-              className='folder-list-item'
+              className='view-folder-item'
               isFocused={isFocused}
               path={nodePath.join(folderPath, base)}
               onDrop={(event, cursorPosition) => {

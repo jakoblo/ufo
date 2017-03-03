@@ -1,19 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
-import nodePath from 'path'
-import _ from 'lodash'
 import { connect } from 'react-redux'
 import { Editor, Raw, Plain } from 'slate'
-import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
+import * as FsMergedSelector from  '../../../filesystem/fs-merged-selectors'
 import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import * as selectors from  '../folder-editor-selectors'
-import Filter from '../../filesystem/filter/filter-index'
+import Filter from '../../../filesystem/filter/filter-index'
 import FilePlugin from '../plugins/file/slate-file-plugin'
-import Config from '../../config/config-index'
+import Config from '../../../config/config-index'
 
-import FilterTypeInput from '../../filesystem/filter/components/filter-type-input'
-import fsWrite from '../../filesystem/write/fs-write-index'
+import Loading from '../../../general-components/loading'
 
 @connect(() => {
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()
@@ -38,21 +35,7 @@ export default class FolderEditor extends React.Component {
 
   render() {
     return ( 
-      <div className={
-          classnames({
-            'folder-display-list': true,
-            'folder-display-list--drop-target': this.props.isOverCurrent,
-            'folder-display-list--focused': this.props.focused,
-            'folder-display-list--readOnly': this.props.readOnly
-          })
-        }
-      >
-        <div className="folder-display-list__toolbar-top">
-          <div className="folder-display-list__name">
-            {nodePath.basename(this.props.path)}
-          </div>
-        </div>
-        <div className="folder-display-list__editor-container">
+        <div className="view-folder__editor-container">
         {
           (this.props.editorState) ?
             <Editor
@@ -62,28 +45,15 @@ export default class FolderEditor extends React.Component {
               onChange={this.onChange}
               onDrop={this.onDrop}
               readOnly={this.props.readOnly}
-              /*ref={(e) => {this.editor = e}} */
               onBlur={() => {
                 console.log('blur')
               }}
               onDocumentChange={this.onDocumentChange}
             />
           : 
-            <div className="noFileActions">
-              Loading...
-            </div>
+            <Loading />
         }
         </div>
-        <div className="folder-display-list__toolbar-bottom">
-          <button
-            className="folder-display-list__button-add-folder" 
-            onClick={() => {
-              this.props.dispatch( fsWrite.actions.newFolder(this.props.path) )
-            }}
-          />
-          <FilterTypeInput path={this.props.path} />
-        </div>
-      </div>
     )
   }
   

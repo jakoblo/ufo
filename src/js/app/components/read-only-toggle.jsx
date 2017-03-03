@@ -15,7 +15,6 @@ export default class ReadOnlyToggle extends React.Component {
   }
 
   render() {
-    console.log(this.props.readOnly)
     let classes = classnames(
       'read-only-toggle',
       {'read-only-toggle--read-only': this.props.readOnly}

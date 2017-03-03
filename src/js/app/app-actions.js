@@ -1,4 +1,5 @@
 import * as t from './app-actiontypes'
+import * as c from './app-constants'
 import _ from 'lodash'
 import nodePath from 'path'
 import * as selectors from './app-selectors'
@@ -106,3 +107,69 @@ function buildPathRoute(fromPath, toPath) {
   newPathRoute.unshift(fromPath)
   return newPathRoute
 }
+
+export const setDisplayType = (displayType) => {
+  return {
+    type: t.APP_SET_DISPLAY_TYPE,
+    payload: {
+      displayType: displayType
+    }
+  }
+}
+
+export const setDisplayTypeSingle = () => {
+  return {
+    type: t.APP_SET_DISPLAY_TYPE,
+    payload: {
+      displayType: c.DISPLAY_TYPE_SINGLE
+    }
+  }
+}
+
+export const toggleDisplayType = () => {
+  return (dispatch, getState) => {
+    const currentType = selectors.getDisplayType(getState())
+    let displayType = c.DISPLAY_TYPE_SINGLE
+    if(currentType== c.DISPLAY_TYPE_SINGLE) {
+      displayType = c.DISPLAY_TYPE_COLUMNS
+    }
+    dispatch( setDisplayType( displayType) ) 
+  }
+}
+
+export const setDisplayTypeColumns = () => {
+  return {
+    type: t.APP_SET_DISPLAY_TYPE,
+    payload: {
+      displayType: c.DISPLAY_TYPE_COLUMNS
+    }
+  }
+}
+
+export const setViewType = (path, type) => {
+  return {
+    type: t.APP_SET_VIEW_TYPE,
+    payload: {
+      path: path,
+      type: type
+    }
+  }
+}
+
+export const viewTypeToggle = (path) => {
+  return (dispatch, getState) => {
+
+    const currentViewSettings = selectors.getViewSettings(getState(), path)
+
+
+    let viewType = c.FOLDER_VIEW_EDITOR
+    if(currentViewSettings.get('type') == c.FOLDER_VIEW_EDITOR) {
+      viewType = c.FOLDER_VIEW_LIST
+    }
+
+    dispatch( setViewType(path, viewType) ) 
+  }
+}
+
+
+
