@@ -1,5 +1,6 @@
 "use strict"
 import {remote, Menu, MenuItem} from 'electron'
+const {app} = remote
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
@@ -38,9 +39,13 @@ export default class FileItemComp extends React.Component {
     this.state = {
       data: Map({
         openAnimation: false,
-        dropTarget: false
+        dropTarget: false,
+        renaming: false,
+        openAnimation: false,
+        icon: null
       })
     }
+    this.requestIcon(this.props.file.get('path'))
   }
 
   render() {
@@ -62,11 +67,13 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--drop-target-top']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
           [this.props.className+'--drop-target-bottom']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
-          [this.props.className+'--in-progress']: this.props.file.get('progress')
+          [this.props.className+'--in-progress']: this.props.file.get('progress'),
+          [this.props.className+'--icon']: (this.state.data.get('icon'))
         })}
         style={this.props.style}
       >
         <div className={this.props.className+'__underlay'} />
+
         {this.props.file.get('progress') ? 
           <ProgressPie
             className={this.props.className+'__progress-pie'}
@@ -74,6 +81,11 @@ export default class FileItemComp extends React.Component {
             size={16}
           />
         : null }
+
+        {(this.state.data.get('icon')) ? 
+          <img  className={this.props.className+'__icon'} width="16" height="16" src={this.state.data.get('icon')} /> 
+        : null}
+
         <div className={this.props.className+'__name-base'} >{this.props.file.get('name')}</div>
         <div className={this.props.className+'__name-suffix'} >{this.props.file.get('suffix')}</div>
         {this.props.file.get('renaming') ? 
@@ -125,6 +137,16 @@ export default class FileItemComp extends React.Component {
       nextProps.isFocused !== this.props.isFocused || 
       nextState.data !== this.state.data
     );
+  }
+
+  requestIcon = (path) => {
+    if(this.props.file.get('stats').isFile()) {
+      app.getFileIcon(path, {size: 'small'}, (error, image) => {
+        if(!error) {
+          this.setImmState((prevState) => (prevState.set('icon', 'data:image/png;base64,' + image.toPNG().toString('base64'))))
+        }
+      })
+    }
   }
 
   onDragStart = (event) => {
