@@ -72,8 +72,6 @@ export function copy(sources, target) {
   })
 }
 
-window.copy = copy
-
 
 /**
  * @param  {string} source
@@ -124,6 +122,7 @@ export function rename(source, destination) {
     })
   }
 }
+
 /**
  * Remove Action from store
  * @param  {number} id

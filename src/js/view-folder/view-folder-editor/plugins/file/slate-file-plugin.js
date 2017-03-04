@@ -6,6 +6,12 @@ import * as c from '../../folder-editor-constants'
 import * as dragndrop from '../../../../utils/dragndrop'
 import * as Helper from '../../folder-editor-helper'
 
+const defaultBlock = {
+  type: 'paragraph',
+  isVoid: false,
+  data: {}
+}
+
 export default function FilePlugin(options) {
 
   const { BLOCK_TYPE, folderPath } = options
@@ -95,7 +101,39 @@ export default function FilePlugin(options) {
             />
           )
         }
-      }
+      },
+      rules: [
+        // Rule to insert a paragraph block if the document is empty
+        {
+          match: (node) => {
+            return node.kind == 'document'
+          },
+          validate: (document) => {
+            return document.nodes.size ? null : true
+          },
+          normalize: (transform, document) => {
+            const block = Block.create(defaultBlock)
+            transform
+              .insertNodeByKey(document.key, 0, block)
+          }
+        },
+        // Rule to insert a paragraph below a void node (File)
+        // if that node is the last one in the document
+        {
+          match: (node) => {
+            return node.kind == 'document'
+          },
+          validate: (document) => {
+            const lastNode = document.nodes.last()
+            return lastNode && lastNode.isVoid ? true : null
+          },
+          normalize: (transform, document) => {
+            const block = Block.create(defaultBlock)
+            transform
+              .insertNodeByKey(document.key, document.nodes.size, block)
+          }
+        }
+      ]
     },
 
     /*

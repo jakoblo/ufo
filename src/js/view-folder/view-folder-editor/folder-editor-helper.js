@@ -1,9 +1,9 @@
 import * as c from  './folder-editor-constants'
-
+import {Block} from 'slate'
 
 export const selectionIsOnFile = (state) => state.blocks.some(block => block.type == c.BLOCK_TYPE_FILE)
 
-function getFileBlockByBase(state, base) {
+export function getFileBlockByBase(state, base) {
   return state.get('document').findDescendant((node) => {
     return (node.getIn(['data', 'base']) == base)
   })
@@ -55,6 +55,20 @@ export const fileBlockTransforms = {
         isVoid: false,
         data: {}
       })
+  },
+
+  insertFileAtEnd: (transforming, document, basename) => {
+    const block = Block.create( getFileBlockProperties(basename) ) 
+    
+    return transforming
+      .insertNodeByKey(document.key, document.nodes.size, block)
+  },
+
+  renameFile: (state, transforming, sourceBase, targetBase) => {
+    const sourceBlock = getFileBlockByBase( state, sourceBase )
+    if(!sourceBlock) return transforming
+    return transforming
+            .setNodeByKey(sourceBlock.key, getFileBlockProperties(targetBase))
   }
 }
 
