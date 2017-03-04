@@ -80,10 +80,9 @@ export default function FilePlugin(options) {
               isFocused={isFocused}
               path={nodePath.join(folderPath, base)}
               onDrop={(event, cursorPosition) => {
-
                 const fileList = dragndrop.getFilePathArray(event)
                 let transforming = state.transform().select( Helper.getSelectionForFileNode(node) )
-
+                
                 fileList.forEach((filePath) => {
                   const basename = nodePath.basename(filePath)
                   transforming = Helper.fileBlockTransforms.removeExisting(transforming, basename)

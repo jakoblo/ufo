@@ -1,5 +1,5 @@
 import * as c from  './folder-editor-constants'
-import {Block} from 'slate'
+import {Block, Selection} from 'slate'
 
 export const selectionIsOnFile = (state) => state.blocks.some(block => block.type == c.BLOCK_TYPE_FILE)
 
