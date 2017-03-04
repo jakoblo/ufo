@@ -67,8 +67,7 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--drop-target-top']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
           [this.props.className+'--drop-target-bottom']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
-          [this.props.className+'--in-progress']: this.props.file.get('progress'),
-          [this.props.className+'--icon']: (this.state.data.get('icon'))
+          [this.props.className+'--in-progress']: this.props.file.get('progress')
         })}
         style={this.props.style}
       >
@@ -82,9 +81,14 @@ export default class FileItemComp extends React.Component {
           />
         : null }
 
-        {(this.state.data.get('icon')) ? 
-          <img  className={this.props.className+'__icon'} width="16" height="16" src={this.state.data.get('icon')} /> 
-        : null}
+        <div className={this.props.className+'__icon'} 
+          style={
+            (this.state.data.get('icon')) ? 
+              {backgroundImage: 'url("'+this.state.data.get('icon') + '")' }
+            : 
+              null
+          }
+        />
 
         <div className={this.props.className+'__name-base'} >{this.props.file.get('name')}</div>
         <div className={this.props.className+'__name-suffix'} >{this.props.file.get('suffix')}</div>
