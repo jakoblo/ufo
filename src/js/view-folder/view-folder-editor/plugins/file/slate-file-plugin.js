@@ -4,68 +4,11 @@ import nodePath from 'path'
 import {Block, Selection} from 'slate'
 import * as c from '../../folder-editor-constants'
 import * as dragndrop from '../../../../utils/dragndrop'
+import * as Helper from '../../folder-editor-helper'
 
 export default function FilePlugin(options) {
 
   const { BLOCK_TYPE, folderPath } = options
-
-  const selectionIsOnFile = (state) => state.blocks.some(block => block.type == BLOCK_TYPE)
-
-  function getFileBlockByBase(state, base) {
-    return state.get('document').findDescendant((node) => {
-      return (node.getIn(['data', 'base']) == base)
-    })
-  }
-
-  function getSelectionForFileNode(node) {
-    const childTextNodeKey = node.get('nodes').first().get('key')
-    return new Selection({
-      anchorKey: childTextNodeKey,
-      anchorOffset: 1,
-      focusKey: childTextNodeKey,
-      focusOffset: 1,
-      isBackward: false,
-      isFocused: true
-    })
-  }
-
-  const getFileBlockProperties = (basename) => {
-    return {
-      type: c.BLOCK_TYPE_FILE,
-      isVoid: true,
-      data: {
-        base: basename
-      }
-    }
-  }
-
-  const fileBlockTransforms = {
-    removeExisting: (transforming, basename) => {
-      const existingFileBlock = getFileBlockByBase(transforming.state, basename)
-      if(existingFileBlock) {
-        transforming = transforming
-          .removeNodeByKey(existingFileBlock.get('key'))
-      }
-      return transforming
-    },
-
-    insertFileOnTop: (transforming, basename) => transforming
-        .splitBlock()
-        .setBlock(getFileBlockProperties(basename)),    
-
-    insertFileBelow: (transforming, basename) => transforming
-        .insertBlock(getFileBlockProperties(basename)),
-    
-    insetLineAboveFileBlock: (transforming) => {
-      return transforming.splitBlock()
-        .setBlock({
-          type: 'paragraph',
-          isVoid: false,
-          data: {}
-        })
-  }
-
-  }
 
   return {
 
@@ -113,7 +56,7 @@ export default function FilePlugin(options) {
       }
 
       // Selection is expanded arround FileBlock(s)
-      if (selectionIsOnFile(state)) {
+      if (Helper.selectionIsOnFile(state)) {
         return state // Chancel Delete - would delete selected file block
       }
     },
@@ -133,16 +76,16 @@ export default function FilePlugin(options) {
               onDrop={(event, cursorPosition) => {
 
                 const fileList = dragndrop.getFilePathArray(event)
-                let transforming = state.transform().select( getSelectionForFileNode(node) )
+                let transforming = state.transform().select( Helper.getSelectionForFileNode(node) )
 
                 fileList.forEach((filePath) => {
                   const basename = nodePath.basename(filePath)
-                  transforming = fileBlockTransforms.removeExisting(transforming, basename)
+                  transforming = Helper.fileBlockTransforms.removeExisting(transforming, basename)
                   transforming = 
                     (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ?
-                      fileBlockTransforms.insertFileOnTop(transforming, basename)
+                      Helper.fileBlockTransforms.insertFileOnTop(transforming, basename)
                     :
-                      fileBlockTransforms.insertFileBelow(transforming, basename)
+                      Helper.fileBlockTransforms.insertFileBelow(transforming, basename)
                 }) 
 
                 editor.onChange(transforming.apply())
@@ -166,8 +109,8 @@ export default function FilePlugin(options) {
     * | FileItem |
     */
     onBeforeInput: (event, data, state) => {
-      if (selectionIsOnFile(state)) {
-        return  fileBlockTransforms
+      if (Helper.selectionIsOnFile(state)) {
+        return  Helper.fileBlockTransforms
                 .insetLineAboveFileBlock( state.transform() )
                 .apply()
       }
@@ -186,8 +129,8 @@ export default function FilePlugin(options) {
         // Insert File Blocks
         fileList.forEach((filePath) => {
           const basename = nodePath.basename(filePath)
-          transforming = fileBlockTransforms.removeExisting(transforming, basename)
-          transforming = fileBlockTransforms.insertFileBelow(transforming, basename)
+          transforming = Helper.fileBlockTransforms.removeExisting(transforming, basename)
+          transforming = Helper.fileBlockTransforms.insertFileBelow(transforming, basename)
         })
 
         state = transforming.deselect().apply()

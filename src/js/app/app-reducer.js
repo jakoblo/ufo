@@ -39,7 +39,7 @@ export default function appReducer(state = INITIAL_STATE, action = { type: '' })
       // create View Settings if necessary
       action.payload.pathRoute.forEach((viewPath) => {
         if(state.getIn(['viewSettings', viewPath])) return // Setting already there
-        state = state.setIn( ['viewSettings', viewPath], Map({ type: c.FOLDER_VIEW_LIST }) )
+        state = state.setIn( ['viewSettings', viewPath], Map({ type: c.FOLDER_VIEW_EDITOR }) )
       })
 
       return state
