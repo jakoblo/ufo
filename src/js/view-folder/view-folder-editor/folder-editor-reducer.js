@@ -8,20 +8,6 @@ import _ from 'lodash'
 import nodePath from 'path'
 
 const INITIAL_STATE = fromJS({})
-const INITIAL_EDITOR_STATE = Raw.deserialize({
-  nodes: [
-    {
-      kind: 'block',
-      type: 'paragraph',
-      nodes: [
-        {
-          kind: 'text',
-          text: 'Empty'
-        }
-      ]
-    }
-  ]
-}, { terse: true })
 
 export default function folderEditorReducer(state = INITIAL_STATE, action = { type: '' }) {
 

@@ -6,6 +6,7 @@
   "description": "",
   "scripts": {
     "start": "NODE_ENV=development ./node_modules/.bin/electron .",
+    "prod": "NODE_ENV=production ./node_modules/.bin/electron .",
     "main-debug": "./node_modules/.bin/electron . --debug=5858",
     "install": "gulp install",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -64,6 +65,8 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-plugin-transform-react-constant-elements": "^6.23.0",
+    "babel-plugin-transform-react-inline-elements": "^6.22.0",
     "babel-plugin-transform-react-jsx": "^6.8.0",
     "babel-preset-electron": "^0.37.8",
     "babel-preset-es2015-node": "^6.1.0",

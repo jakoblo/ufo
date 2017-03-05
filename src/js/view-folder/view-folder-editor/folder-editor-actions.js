@@ -5,20 +5,20 @@ import * as Helper from  './folder-editor-helper'
 import _ from 'lodash'
 import {Raw} from 'slate'
 
-const INITIAL_EDITOR_STATE = Raw.deserialize({
-  nodes: [
-    {
-      kind: 'block',
-      type: 'paragraph',
-      nodes: [
-        {
-          kind: 'text',
-          text: 'Empty'
-        }
-      ]
-    }
-  ]
-}, { terse: true })
+// const INITIAL_EDITOR_STATE = Raw.deserialize({
+//   nodes: [
+//     {
+//       kind: 'block',
+//       type: 'paragraph',
+//       nodes: [
+//         {
+//           kind: 'text',
+//           text: 'Empty'
+//         }
+//       ]
+//     }
+//   ]
+// }, { terse: true })
 
 /**
  * @param {string} path
@@ -29,8 +29,8 @@ export function folderEditorInit(props) {
 
     const {path} = props
 
-    let editorState = INITIAL_EDITOR_STATE
-    editorState = mapFilesToEditorState(getState(), props, editorState)
+    // let editorState = INITIAL_EDITOR_STATE
+    const editorState = mapFilesToEditorState(getState(), props, null)
 
     dispatch({
       type: t.FOLDER_EDITOR_INIT,
@@ -142,7 +142,7 @@ function newStateWithFileNodes(filesNotInEditor) {
   })
 
   console.time('Create Slate State')
-  const editorState = Raw.deserialize({ nodes }, { terse: true }) 
+  const editorState = Raw.deserialize({ nodes }, { terse: true })
   console.timeEnd('Create Slate State')
 
   return editorState

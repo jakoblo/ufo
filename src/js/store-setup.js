@@ -29,12 +29,11 @@ function getMiddleware() {
 
   let middleware = [
     // promiseMiddleware,
-    thunk,
-    logger
+    thunk
   ];
 
   if (process.env.NODE_ENV !== 'production') {
-    middleware = [...middleware];
+    middleware = [...middleware, logger];
   }
 
   return applyMiddleware(...middleware);
