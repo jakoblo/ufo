@@ -7,7 +7,8 @@ import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import * as selectors from  '../folder-editor-selectors'
 import Filter from '../../../filesystem/filter/filter-index'
-import FilePlugin from '../plugins/file/slate-file-plugin'
+import FilePlugin from '../plugins/slate-file-plugin'
+import MarkdownPlugin from '../plugins/slate-markdown'
 import Config from '../../../config/config-index'
 
 import Loading from '../../../general-components/loading'
@@ -31,6 +32,7 @@ export default class FolderEditor extends React.Component {
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
       folderPath: props.path
     })
+    this.markdownPlugin = MarkdownPlugin()
   }
 
   render() {
@@ -41,14 +43,11 @@ export default class FolderEditor extends React.Component {
             <Editor
               state={this.props.editorState}
               className="slate-editor"
-              plugins={ [this.filePlugin] }
+              plugins={ [this.filePlugin, this.markdownPlugin] }
               onChange={this.onChange}
               onDrop={this.onDrop}
               readOnly={this.props.readOnly}
-              onBlur={() => {
-                console.log('blur')
-              }}
-              onDocumentChange={this.onDocumentChange}
+              onBeforeChange={this.onBeforeChange}
             />
           : 
             <Loading />
@@ -70,16 +69,49 @@ export default class FolderEditor extends React.Component {
   }
 
   onChange = (editorState) => {
+    // console.log('external onchange')
     this.props.dispatch(
       Actions.folderEditorChange(this.props.path, editorState)
     )
   }
 
-  onDocumentChange = (document, editorState) => {
-    // this.props.dispatch(
-    //   Actions.mapFilesToEditor(nextProps)
-    // )
-  }
+  // onBeforeChange = (state) => {
+  //   const selection = state.get('selection')
+  //   const document = state.get('document')
+  //   const blocks = document.getBlocksAtRange(selection)
+
+  //   let transforming = state.transform()
+    
+  //   const block = blocks.first() 
+  //   const newBlock = this.blockDecortor( blocks.first() )
+  //   // blocks.forEach((block) => {
+      
+  //     if(block != newBlock) { 
+  //       transforming = transforming.setNodeByKey(block.key, newBlock)
+  //     }
+  //   // })
+
+  //   return transforming.apply()
+  // }
+
+  // blockDecortor = (block) => {
+
+  //   if(block.isVoid) return block
+
+  //   const text = block.text
+
+  //   // #headline 
+  //   if(text.match(/^(#+)(.*)/g)) {
+  //     let headlineDept = text.match(/^(#+)/g)[0].length
+  //     if(headlineDept > 6) headlineDept = 6
+  //     let newBlockType = 'h'+headlineDept
+  //     return block.set('type', newBlockType)
+  //   }
+
+  //   if(block.get('type') != "paragraph") {
+  //     return block.set('type', 'paragraph')
+  //   }
+  // }
 
   componentWillReceiveProps(nextProps) {}
 

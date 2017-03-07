@@ -1,10 +1,10 @@
 import React from 'react'
-import FileItem from '../../../../file-item/components/file-item'
+import FileItem from '../../../file-item/components/file-item'
 import nodePath from 'path'
 import {Block, Selection} from 'slate'
-import * as c from '../../folder-editor-constants'
-import * as dragndrop from '../../../../utils/dragndrop'
-import * as Helper from '../../folder-editor-helper'
+import * as c from '../folder-editor-constants'
+import * as dragndrop from '../../../utils/dragndrop'
+import * as Helper from '../folder-editor-helper'
 
 const defaultBlock = {
   type: 'paragraph',

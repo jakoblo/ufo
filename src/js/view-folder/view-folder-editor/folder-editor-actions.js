@@ -138,11 +138,11 @@ function newStateWithFileNodes(filesNotInEditor) {
   // Add empty line at the end
   nodes.push({
     kind: 'block',
-    type: 'paragraph'
+    type: 'markdown'
   })
 
   console.time('Create Slate State')
-  const editorState = Raw.deserialize({ nodes }, { terse: true })
+  const editorState = Raw.deserialize({ nodes }, { terse: true, normalize: false })
   console.timeEnd('Create Slate State')
 
   return editorState

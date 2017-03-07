@@ -51,7 +51,7 @@ export const fileBlockTransforms = {
   insetLineAboveFileBlock: (transforming) => {
     return transforming.splitBlock()
       .setBlock({
-        type: 'paragraph',
+        type: 'markdown',
         isVoid: false,
         data: {}
       })
