@@ -57,7 +57,6 @@ export default function MarkdownPlugin(options) {
 
 
   function applyMarksToCharacters(characters, offset, length, markType) {
-    console.log(markType)
     for (let i = offset; i < length; i++) {
       let char = characters.get(i)
       let { marks } = char

@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect'
 import * as c from './folder-editor-constants'
+import * as Helper from './folder-editor-helper'
 
 export const getEditorState = (state, path) => state[c.NAME].get(path)
 
@@ -14,11 +15,7 @@ export const getFilesInEditor_Factory = () => {
       if(!editorState) {
         return null
       }
-      return editorState.document.getBlocks().filter((block) => {
-        return block.get('type') == "file"
-      }).map((fileBlock) => {
-        return fileBlock.getIn(['data', 'base'])
-      }).toJS()
+      return Helper.getFilesInNodes(editorState.document.getBlocks())
     }
   )
 }

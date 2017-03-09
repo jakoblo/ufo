@@ -1,5 +1,5 @@
 import * as c from  './folder-editor-constants'
-import {Block, Selection} from 'slate'
+import {Block, Selection, Raw} from 'slate'
 
 export const selectionIsOnFile = (state) => state.blocks.some(block => block.type == c.BLOCK_TYPE_FILE)
 
@@ -19,6 +19,18 @@ export function getSelectionForFileNode(node) {
     isBackward: false,
     isFocused: true
   })
+}
+
+export const getSelectedFiles = (state) => {
+  return getFilesInNodes(state.blocks)
+}
+
+export const getFilesInNodes = (nodes) => {
+  return nodes.filter((node) => {
+    return node.get('type') == "file"
+  }).map((fileBlock) => {
+    return fileBlock.getIn(['data', 'base'])
+  }).toJS()
 }
 
 export const getFileBlockProperties = (basename) => {
@@ -71,6 +83,102 @@ export const fileBlockTransforms = {
             .setNodeByKey(sourceBlock.key, getFileBlockProperties(targetBase))
   }
 }
+
+export function getFilesInState(state) {
+  return state.document.getBlocks().filter((block) => {
+    return block.get('type') == "file"
+  }).map((fileBlock) => {
+    return fileBlock.getIn(['data', 'base'])
+  }).toJS()
+}
+
+
+export const getFileBlock = (fileBase) => {
+  return {
+    kind: 'block',
+    type: c.BLOCK_TYPE_FILE,
+    isVoid: true,
+    "nodes": [
+      {
+        "kind": "text",
+        "ranges": [
+          {
+            "kind": "range",
+            "text": " ",
+            "marks": []
+          }
+        ]
+      }
+    ],
+    data: {
+      base: fileBase
+    }
+  }
+}
+
+
+
+/**
+ * Deserialize a plain text `string` to a state.
+ *
+ * @param {String} string
+ * @param {Object} options
+ *   @property {Boolean} toRaw
+ * @return {State}
+ */
+
+export function deserializeMarkdown(string, options = {}) {
+  const raw = {
+    kind: 'state',
+    document: {
+      kind: 'document',
+      nodes: string.split('\n').map((line) => {
+        if(line.match( /<.*>/ )){
+          // insert Void Block with filename as data
+          return getFileBlock( line.substring(1, line.length - 1) )
+        } else {
+          return {
+            kind: 'block',
+            type: 'line',
+            nodes: [
+              {
+                kind: 'text',
+                ranges: [
+                  {
+                    text: line,
+                    marks: [],
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }),
+    }
+  }
+
+  return options.toRaw ? raw : Raw.deserialize(raw)
+}
+
+
+/**
+ * Serialize a `state` to plain text.
+ *
+ * @param {State} state
+ * @return {String}
+ */
+
+export function serializeMarkdown(state) {
+  return state.document.nodes
+    .map((block) => {
+      if(block.type == c.BLOCK_TYPE_FILE) {
+        return '<'+block.getIn(['data', 'base'])+'>'
+      } else {
+        return block.text
+      }
+    }).join('\n')
+}
+
 
 
 

@@ -1,7 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
+import nodePath from 'path'
 import { connect } from 'react-redux'
-import { Editor, Raw, Plain } from 'slate'
+import { Editor } from 'slate'
 import * as FsMergedSelector from  '../../../filesystem/fs-merged-selectors'
 import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
@@ -10,6 +11,8 @@ import Filter from '../../../filesystem/filter/filter-index'
 import FilePlugin from '../plugins/slate-file-plugin'
 import MarkdownPlugin from '../plugins/slate-markdown'
 import Config from '../../../config/config-index'
+import * as Utils from '../../../utils/utils-index'
+import * as Helper from '../folder-editor-helper'
 
 import Loading from '../../../general-components/loading'
 
@@ -30,7 +33,8 @@ export default class FolderEditor extends React.Component {
     super(props)
     this.filePlugin = FilePlugin({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
-      folderPath: props.path
+      folderPath: props.path,
+      dispatch: this.props.dispatch
     })
     this.markdownPlugin = MarkdownPlugin()
   }
@@ -47,7 +51,8 @@ export default class FolderEditor extends React.Component {
               onChange={this.onChange}
               onDrop={this.onDrop}
               readOnly={this.props.readOnly}
-              onBeforeChange={this.onBeforeChange}
+              onDocumentChange={this.onDocumentChange}
+              onSelectionChange={this.onSelectionChange}
             />
           : 
             <Loading />
@@ -75,47 +80,28 @@ export default class FolderEditor extends React.Component {
     )
   }
 
-  // onBeforeChange = (state) => {
-  //   const selection = state.get('selection')
-  //   const document = state.get('document')
-  //   const blocks = document.getBlocksAtRange(selection)
+  onDocumentChange = (document, state) => {
+    this.savingTimout = setTimeout(this.saveDocument, 1000)
+  }
 
-  //   let transforming = state.transform()
-    
-  //   const block = blocks.first() 
-  //   const newBlock = this.blockDecortor( blocks.first() )
-  //   // blocks.forEach((block) => {
-      
-  //     if(block != newBlock) { 
-  //       transforming = transforming.setNodeByKey(block.key, newBlock)
-  //     }
-  //   // })
+  savingTimout = null
 
-  //   return transforming.apply()
-  // }
-
-  // blockDecortor = (block) => {
-
-  //   if(block.isVoid) return block
-
-  //   const text = block.text
-
-  //   // #headline 
-  //   if(text.match(/^(#+)(.*)/g)) {
-  //     let headlineDept = text.match(/^(#+)/g)[0].length
-  //     if(headlineDept > 6) headlineDept = 6
-  //     let newBlockType = 'h'+headlineDept
-  //     return block.set('type', newBlockType)
-  //   }
-
-  //   if(block.get('type') != "paragraph") {
-  //     return block.set('type', 'paragraph')
-  //   }
-  // }
+  saveDocument = () => {
+    this.savingTimout = setTimeout(() => {
+      this.savingTimout = null
+      const path = nodePath.join( this.props.path, 'index.md')
+      const content = Helper.serializeMarkdown(this.props.editorState)
+      Utils.fs.saveFile( path, content )
+    }, 1000)
+  }
 
   componentWillReceiveProps(nextProps) {}
 
   componentWillUnmount() {
+    if(this.savingTimout) {
+      clearTimeout(this.savingTimout)
+      this.saveDocument()
+    }
     this.props.dispatch(
       Actions.folderEditorClose(this.props.path)
     )
