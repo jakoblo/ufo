@@ -16,11 +16,12 @@ export function folderEditorInit(props) {
   return (dispatch, getState) => {
 
     const {path, fileList} = props
+    let editorState
 
     if(fileList.indexOf('index.md') > -1) {
       const fileContent = Utils.fs.loadFile( nodePath.join(props.path, 'index.md') )
         .then((fileContent) => {
-          let editorState = Helper.deserializeMarkdown(fileContent)
+          editorState = Helper.deserializeMarkdown(fileContent)
           editorState = mapFilesToEditorState(props, editorState)
 
           dispatch({
@@ -30,6 +31,14 @@ export function folderEditorInit(props) {
               editorState: editorState
             }
           })
+      })
+    } else {
+      dispatch({
+        type: t.FOLDER_EDITOR_INIT,
+        payload: {
+          path : path,
+          editorState: newStateWithFileNodes(props.fileList)
+        }
       })
     }
   }
