@@ -1,14 +1,18 @@
 import React from 'react'
 import classnames from 'classnames'
+import nodePath from 'path'
 import { connect } from 'react-redux'
-import { Editor, Raw, Plain } from 'slate'
+import { Editor } from 'slate'
 import * as FsMergedSelector from  '../../../filesystem/fs-merged-selectors'
 import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import * as selectors from  '../folder-editor-selectors'
 import Filter from '../../../filesystem/filter/filter-index'
-import FilePlugin from '../plugins/file/slate-file-plugin'
+import FilePlugin from '../plugins/slate-file-plugin'
+import MarkdownPlugin from '../plugins/slate-markdown'
 import Config from '../../../config/config-index'
+import * as Utils from '../../../utils/utils-index'
+import * as Helper from '../folder-editor-helper'
 
 import Loading from '../../../general-components/loading'
 
@@ -29,8 +33,10 @@ export default class FolderEditor extends React.Component {
     super(props)
     this.filePlugin = FilePlugin({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
-      folderPath: props.path
+      folderPath: props.path,
+      dispatch: this.props.dispatch
     })
+    this.markdownPlugin = MarkdownPlugin()
   }
 
   render() {
@@ -41,14 +47,12 @@ export default class FolderEditor extends React.Component {
             <Editor
               state={this.props.editorState}
               className="slate-editor"
-              plugins={ [this.filePlugin] }
+              plugins={ [this.filePlugin, this.markdownPlugin] }
               onChange={this.onChange}
               onDrop={this.onDrop}
               readOnly={this.props.readOnly}
-              onBlur={() => {
-                console.log('blur')
-              }}
               onDocumentChange={this.onDocumentChange}
+              onSelectionChange={this.onSelectionChange}
             />
           : 
             <Loading />
@@ -70,20 +74,34 @@ export default class FolderEditor extends React.Component {
   }
 
   onChange = (editorState) => {
+    // console.log('external onchange')
     this.props.dispatch(
       Actions.folderEditorChange(this.props.path, editorState)
     )
   }
 
-  onDocumentChange = (document, editorState) => {
-    // this.props.dispatch(
-    //   Actions.mapFilesToEditor(nextProps)
-    // )
+  onDocumentChange = (document, state) => {
+    this.savingTimout = setTimeout(this.saveDocument, 1000)
+  }
+
+  savingTimout = null
+
+  saveDocument = () => {
+    this.savingTimout = setTimeout(() => {
+      this.savingTimout = null
+      const path = nodePath.join( this.props.path, 'index.md')
+      const content = Helper.serializeMarkdown(this.props.editorState)
+      Utils.fs.saveFile( path, content )
+    }, 1000)
   }
 
   componentWillReceiveProps(nextProps) {}
 
   componentWillUnmount() {
+    if(this.savingTimout) {
+      clearTimeout(this.savingTimout)
+      this.saveDocument()
+    }
     this.props.dispatch(
       Actions.folderEditorClose(this.props.path)
     )

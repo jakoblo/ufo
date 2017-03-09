@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain } from 'electron'
+import fs from 'fs'
 
 export default function ipcListener(handleNewWindow) {
 
@@ -19,19 +20,8 @@ export default function ipcListener(handleNewWindow) {
       windowManager.newWindow()
   })
 
+  ipcMain.on('writeFile', function(event, path, content) {
+    fs.writeFile(path, content)
+  })
+  
 }
-
-// Not needed right now:
-// ipcMain.on('writeFile', function(event, path, content) {
-//   console.log('writeFile: '+path);
-//   let pathObj = Utils.Path.createPathObj(path)
-
-//   fs.access(pathObj.dir, (error) => {
-//       if(!error) {
-//         fs.writeFileSync(path, content)
-//       } else {
-//         console.log(error)
-//       }
-//     }
-//   )
-// })

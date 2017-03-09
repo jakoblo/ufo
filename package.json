@@ -32,6 +32,7 @@
     "mz": "^2.4.0",
     "ncp": "^2.0.0",
     "npm": "^4.0.3",
+    "prismjs": "^1.6.0",
     "progress": "^1.1.8",
     "progress-stream": "^1.2.0",
     "rc-tooltip": "^3.4.2",
@@ -53,7 +54,7 @@
     "redux-undo": "^1.0.0-beta9",
     "reselect": "^2.5.3",
     "rimraf": "^2.5.4",
-    "slate": "^0.17.4",
+    "slate": "^0.19.2",
     "trash": "^4.0.0",
     "underscore": "^1.8.3"
   },

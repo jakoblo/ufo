@@ -27,7 +27,6 @@ export default class Editor extends React.Component {
 
   loadFile = (path) => {
     fs.readFile(path, 'utf8', (err, data) => {
-      console.log('done')
       this.setState({
         content: err || data
       })

@@ -1,10 +1,11 @@
 import React from 'react'
-import FileItem from '../../../../file-item/components/file-item'
+import FileItem from '../../../file-item/components/file-item'
 import nodePath from 'path'
-import {Block, Selection} from 'slate'
-import * as c from '../../folder-editor-constants'
-import * as dragndrop from '../../../../utils/dragndrop'
-import * as Helper from '../../folder-editor-helper'
+import {Block} from 'slate'
+import * as c from '../folder-editor-constants'
+import * as dragndrop from '../../../utils/dragndrop'
+import * as Helper from '../folder-editor-helper'
+import Selection from '../../../filesystem/selection/sel-index'
 
 const defaultBlock = {
   type: 'paragraph',
@@ -14,7 +15,16 @@ const defaultBlock = {
 
 export default function FilePlugin(options) {
 
-  const { BLOCK_TYPE, folderPath } = options
+  const { BLOCK_TYPE, folderPath, dispatch } = options
+  let stateCache
+
+  const onSelectionChange = (state) => {
+    const selectedFiles = Helper.getSelectedFiles(state).map((fileBase) => {
+      return nodePath.join(folderPath, fileBase)
+    })
+    
+    dispatch( Selection.actions.set(selectedFiles) )
+  }
 
   return {
 
@@ -178,6 +188,13 @@ export default function FilePlugin(options) {
         return state
       }
     },
+
+    onChange: (state) => {
+      if(stateCache && state && state.selection != stateCache.selection ) {
+        onSelectionChange(state)
+      }
+      stateCache = state
+    }
 
 
   }

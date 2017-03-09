@@ -144,7 +144,7 @@ export default class FileItemComp extends React.Component {
   }
 
   requestIcon = (path) => {
-    if(this.props.file.get('stats').isFile()) {
+    if(this.props.file && this.props.file.get('stats') && this.props.file.get('stats').isFile()) {
       app.getFileIcon(path, {size: 'small'}, (error, image) => {
         if(!error) {
           this.setImmState((prevState) => (prevState.set('icon', 'data:image/png;base64,' + image.toPNG().toString('base64'))))
