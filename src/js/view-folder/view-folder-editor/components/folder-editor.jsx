@@ -8,11 +8,10 @@ import * as c from  '../folder-editor-constants'
 import * as Actions from  '../folder-editor-actions'
 import * as selectors from  '../folder-editor-selectors'
 import Filter from '../../../filesystem/filter/filter-index'
-import FilePlugin from '../plugins/slate-file-plugin'
-import MarkdownPlugin from '../plugins/slate-markdown'
+import FileExtension from '../slate-extensions/slate-file/slate-file-index'
+import MarkdownPlugin from '../slate-extensions/slate-markdown/slate-markdown-plugin'
 import Config from '../../../config/config-index'
 import * as Utils from '../../../utils/utils-index'
-import * as Helper from '../folder-editor-helper'
 
 import Loading from '../../../general-components/loading'
 
@@ -31,12 +30,11 @@ export default class FolderEditor extends React.Component {
 
   constructor(props) {
     super(props)
-    this.filePlugin = FilePlugin({
+    this.filePlugin = FileExtension.SlatePlugin_Factory({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
       folderPath: props.path,
       dispatch: this.props.dispatch
     })
-    this.markdownPlugin = MarkdownPlugin()
   }
 
   render() {
@@ -47,7 +45,7 @@ export default class FolderEditor extends React.Component {
             <Editor
               state={this.props.editorState}
               className="slate-editor"
-              plugins={ [this.filePlugin, this.markdownPlugin] }
+              plugins={ [this.filePlugin, MarkdownPlugin] }
               onChange={this.onChange}
               onDrop={this.onDrop}
               readOnly={this.props.readOnly}
@@ -81,18 +79,18 @@ export default class FolderEditor extends React.Component {
   }
 
   onDocumentChange = (document, state) => {
-    this.savingTimout = setTimeout(this.saveDocument, 1000)
+    clearTimeout(this.savingTimout)
+    this.savingTimout = setTimeout(this.saveDocument, 5000)
   }
 
   savingTimout = null
 
   saveDocument = () => {
-    this.savingTimout = setTimeout(() => {
-      this.savingTimout = null
-      const path = nodePath.join( this.props.path, 'index.md')
-      const content = Helper.serializeMarkdown(this.props.editorState)
-      Utils.fs.saveFile( path, content )
-    }, 1000)
+    this.savingTimout = null
+    console.log('save '+this.props.path)
+    const path = nodePath.join( this.props.path, c.INDEX_BASE_NAME)
+    const content = FileExtension.Serialize.stateToPlain(this.props.editorState)
+    Utils.fs.saveFile( path, content )
   }
 
   componentWillReceiveProps(nextProps) {}

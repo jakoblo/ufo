@@ -5,7 +5,8 @@ import { Map } from 'immutable'
 const INITIAL_STATE = Map({
   windowWidth: 800,
   windowHeight: 600,
-  readOnly: false
+  readOnly: false,
+  indexBase: 'index.md'
 })
 
 export default function configReducer(state = INITIAL_STATE, action = { type: '' }) {

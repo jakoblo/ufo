@@ -1,12 +1,11 @@
 import * as t from './folder-editor-actiontypes'
 import * as selectors from './folder-editor-selectors'
 import * as c from  './folder-editor-constants'
-import * as Helper from  './folder-editor-helper'
+import SlateFile from  './slate-extensions/slate-file/slate-file-index'
 import * as Utils from  '../../utils/utils-index'
-import * as Markdown from  './folder-editor-serializer'
 import nodePath from 'path'
 import _ from 'lodash'
-import {Raw, Plain, setKeyGenerator} from 'slate'
+import { Raw } from 'slate'
 
 /**
  * @param {string} path
@@ -18,10 +17,10 @@ export function folderEditorInit(props) {
     const {path, fileList} = props
     let editorState
 
-    if(fileList.indexOf('index.md') > -1) {
-      const fileContent = Utils.fs.loadFile( nodePath.join(props.path, 'index.md') )
+    if(fileList.indexOf(c.INDEX_BASE_NAME) > -1) {
+      const fileContent = Utils.fs.loadFile( nodePath.join(props.path, c.INDEX_BASE_NAME) )
         .then((fileContent) => {
-          editorState = Helper.deserializeMarkdown(fileContent)
+          editorState = SlateFile.Serialize.plainToState(fileContent)
           editorState = mapFilesToEditorState(props, editorState)
 
           dispatch({
@@ -33,13 +32,15 @@ export function folderEditorInit(props) {
           })
       })
     } else {
+      console.time('Init')
       dispatch({
         type: t.FOLDER_EDITOR_INIT,
         payload: {
           path : path,
-          editorState: newStateWithFileNodes(props.fileList)
+          editorState: newStateWithFileNodes(fileList)
         }
       })
+       console.timeEnd('Init')
     }
   }
 }
@@ -78,31 +79,6 @@ export function folderEditorChange(path, editorState) {
  * Will create file blocks for each file 
  * which is in the props.folder and not jet in the Editor
  * 
- * @param {Props} props - component props
- * @returns {ActionCreator}
- */
-// export function mapFilesToEditor(props) {
-//   return (dispatch, getState) => {
-
-//     const {editorState} = props
-//     const newEditorState = mapFilesToEditorState(state, props)
-
-//     if(editorState != newEditorState) {
-//       dispatch({
-//         type: t.FOLDER_EDITOR_FILEMAPPING,
-//         payload: {
-//           path : path,
-//           editorState: editorState
-//         }
-//       })
-//     }
-//   }
-// }
-
-/**
- * Will create file blocks for each file 
- * which is in the props.folder and not jet in the Editor
- * 
  * @param {State} state - redux store state
  * @param {Props} props - component props
  * @param {Immuteable} editorState
@@ -112,14 +88,14 @@ function mapFilesToEditorState(props, editorState) {
 
   const filesOnDisk = props.fileList
 
-  const filesInEditor = Helper.getFilesInState(editorState)
+  const filesInEditor = SlateFile.Blocks.getFilesInState(editorState)
   const filesNotInEditor = _.difference(filesOnDisk, filesInEditor)
 
   if(filesNotInEditor.length > 0) {
     // editorState = newStateWithFileNodes(filesNotInEditor)
     let transforming = editorState.transform()
     filesNotInEditor.forEach((base, index) => {
-      transforming = Helper.fileBlockTransforms.insertFileAtEnd(transforming, editorState.get('document'), base)
+      transforming = SlateFile.Transforms.insertFileAtEnd(transforming, editorState.get('document'), base)
     })
     editorState = transforming.apply()
 
@@ -128,7 +104,7 @@ function mapFilesToEditorState(props, editorState) {
 }
 
 // Faster than block transforms, but still slow
-function newStateWithFileNodes(filesNotInEditor) {
+function newStateWithFileNodes(filesNotInEditor) {  
 
   let state = {
     "document": {
@@ -140,33 +116,48 @@ function newStateWithFileNodes(filesNotInEditor) {
   }
 
   filesNotInEditor.forEach((base, index) => {
-    state.document.nodes.push({
-      kind: 'block',
-      type: c.BLOCK_TYPE_FILE,
-      isVoid: true,
-      "nodes": [
-        {
-          "kind": "text",
-          "ranges": [
-            {
-              "kind": "range",
-              "text": " ",
-              "marks": []
-            }
-          ]
+    if(base != c.INDEX_BASE_NAME) {
+      state.document.nodes.push({
+        kind: 'block',
+        type: c.BLOCK_TYPE_FILE,
+        isVoid: true,
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "kind": "range",
+                "text": " ",
+                "marks": []
+              }
+            ]
+          }
+        ],
+        data: {
+          base: base
         }
-      ],
-      data: {
-        base: base
-      }
-    })
+      })
+    }
   })
 
-  // Add empty line at the end
-  // nodes.push({
-  //   kind: 'block',
-  //   type: 'markdown'
-  // })
+  //Add empty line at the end
+  state.document.nodes.push({
+    kind: 'block',
+    type: 'markdown',
+    isVoid: false,
+    "nodes": [
+      {
+        "kind": "text",
+        "ranges": [
+          {
+            "kind": "range",
+            "text": "",
+            "marks": []
+          }
+        ]
+      }
+    ]
+  })
 
   console.time('Create Slate State')
   const editorState = Raw.deserialize(state, { terse: false, normalize: false })

@@ -63,7 +63,8 @@ export default class FileItemComp extends React.Component {
           [this.props.className+'--active']: this.props.file.get('active'),
           [this.props.className+'--selected']: this.props.file.get('selected'),
           [this.props.className+'--is-focused']: this.props.isFocused,
-          [this.props.className+'--drop-target']: (this.props.file.get('stats').isDirectory() && this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
+          [this.props.className+'--is-cursor']: this.props.isCursor,
+          [this.props.className+'--drop-target']: this.props.file.get('stats').isDirectory() && this.state.data.get('dropTarget'),
           [this.props.className+'--drop-target-top']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
           [this.props.className+'--drop-target-bottom']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
           [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
@@ -121,15 +122,8 @@ export default class FileItemComp extends React.Component {
   }
 
   componentWillReceiveProps = (nextProps) => {
-    if (!this.props.isOver && nextProps.isOver) {
-      // You can use this as enter handler
-      this.dragOverTimeout = setTimeout(() => {
-        this.props.dispatch( FileActions.show(this.props.file) )
-      }, 1000)
-    }
-    if (this.props.isOver && !nextProps.isOver) {
-      // You can use this as leave handler
-      clearTimeout(this.dragOverTimeout)
+    if(this.props.file != nextProps.file) {
+      this.requestIcon(nextProps.file.get('path'))
     }
   }
 
@@ -139,6 +133,7 @@ export default class FileItemComp extends React.Component {
       nextProps.isOver !== this.props.isOver || 
       nextProps.isOverCurrent !== this.props.isOverCurrent || 
       nextProps.isFocused !== this.props.isFocused || 
+      nextProps.isCursor !== this.props.isCursor || 
       nextState.data !== this.state.data
     );
   }
@@ -169,9 +164,9 @@ export default class FileItemComp extends React.Component {
       this.setDropHover(event, cursorPosition) 
     },
 
-    dragOut: (event, cursorPosition)  => {
+    dragOut: (event)  => {
       this.cancelPeakTimeout()
-      this.setDropHover(event, cursorPosition)
+      this.setDropHover(event, false)
     },
 
     drop: (event, cursorPosition) => {

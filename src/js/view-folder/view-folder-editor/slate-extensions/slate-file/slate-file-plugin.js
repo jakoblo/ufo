@@ -1,11 +1,13 @@
 import React from 'react'
-import FileItem from '../../../file-item/components/file-item'
+import FileItem from '../../../../file-item/components/file-item'
+import Selection from '../../../../filesystem/selection/sel-index'
 import nodePath from 'path'
 import {Block} from 'slate'
-import * as c from '../folder-editor-constants'
-import * as dragndrop from '../../../utils/dragndrop'
-import * as Helper from '../folder-editor-helper'
-import Selection from '../../../filesystem/selection/sel-index'
+import * as c from '../../folder-editor-constants'
+import * as dragndrop from '../../../../utils/dragndrop'
+import * as EditorSelection from './slate-file-selection'
+import * as Transforms from './slate-file-transforms'
+import * as Blocks from './slate-file-blocks'
 
 const defaultBlock = {
   type: 'paragraph',
@@ -13,18 +15,18 @@ const defaultBlock = {
   data: {}
 }
 
-export default function FilePlugin(options) {
+export default function FilePlugin_Factory(options) {
 
   const { BLOCK_TYPE, folderPath, dispatch } = options
   let stateCache
 
-  const onSelectionChange = (state) => {
-    const selectedFiles = Helper.getSelectedFiles(state).map((fileBase) => {
-      return nodePath.join(folderPath, fileBase)
-    })
+  // const onSelectionChange = (state) => {
+  //   const selectedFiles = EditorSelection.getSelectedFiles(state).map((fileBase) => {
+  //     return nodePath.join(folderPath, fileBase)
+  //   })
     
-    dispatch( Selection.actions.set(selectedFiles) )
-  }
+  //   dispatch( Selection.actions.set(selectedFiles) )
+  // }
 
   return {
 
@@ -72,7 +74,7 @@ export default function FilePlugin(options) {
       }
 
       // Selection is expanded arround FileBlock(s)
-      if (Helper.selectionIsOnFile(state)) {
+      if (EditorSelection.includesAFileBlock(state)) {
         return state // Chancel Delete - would delete selected file block
       }
     },
@@ -81,29 +83,29 @@ export default function FilePlugin(options) {
       nodes: {
         // Render FileItems in blocks with type file
         [BLOCK_TYPE]: function (editorProps) {
-          const { node, state, editor } = editorProps
-          const isFocused = state.selection.hasEdgeIn(node)
+          const { node, editor } = editorProps
+          const isCursor = editor.getState().selection.hasEdgeIn(node)
           const base = node.getIn(['data', 'base'])
           return (
             <FileItem
               className='view-folder-item'
-              isFocused={isFocused}
+              isCursor={isCursor}
               path={nodePath.join(folderPath, base)}
               onDrop={(event, cursorPosition) => {
-                const fileList = dragndrop.getFilePathArray(event)
-                let transforming = state.transform().select( Helper.getSelectionForFileNode(node) )
-                
-                fileList.forEach((filePath) => {
-                  const basename = nodePath.basename(filePath)
-                  transforming = Helper.fileBlockTransforms.removeExisting(transforming, basename)
-                  transforming = 
-                    (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ?
-                      Helper.fileBlockTransforms.insertFileOnTop(transforming, basename)
-                    :
-                      Helper.fileBlockTransforms.insertFileBelow(transforming, basename)
-                }) 
 
-                editor.onChange(transforming.apply())
+                const fileList = dragndrop.getFilePathArray(event)
+                const baselist = fileList.map(filePath => nodePath.basename(filePath))
+                let state = editor.getState()
+
+                state = Transforms.removeFiles(state, baselist)
+
+                // Need to be calcualted after remove Files
+                const nodeIndex = state.document.getParent(node).get('nodes').indexOf(node)
+                const position = (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ? nodeIndex : nodeIndex + 1
+                
+                state = Transforms.insertFilesAt(state, baselist, position)
+
+                editor.onChange(state)
                 dragndrop.executeFileDropOnDisk(event, folderPath)
 
               }}
@@ -156,8 +158,8 @@ export default function FilePlugin(options) {
     * | FileItem |
     */
     onBeforeInput: (event, data, state) => {
-      if (Helper.selectionIsOnFile(state)) {
-        return  Helper.fileBlockTransforms
+      if (EditorSelection.includesAFileBlock(state)) {
+        return  Transforms
                 .insetLineAboveFileBlock( state.transform() )
                 .apply()
       }
@@ -169,18 +171,21 @@ export default function FilePlugin(options) {
       
       if(dragndrop.shouldAcceptDrop(event, [dragndrop.constants.TYPE_FILE])) {
         const fileList = dragndrop.getFilePathArray(event)
+        const baselist = fileList.map(filePath => nodePath.basename(filePath))
+        const selection = data.target
 
-        // Transform selection
-        let transforming = state.transform().deselect().select(data.target)
+        state = Transforms.removeFiles(state, baselist)
       
-        // Insert File Blocks
-        fileList.forEach((filePath) => {
-          const basename = nodePath.basename(filePath)
-          transforming = Helper.fileBlockTransforms.removeExisting(transforming, basename)
-          transforming = Helper.fileBlockTransforms.insertFileBelow(transforming, basename)
-        })
+        // Set Selection to Drop Position and create a Break there
+        state = state.transform().deselect().select(selection).splitBlock().apply()
 
-        state = transforming.deselect().apply()
+        const node = state.document.findDescendant((node) => (node.key == selection.focusKey))
+        const block = Blocks.getRootBlockOfNode(state, node)
+        const blockIndex = state.document.get('nodes').indexOf(block)
+        
+        state = Transforms.insertFilesAt(state, baselist, blockIndex+1)
+
+        // state = state.transform().deselect().apply()
         
         // Move Files
         dragndrop.executeFileDropOnDisk(event, folderPath)
@@ -189,12 +194,12 @@ export default function FilePlugin(options) {
       }
     },
 
-    onChange: (state) => {
-      if(stateCache && state && state.selection != stateCache.selection ) {
-        onSelectionChange(state)
-      }
-      stateCache = state
-    }
+    // onChange: (state) => {
+    //   // if(stateCache && state && state.selection != stateCache.selection ) {
+    //   //   onSelectionChange(state)
+    //   // }
+    //   // stateCache = state
+    // }
 
 
   }

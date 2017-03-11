@@ -1,6 +1,7 @@
 import { fromJS, Map } from 'immutable'
 import * as t from './folder-editor-actiontypes'
-import * as Helper from './folder-editor-helper'
+import * as c from './folder-editor-constants'
+import SlateFile from './slate-extensions/slate-file/slate-file-index'
 import fsWatch from '../../filesystem/watch/fs-watch-index'
 import fsWrite from '../../filesystem/write/fs-write-index'
 import {Raw} from 'slate'
@@ -28,22 +29,22 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
     // Add file at the end of the Document if not exists
     case fsWatch.actiontypes.FILE_ADD:
+      if(action.payload.base == c.INDEX_BASE_NAME) return state
 
       // File Exists already ?
-      if(Helper.getFileBlockByBase(state.get(action.payload.root), action.payload.base)) return state
+      if(SlateFile.Blocks.getFileBlockByBase(state.get(action.payload.root), action.payload.base)) return state
       
       // Add file at the end of the Document
       const document = state.get(action.payload.root).get('document')
       let transformAddFile = state.get(action.payload.root).transform()
-          transformAddFile = Helper.fileBlockTransforms.insertFileAtEnd(transformAddFile, document, action.payload.base)
+          transformAddFile = SlateFile.Transforms.insertFileAtEnd(transformAddFile, document, action.payload.base)
 
       return state.set(action.payload.root, transformAddFile.apply())
-
 
     // Remove file from document is exists
     case fsWatch.actiontypes.FILE_UNLINK:
       let transformRemoveFile = state.get(action.payload.root).transform()
-          transformRemoveFile = Helper.fileBlockTransforms.removeExisting(transformRemoveFile, action.payload.base)
+          transformRemoveFile = SlateFile.Transforms.removeExisting(transformRemoveFile, action.payload.base)
       return state.set(action.payload.root, transformRemoveFile.apply())
     
 
@@ -61,7 +62,7 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
         if(!renamingEditor) return state
 
-        return state.set(renamingSourceRoot, Helper.fileBlockTransforms.renameFile( 
+        return state.set(renamingSourceRoot, SlateFile.Transforms.renameFile( 
           renamingEditor,
           renamingEditor.transform(),
           renamingSourceBase,
@@ -84,14 +85,13 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
         if(!renamingEditor) return state
 
-        return state.set(renamingSourceRoot, Helper.fileBlockTransforms.renameFile( 
+        return state.set(renamingSourceRoot, SlateFile.Transforms.renameFile( 
           renamingEditor,
           renamingEditor.transform(),
           renamingTargetBase, // Inverted
           renamingSourceBase // Inverted
         ).apply() )
       })()
-      
 
     default:
       return state
