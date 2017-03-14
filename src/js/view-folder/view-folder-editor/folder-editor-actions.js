@@ -90,16 +90,21 @@ function mapFilesToEditorState(props, editorState) {
 
   const filesInEditor = SlateFile.Blocks.getFilesInState(editorState)
   const filesNotInEditor = _.difference(filesOnDisk, filesInEditor)
+  const fileNotOnDisk = _.difference(filesInEditor, filesOnDisk)
 
-  if(filesNotInEditor.length > 0) {
-    // editorState = newStateWithFileNodes(filesNotInEditor)
-    let transforming = editorState.transform()
-    filesNotInEditor.forEach((base, index) => {
+  let transforming = editorState.transform()
+
+  fileNotOnDisk.forEach((base, index) => {
+    transforming = SlateFile.Transforms.removeExisting(transforming, base)
+  })
+  filesNotInEditor.forEach((base, index) => {
+    if(base != c.INDEX_BASE_NAME) {
       transforming = SlateFile.Transforms.insertFileAtEnd(transforming, editorState.get('document'), base)
-    })
-    editorState = transforming.apply()
+    }
+  })
 
-  }
+  editorState = transforming.apply()
+  
   return editorState
 }
 

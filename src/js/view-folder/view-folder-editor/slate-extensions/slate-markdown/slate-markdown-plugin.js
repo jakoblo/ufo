@@ -134,7 +134,9 @@ const MarkdownPlugin = {
         opacity: 0.5
       },
       'list': {
-        paddingLeft: '10px'
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        color: '#000'
       },
       'hr': {
         borderBottom: '2px solid #000',

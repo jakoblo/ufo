@@ -10,11 +10,16 @@
   padding: 0 @padding__sidebar-horizonal;
   position: relative;
   box-sizing: border-box;
+  // user-select: none;
 
-  .slate-editor & {
-    margin-left: -@editor-padding-left;
-    margin-right: -@editor-padding-right;
+  *::selection {
+    background: transparent !important;
   }
+
+  // .slate-editor & {
+  //   margin-left: -@editor-padding-left;
+  //   margin-right: -@editor-padding-right;
+  // }
 
   .animation__shrink-and-fade(@height__item, 250ms);
 

@@ -5,7 +5,7 @@
 
 .nav-bar-item {
   
-  @height_nav-bar-item: 26px;
+  @height_nav-bar-item: 28px;
 
   display: flex;
   align-items: top;
@@ -22,13 +22,13 @@
     margin-right: 8px;
   }
   &--theme-folder::before {
-    .icon('../../img/nav-bar-item__icon-folder.svg', 0.5);
+    .icon('../../img/nav-bar-item__icon-folder.svg', 0.5, @height: @height_nav-bar-item);
   }
   &--theme-file::before {
-    .icon('../../img/nav-bar-item__icon-file.svg', 0.5);
+    .icon('../../img/nav-bar-item__icon-file.svg', 0.5, @height: @height_nav-bar-item);
   }
   &--theme-device::before {
-    .icon('../../img/nav-bar-item__icon-device.svg', 0.5);
+    .icon('../../img/nav-bar-item__icon-device.svg', 0.5, @height: @height_nav-bar-item);
   }
 
 

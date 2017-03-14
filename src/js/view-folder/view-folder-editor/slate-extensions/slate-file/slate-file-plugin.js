@@ -20,13 +20,15 @@ export default function FilePlugin_Factory(options) {
   const { BLOCK_TYPE, folderPath, dispatch } = options
   let stateCache
 
-  // const onSelectionChange = (state) => {
-  //   const selectedFiles = EditorSelection.getSelectedFiles(state).map((fileBase) => {
-  //     return nodePath.join(folderPath, fileBase)
-  //   })
+  const onSelectionChange = (state) => {
+    const selectedFiles = EditorSelection.getSelectedFiles(state).map((fileBase) => {
+      return nodePath.join(folderPath, fileBase)
+    })
+
+    console.log(selectedFiles)
     
-  //   dispatch( Selection.actions.set(selectedFiles) )
-  // }
+    dispatch( Selection.actions.set(selectedFiles) )
+  }
 
   return {
 
@@ -194,12 +196,12 @@ export default function FilePlugin_Factory(options) {
       }
     },
 
-    // onChange: (state) => {
-    //   // if(stateCache && state && state.selection != stateCache.selection ) {
-    //   //   onSelectionChange(state)
-    //   // }
-    //   // stateCache = state
-    // }
+    onChange: (state) => {
+      if(stateCache && state && state.selection != stateCache.selection ) {
+        onSelectionChange(state)
+      }
+      stateCache = state
+    }
 
 
   }

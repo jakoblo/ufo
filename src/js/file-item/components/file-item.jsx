@@ -32,10 +32,6 @@ export default class FileItemComp extends React.Component {
 
   constructor(props) {
     super(props)
-    this.dragOverTimeout = null
-    this.setDropHover = (event, cursorPosition) => {
-      this.setImmState((prevState) => (prevState.set('dropTarget', cursorPosition)))
-    }
     this.state = {
       data: Map({
         openAnimation: false,
@@ -161,12 +157,12 @@ export default class FileItemComp extends React.Component {
 
     dragHover: (event, cursorPosition)  => {
       this.startPeakTimeout()
-      this.setDropHover(event, cursorPosition) 
+      this.setImmState((prevState) => (prevState.set('dropTarget', cursorPosition)))
     },
 
     dragOut: (event)  => {
       this.cancelPeakTimeout()
-      this.setDropHover(event, false)
+      this.setImmState((prevState) => (prevState.set('dropTarget', false)))
     },
 
     drop: (event, cursorPosition) => {
@@ -175,6 +171,8 @@ export default class FileItemComp extends React.Component {
       }
     }
   })
+
+  dragOverTimeout = null
 
   startPeakTimeout = () => {
     if(this.props.file.get('stats').isDirectory() && this.dragOverTimeout == null) {

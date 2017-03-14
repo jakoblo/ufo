@@ -10,7 +10,6 @@ import * as dragndrop from '../../utils/dragndrop'
 export default class NavGroupItem extends React.Component {
   constructor(props) {
     super(props)
-    this.dragOverTimeout = null
     this.state = {
       dropTarget: false
     }
@@ -45,23 +44,6 @@ export default class NavGroupItem extends React.Component {
         {!this.props.isDiskGroup && deleteButton}
       </div>
     )
-  }
-
-  componentWillReceiveProps = (nextProps) => {
-    if (!this.props.isOver && nextProps.isOver) {
-      // You can use this as enter handler
-      this.dragOverTimeout = setTimeout(this.props.onClick, 1000)
-      this.setState({
-        dropTarget: true
-      })
-    }
-    if (this.props.isOver && !nextProps.isOver) {
-      // You can use this as leave handler
-      clearTimeout(this.dragOverTimeout)
-      this.setState({
-        dropTarget: false
-      })
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -110,40 +92,20 @@ export default class NavGroupItem extends React.Component {
    */
 
   dropZoneListener = dragndrop.getEnhancedDropZoneListener({
-    acceptableTypes: DnDTypes.GROUPITEM,
+    acceptableTypes: [DnDTypes.GROUPITEM, dragndrop.constants.TYPE_FILE],
     possibleEffects: dragndrop.constants.effects.ALL,
 
     dragHover: (event, cursorPosition) => {
-
-      if(!this.props.draggingItem) return // no needed data, jet
-      if(this.props.groupID !== this.props.draggingItem.groupID) return
-
-      const dragIndex = this.props.draggingItem.index
-      const hoverIndex = this.props.index;
-
-      // Don't replace items with themselves
-      if (dragIndex === hoverIndex) return
-
-      if (dragIndex+1 == hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) {
-        return // Not over 50% Group height downwards, do nothing for now
+      if(dragndrop.shouldAcceptDrop(event, DnDTypes.GROUPITEM )) {
+        this.itemDragOverToSort(event, cursorPosition)
+      } 
+      if(dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE )) {
+        this.fileDragOver(event, cursorPosition)
       }
-      if (dragIndex-1 == hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_BOTTOM) {
-        return // Not over 50% Group height upwards, do nothing for now
-      }
-
-      // Time to actually perform the action
-      this.props.setDraggingItem({
-        index: hoverIndex,
-        groupID: this.props.groupID
-      })
-      this.props.onMoveGroupItem(dragIndex, hoverIndex)
-
     },
 
-    dragOut: () => {
-      this.setState({
-        dragOver: false
-      })
+    dragOut: (event) => {
+      this.fileDragOut()
     },
 
     drop: (event, cursorPosition) => {
@@ -152,5 +114,63 @@ export default class NavGroupItem extends React.Component {
     }
 
   })
+
+  itemDragOverToSort = (event, cursorPosition) => {
+    if(!this.props.draggingItem) return // no needed data, jet
+    if(this.props.groupID !== this.props.draggingItem.groupID) return
+
+    const dragIndex = this.props.draggingItem.index
+    const hoverIndex = this.props.index;
+
+    // Don't replace items with themselves
+    if (dragIndex === hoverIndex) return
+
+    if (dragIndex+1 == hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) {
+      return // Not over 50% Group height downwards, do nothing for now
+    }
+    if (dragIndex-1 == hoverIndex && cursorPosition == dragndrop.constants.CURSOR_POSITION_BOTTOM) {
+      return // Not over 50% Group height upwards, do nothing for now
+    }
+
+    // Time to actually perform the action
+    this.props.setDraggingItem({
+      index: hoverIndex,
+      groupID: this.props.groupID
+    })
+    this.props.onMoveGroupItem(dragIndex, hoverIndex)
+  }
+
+  fileDragOver = (event, cursorPosition) => {
+    this.startPeakTimeout()
+    this.setState({
+      dropTarget: true
+    })
+  }
+
+  fileDragOut = (event) => {
+    this.cancelPeakTimeout()
+    this.setState({
+      dropTarget: false
+    })
+  }
+
+  dragOverTimeout = null
+
+  startPeakTimeout = () => {
+    if(
+      (this.props.type == "folder" || this.props.type == "device") && 
+      this.dragOverTimeout == null
+    ) {
+      this.dragOverTimeout = setTimeout(() => {
+        console.log('click', this.props.onClick)
+        this.props.onClick()
+      }, 1000)
+    }
+  }
+
+  cancelPeakTimeout = () => {
+    clearTimeout(this.dragOverTimeout)
+    this.dragOverTimeout = null
+  }
 
 }
