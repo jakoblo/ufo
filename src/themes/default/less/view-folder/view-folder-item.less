@@ -13,13 +13,10 @@
   // user-select: none;
 
   *::selection {
-    background: transparent !important;
+    background: transparent;
   }
 
-  // .slate-editor & {
-  //   margin-left: -@editor-padding-left;
-  //   margin-right: -@editor-padding-right;
-  // }
+  
 
   .animation__shrink-and-fade(@height__item, 250ms);
 
@@ -107,6 +104,10 @@
   &__rename-input {
     width: 100%;
     font-size: @font__size-base;
+    &::selection, & *::selection {
+      background: @color__main-decoration;
+      color: #fff;
+    }
   }
 
   &--renaming &__name-base,

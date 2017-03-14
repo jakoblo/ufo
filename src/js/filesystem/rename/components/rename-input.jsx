@@ -27,6 +27,21 @@ export default class RenameInput extends React.Component {
         onBlur={this.onBlur}
         onChange={this.onChange}
         onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)}
+
+        // Stop all events slate could catch
+        onSelect={this.stopEvent}
+        onCompositionEnd={this.stopEvent}
+        onCompositionStart={this.stopEvent}
+        onCopy={this.stopEvent}
+        onCut={this.stopEvent}
+        onDragEnd={this.stopEvent}
+        onDragOver={this.stopEvent}
+        onClick={this.stopEvent}
+        onDragStart={this.stopEvent}
+        onDrop={this.stopEvent}
+        onInput={this.stopEvent}
+        onKeyUp={this.stopEvent}
+        onPaste={this.stopEvent}
       />
     )
   }
@@ -50,9 +65,10 @@ export default class RenameInput extends React.Component {
     }
   }
 
-  onMouseDown = (event) => { event.stopPropagation() }
-  onMouseUp = (event) => { event.stopPropagation() }
+  stopEvent = (event) => { event.preventDefault(); event.stopPropagation() }
+
   onBlur = (event) => { this.renameSave(event) }
+
   onChange = (event) => {
     this.setState({'fileName': event.target.value})
   }
