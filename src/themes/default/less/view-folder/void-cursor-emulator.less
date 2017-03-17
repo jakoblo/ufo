@@ -1,0 +1,31 @@
+.void-cursor-emulator {
+
+  margin: 0 1px;
+
+   &--cursor-left {
+    border-left: 1px solid #000;
+    margin-left: 0;
+    animation: cursor-border 1s infinite
+  }
+
+   &--cursor-right {
+    border-right: 1px solid #000;
+    margin-right: 0;
+    animation: cursor-border 1s infinite
+  }
+}
+
+@keyframes cursor-border {
+  0% {
+    border-color: #000
+  }
+  50% { 
+    border-color: #000
+  }
+  51% {
+    border-color: transparent
+  }
+  100% {
+    border-color: transparent
+  }
+}

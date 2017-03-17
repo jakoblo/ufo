@@ -6,6 +6,7 @@ import Selection from '../../filesystem/selection/sel-index'
 import Filter from '../../filesystem/filter/filter-index'
 import App from '../../app/app-index'
 import classnames from 'classnames'
+import _ from 'lodash'
 import nodePath from 'path'
 import { dragndrop } from '../../utils/utils-index'
 import { DropTarget } from 'react-dnd'
@@ -46,6 +47,7 @@ export default class DisplayList extends React.Component {
   }
 
   render() {
+
     return (
       <AutoSizer>
         {({ width, height }) => (
@@ -74,6 +76,8 @@ export default class DisplayList extends React.Component {
                 path={nodePath.join(this.props.path, this.props.fileList[index])}
                 className="view-folder-item"
                 dispatch={this.props.dispatch}
+                onShiftClick={this.handleExpandSelection}
+                onCtrlMetaClick={this.handleAddtoSelection}
               />
             )}
             scrollToIndex={ (this.props.selected) ? 
@@ -110,5 +114,37 @@ export default class DisplayList extends React.Component {
    */
   focus = (event) => {
     this.props.dispatch( App.actions.changeAppPath(null, this.props.path) )
+  }
+
+
+  handleExpandSelection = (base, file) => {
+    if(this.props.selected.size > 0) {
+      
+      const {fileList, selected, path} = this.props
+      
+      let lastSelectionIndex  = fileList.indexOf( selected.last() )
+      let currentIndex        = fileList.indexOf( base )
+
+      let start, end
+      if (lastSelectionIndex < currentIndex) { 
+        start = lastSelectionIndex + 1
+        end = currentIndex + 1
+      } else {
+        start = currentIndex
+        end = lastSelectionIndex
+      }
+
+      let newSelected = _.slice(fileList, start, end).map((base) => {
+        return nodePath.join(path, base)
+      })
+
+      this.props.dispatch( Selection.actions.filesAdd( newSelected ) )
+    } else {
+      this.props.dispatch( Selection.actions.filesAdd( [nodePath.join(this.props.path, base)] ) )
+    }
+  }
+
+  handleAddtoSelection = (base, file) => {
+    this.props.dispatch( Selection.actions.filesAdd( [file.get('path')] ) )
   }
 }

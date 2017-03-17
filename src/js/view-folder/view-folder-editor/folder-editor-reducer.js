@@ -2,6 +2,7 @@ import { fromJS, Map } from 'immutable'
 import * as t from './folder-editor-actiontypes'
 import * as c from './folder-editor-constants'
 import SlateFile from './slate-extensions/slate-file/slate-file-index'
+import App from '../../app/app-index'
 import fsWatch from '../../filesystem/watch/fs-watch-index'
 import fsWrite from '../../filesystem/write/fs-write-index'
 import {Raw} from 'slate'
@@ -25,7 +26,6 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
     case t.FOLDER_EDITOR_CLOSE:
       return state.delete(action.payload.path)
-    
 
     // Add file at the end of the Document if not exists
     case fsWatch.actiontypes.FILE_ADD:
@@ -39,13 +39,13 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
       let transformAddFile = state.get(action.payload.root).transform()
           transformAddFile = SlateFile.Transforms.insertFileAtEnd(transformAddFile, document, action.payload.base)
 
-      return state.set(action.payload.root, transformAddFile.apply())
+      return state.set(action.payload.root, transformAddFile.apply({save: false}))
 
     // Remove file from document is exists
     case fsWatch.actiontypes.FILE_UNLINK:
       let transformRemoveFile = state.get(action.payload.root).transform()
           transformRemoveFile = SlateFile.Transforms.removeExisting(transformRemoveFile, action.payload.base)
-      return state.set(action.payload.root, transformRemoveFile.apply())
+      return state.set(action.payload.root, transformRemoveFile.apply({save: false}))
     
 
     // Rename File in Document
@@ -67,7 +67,7 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
           renamingEditor.transform(),
           renamingSourceBase,
           renamingTargetBase
-        ).apply() )
+        ).apply({save: false}) )
       })()
     
 
@@ -90,8 +90,33 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
           renamingEditor.transform(),
           renamingTargetBase, // Inverted
           renamingSourceBase // Inverted
-        ).apply() )
+        ).apply({save: false}) )
       })()
+
+    case App.actiontypes.APP_CHANGE_PATH:
+      // Set Selection to last folder in pathRoute
+      if(action.payload.pathRoute.length > 1) {
+        const selectedBase = nodePath.basename( _.last(action.payload.pathRoute) )
+        const root = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
+        let editorState = state.get(root)
+
+        if(editorState) {
+          const node = SlateFile.Blocks.getFileBlockByBase(editorState, selectedBase)
+          const newSelection = SlateFile.Selection.createSelectionForFile(node)
+          editorState = editorState.transform().select(newSelection).apply({save: false})
+          state = state.set(root, editorState)
+        }
+      }
+
+      return state
+
+    // case Preview.actiontypes.SHOW_PREVIEW:
+    //   // Select File wich is opend in File Preview
+    //   return fromJS({
+    //     root: nodePath.dirname(action.payload.path),
+    //     files: [ nodePath.basename(action.payload.path) ],
+    //     selectTypeInput: ""
+    //   })
 
     default:
       return state

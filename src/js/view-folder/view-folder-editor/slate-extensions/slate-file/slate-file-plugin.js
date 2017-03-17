@@ -3,6 +3,7 @@ import FileItem from '../../../../file-item/components/file-item'
 import Selection from '../../../../filesystem/selection/sel-index'
 import nodePath from 'path'
 import {Block} from 'slate'
+import VoidCursorEmulator from './components/void-cursor-emulator'
 import * as c from '../../folder-editor-constants'
 import * as dragndrop from '../../../../utils/dragndrop'
 import * as EditorSelection from './slate-file-selection'
@@ -10,7 +11,7 @@ import * as Transforms from './slate-file-transforms'
 import * as Blocks from './slate-file-blocks'
 
 const defaultBlock = {
-  type: 'paragraph',
+  type: 'markdown',
   isVoid: false,
   data: {}
 }
@@ -18,17 +19,6 @@ const defaultBlock = {
 export default function FilePlugin_Factory(options) {
 
   const { BLOCK_TYPE, folderPath, dispatch } = options
-  let stateCache
-
-  const onSelectionChange = (state) => {
-    const selectedFiles = EditorSelection.getSelectedFiles(state).map((fileBase) => {
-      return nodePath.join(folderPath, fileBase)
-    })
-
-    console.log(selectedFiles)
-    
-    dispatch( Selection.actions.set(selectedFiles) )
-  }
 
   return {
 
@@ -42,7 +32,6 @@ export default function FilePlugin_Factory(options) {
       const onEndOfBlock = state.selection.hasStartAtEndOf(startBlock) && state.selection.hasEndAtEndOf(startBlock)
 
       /*
-      * | = cursor)
       * [FileItem]
       * |
       * [FileItem]
@@ -75,6 +64,23 @@ export default function FilePlugin_Factory(options) {
         }
       }
 
+      /*
+      * on ENTER
+      *
+      * [FileItem]|
+      * to:
+      * [FileItem]
+      * |
+      * --- or ---
+      * |[FileItem]
+      * to:
+      * |
+      * [FileItem]
+      */
+      if (event.key == "Enter" && EditorSelection.includesAFileBlock(state)) {
+        return Transforms.createNewLineAroundFileBlock(state.transform(), state.selection).apply()
+      }
+
       // Selection is expanded arround FileBlock(s)
       if (EditorSelection.includesAFileBlock(state)) {
         return state // Chancel Delete - would delete selected file block
@@ -86,35 +92,66 @@ export default function FilePlugin_Factory(options) {
         // Render FileItems in blocks with type file
         [BLOCK_TYPE]: function (editorProps) {
           const { node, editor } = editorProps
-          const isCursor = editor.getState().selection.hasEdgeIn(node)
+          const selection = editor.getState().selection
+          const { document, startKey, startBlock} = editor.getState()
           const base = node.getIn(['data', 'base'])
+
+          const cursorLeft = selection.hasFocusAtStartOf(node)
+          const cursorRight = selection.hasFocusAtEndOf(node)
+
           return (
-            <FileItem
-              className='view-folder-item'
-              isCursor={isCursor}
-              path={nodePath.join(folderPath, base)}
-              onDrop={(event, cursorPosition) => {
+            <VoidCursorEmulator 
+              cursorLeft={cursorLeft} 
+              cursorRight={cursorRight}
+              focusEditor={editor.focus}
+            >
+              <FileItem
+                className='view-folder-item'
+                path={nodePath.join(folderPath, base)}
+                onDrop={(event, cursorPosition) => {
 
-                const fileList = dragndrop.getFilePathArray(event)
-                const baselist = fileList.map(filePath => nodePath.basename(filePath))
-                let state = editor.getState()
+                  const fileList = dragndrop.getFilePathArray(event)
+                  const baselist = fileList.map(filePath => nodePath.basename(filePath))
+                  let state = editor.getState()
 
-                state = Transforms.removeFiles(state, baselist)
+                  state = Transforms.removeFiles(state, baselist)
 
-                // Need to be calcualted after remove Files
-                const nodeIndex = state.document.getParent(node).get('nodes').indexOf(node)
-                const position = (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ? nodeIndex : nodeIndex + 1
-                
-                state = Transforms.insertFilesAt(state, baselist, position)
+                  // Need to be calcualted after remove Files
+                  const nodeIndex = state.document.getParent(node).get('nodes').indexOf(node)
+                  const position = (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ? nodeIndex : nodeIndex + 1
+                  
+                  state = Transforms.insertFilesAt(state, baselist, position)
 
-                editor.onChange(state)
-                dragndrop.executeFileDropOnDisk(event, folderPath)
+                  editor.onChange(state)
+                  dragndrop.executeFileDropOnDisk(event, folderPath)
 
-              }}
-            />
+                }}
+
+                onShiftClick={(event) => {
+
+                  const state = editor.getState()
+
+                  const {selection} = state
+                  const startNode = state.document.findDescendant((node) => node.key == selection.startKey)
+
+                  const startIndex = Blocks.getIndexOfNodeInDocument(state, startNode)
+                  const currentIndex =  Blocks.getIndexOfNodeInDocument(state, node)
+
+                  if(startIndex > currentIndex) {
+                    editor.onChange( state.transform().extendToStartOf(node).apply() )
+                  } else {
+                    editor.onChange( state.transform().extendToEndOf(node).apply() )
+                  }
+
+                }}
+
+              />
+              
+            </VoidCursorEmulator>
           )
         }
       },
+      
       rules: [
         // Rule to insert a paragraph block if the document is empty
         {
@@ -162,8 +199,8 @@ export default function FilePlugin_Factory(options) {
     onBeforeInput: (event, data, state) => {
       if (EditorSelection.includesAFileBlock(state)) {
         return  Transforms
-                .insetLineAboveFileBlock( state.transform() )
-                .apply()
+          .createNewLineAroundFileBlock( state.transform(), state.selection )
+          .apply()
       }
     },
 
@@ -179,7 +216,7 @@ export default function FilePlugin_Factory(options) {
         state = Transforms.removeFiles(state, baselist)
       
         // Set Selection to Drop Position and create a Break there
-        state = state.transform().deselect().select(selection).splitBlock().apply()
+        state = state.transform().deselect().select(selection).splitBlock().apply({save: false})
 
         const node = state.document.findDescendant((node) => (node.key == selection.focusKey))
         const block = Blocks.getRootBlockOfNode(state, node)
@@ -196,13 +233,15 @@ export default function FilePlugin_Factory(options) {
       }
     },
 
-    onChange: (state) => {
-      if(stateCache && state && state.selection != stateCache.selection ) {
-        onSelectionChange(state)
-      }
-      stateCache = state
-    }
-
+    // onChange: (state) => {
+    //   if(
+    //     (!stateCache && state) || // First State Change, first Selection
+    //     state.selection != stateCache.selection // Selection has changed
+    //   ) {
+    //     onSelectionChange(state)
+    //   }
+    //   stateCache = state
+    // }
 
   }
 }

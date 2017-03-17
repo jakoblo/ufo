@@ -5,6 +5,7 @@ import Preview from '../../view-file/vf-index'
 import Filter from '../filter/filter-index'
 import FS from '../watch/fs-watch-index'
 import FsWrite from '../write/fs-write-index'
+import FolderEditor from '../../view-folder/view-folder-editor/folder-editor-index'
 import * as _ from 'lodash'
 import nodePath from 'path'
 import {Map, List, Seq, fromJS} from 'immutable'
@@ -55,6 +56,9 @@ export default function reducer(state = fromJS(INITIAL_STATE), action = { type: 
         return state.set('files', List([]))
       }
       return state
+
+    case FolderEditor.actiontypes.FOLDER_EDITOR_CHANGE:
+      return state.set('root', action.payload.path).set('files', List(action.payload.selectedFiles))
 
     case t.SELECT_TYPE_SET:
       return state.set('selectTypeInput', action.payload.input)

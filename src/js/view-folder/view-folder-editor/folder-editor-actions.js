@@ -70,9 +70,24 @@ export function folderEditorChange(path, editorState) {
     type: t.FOLDER_EDITOR_CHANGE,
     payload: {
       path : path,
-      editorState: editorState
+      editorState: editorState,
+      selectedFiles: buildSelectedFiles(path, editorState)
     }
-  };
+  }
+}
+
+function buildSelectedFiles(path, editorState) {
+  const selection = editorState.selection
+  return editorState.blocks
+    .filter(block => block.type == c.BLOCK_TYPE_FILE) // This block is Fileblock
+    .filter(block => selection.isExpanded) // Selection is Expaneded
+    .filter(block => { // Selection wrapps the block
+      if(selection.hasStartAtEndOf(block)) return false
+      if(selection.hasEndAtStartOf(block)) return false
+      return true
+    })
+    .map( (block) => block.getIn( ['data', 'base'] ))
+    .toJS()
 }
 
 /**
@@ -103,7 +118,7 @@ function mapFilesToEditorState(props, editorState) {
     }
   })
 
-  editorState = transforming.apply()
+  editorState = transforming.apply({save: false})
   
   return editorState
 }
@@ -164,9 +179,7 @@ function newStateWithFileNodes(filesNotInEditor) {
     ]
   })
 
-  console.time('Create Slate State')
   const editorState = Raw.deserialize(state, { terse: false, normalize: false })
-  console.timeEnd('Create Slate State')
 
   return editorState
 }

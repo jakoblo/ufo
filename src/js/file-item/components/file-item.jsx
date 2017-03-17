@@ -4,10 +4,8 @@ const {app} = remote
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
-import Icon from '../../general-components/icon'
 import classNames from 'classnames'
 import {Map} from 'immutable'
-import _ from 'lodash'
 import RenameInput from '../../filesystem/rename/components/rename-input'
 import ProgressPie from '../../general-components/progress-pie'
 import FileItemUnkown from './file-item-unknown'
@@ -17,14 +15,10 @@ import * as FileActions from '../fi-actions'
 import * as FsMergedSelector from  '../../filesystem/fs-merged-selectors'
 
 @connect(() => {
-
   const getFile = FsMergedSelector.getFile_Factory()
-
   return (state, props) => {
-    const file = getFile(state, props.path)
-
     return {
-      file: file
+      file: getFile(state, props.path)
     }
   }
 })
@@ -45,64 +39,66 @@ export default class FileItemComp extends React.Component {
   }
 
   render() {
-    if(this.props.file.get('type') == "unknown") {
-      return <FileItemUnkown className={this.props.className} />
+
+    const {className, file, isFocused} = this.props
+    const immState = this.state.data
+
+    if(file.get('type') == "unknown") {
+      return <FileItemUnkown className={className} />
     }
 
     return(
       <div
         className={classNames({
-          [this.props.className]: true,
-          [this.props.className+'--renaming']: this.props.file.get('renaming'),
-          [this.props.className+'--theme-folder']: this.props.file.get('stats').isDirectory(),
-          [this.props.className+'--theme-file']: this.props.file.get('stats').isFile(),
-          [this.props.className+'--active']: this.props.file.get('active'),
-          [this.props.className+'--selected']: this.props.file.get('selected'),
-          [this.props.className+'--is-focused']: this.props.isFocused,
-          [this.props.className+'--is-cursor']: this.props.isCursor,
-          [this.props.className+'--drop-target']: this.props.file.get('stats').isDirectory() && this.state.data.get('dropTarget'),
-          [this.props.className+'--drop-target-top']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
-          [this.props.className+'--drop-target-bottom']: (this.state.data.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
-          [this.props.className+'--open-animation']: this.state.data.get('openAnimation'),
-          [this.props.className+'--in-progress']: this.props.file.get('progress')
+          [className]: true,
+          [className+'--renaming']: file.get('renaming'),
+          [className+'--theme-folder']: file.get('stats').isDirectory(),
+          [className+'--theme-file']: file.get('stats').isFile(),
+          [className+'--active']: file.get('active'),
+          [className+'--selected']: file.get('selected'),
+          [className+'--is-focused']: isFocused,
+          [className+'--drop-target']: file.get('stats').isDirectory() && immState.get('dropTarget'),
+          [className+'--drop-target-top']: (immState.get('dropTarget') == DnD.constants.CURSOR_POSITION_TOP),
+          [className+'--drop-target-bottom']: (immState.get('dropTarget') == DnD.constants.CURSOR_POSITION_BOTTOM),
+          [className+'--open-animation']: immState.get('openAnimation'),
+          [className+'--in-progress']: file.get('progress')
         })}
-        style={this.props.style}
       >
-        <div className={this.props.className+'__underlay'} />
+        <div className={className+'__underlay'} />
 
-        {this.props.file.get('progress') ? 
+        {file.get('progress') ? 
           <ProgressPie
-            className={this.props.className+'__progress-pie'}
-            progress={this.props.file.get('progress')}
+            className={className+'__progress-pie'}
+            progress={file.get('progress')}
             size={16}
           />
-        : null }
+        :
+          <div className={className+'__icon'} 
+            style={
+              (immState.get('icon')) ? 
+                {backgroundImage: 'url("'+immState.get('icon') + '")' }
+              : 
+                null
+            }
+          />
+        }
 
-        <div className={this.props.className+'__icon'} 
-          style={
-            (this.state.data.get('icon')) ? 
-              {backgroundImage: 'url("'+this.state.data.get('icon') + '")' }
-            : 
-              null
-          }
-        />
-
-        <div className={this.props.className+'__name-base'} >{this.props.file.get('name')}</div>
-        <div className={this.props.className+'__name-suffix'} >{this.props.file.get('suffix')}</div>
-        {this.props.file.get('renaming') ? 
+        <div className={className+'__name-base'} >{file.get('name')}</div>
+        <div className={className+'__name-suffix'} >{file.get('suffix')}</div>
+        {file.get('renaming') ? 
           <RenameInput
-            className={this.props.className+'__rename-input'}
-            path={this.props.file.get('path')}
+            className={className+'__rename-input'}
+            path={file.get('path')}
             dispatch={this.props.dispatch}
           />
         : 
-          <div className={this.props.className+'__event-catcher'} 
+          <div className={className+'__event-catcher'} 
             draggable={true}
-            onMouseDown={this.onMouseDown}
-            onMouseUp={this.onMouseUp}
-            onDoubleClick={this.onDoubleClick}
-            onContextMenu={this.onContextMenu}
-            onDragStart={this.onDragStart}
+            onDragStart={this.props.onDragStart || this.onDragStart}
+            onMouseDown={this.props.onMouseDown || this.onMouseDown}
+            onMouseUp={this.props.onMouseUp || this.onMouseUp}
+            onContextMenu={this.props.onContextMenu || this.onContextMenu}
+            onDoubleClick={this.props.onDoubleClick || this.onDoubleClick}
             {...this.enhancedDropZoneListener}
           />
         }
@@ -130,6 +126,8 @@ export default class FileItemComp extends React.Component {
       nextProps.isOverCurrent !== this.props.isOverCurrent || 
       nextProps.isFocused !== this.props.isFocused || 
       nextProps.isCursor !== this.props.isCursor || 
+      nextProps.cursorLeft !== this.props.cursorLeft || 
+      nextProps.cursorRigth !== this.props.cursorRigth || 
       nextState.data !== this.state.data
     );
   }
@@ -187,23 +185,24 @@ export default class FileItemComp extends React.Component {
     this.dragOverTimeout = null
   }
 
-  /**
-   * Adding file to Selection
-   */
+  // Adding file to Selection
   onMouseDown = (event) => {
     event.stopPropagation()
+    event.preventDefault()
     if(!this.props.file.get('progress')) {
       if(event.ctrlKey || event.metaKey) {
-        this.props.dispatch( FileActions.addToSelection(this.props.file) )
+        this.props.onCtrlMetaClick(this.props.file.get('base'), this.props.file)
+        // this.props.dispatch( FileActions.addToSelection(this.props.file) )
       } else if(event.shiftKey) {
-        this.props.dispatch( FileActions.expandSelection(this.props.file) )
+        // this.props.dispatch( FileActions.expandSelection(this.props.file) )
+        this.props.onShiftClick(this.props.file.get('base'), this.props.file)
+      } else {
+        // Wait for mouse up
       }
     }
   }
 
-  /**
-   * Show Folder or File in Preview
-   */
+  //Show Folder or File in Preview
   onMouseUp = (event) => {
     event.stopPropagation()
     if(!this.props.file.get('progress')) {
@@ -215,9 +214,7 @@ export default class FileItemComp extends React.Component {
     }
   }
 
-  /**
-   * Open File in Default Application
-   */
+  //Open File in Default Application
   onDoubleClick = (event) => {
     if(!this.props.file.get('progress') && this.props.file.get('stats').isFile()) {
       // Open
@@ -230,9 +227,7 @@ export default class FileItemComp extends React.Component {
     }
   }
 
-  /**
-   * Right Click menu
-   */
+  //Right Click menu
   onContextMenu = (event) => {
     event.preventDefault()
     event.stopPropagation()

@@ -8,7 +8,7 @@ export function createSelectionForFile(node) {
   const childTextNodeKey = node.get('nodes').first().get('key')
   return new Selection({
     anchorKey: childTextNodeKey,
-    anchorOffset: 1,
+    anchorOffset: 0,
     focusKey: childTextNodeKey,
     focusOffset: 1,
     isBackward: false,

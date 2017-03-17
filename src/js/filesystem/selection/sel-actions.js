@@ -12,7 +12,7 @@ import * as _ from 'lodash'
 import {ipcRenderer} from 'electron'
 
 /**
- * Sets set selection to the given file
+ * Sets set selection to the given files
  * used by all selecion actions
  * 
  * @param  {string[]} pathArray
@@ -52,7 +52,8 @@ export function set(pathArray) {
 /**
  * Adds the List of given paths to the selection
  * Ctrl Click on file & used by expandToFile()
- * @param  {string[]} pathArray
+ * 
+ * @param  {Array<string>} pathArray
  */
 export function filesAdd(pathArray) {
   return function (dispatch, getState) {
@@ -79,10 +80,13 @@ export function filesAdd(pathArray) {
 /**
  * Shift Click on file
  * expands selection from the last selected file to the current one
- * @param  {string} path of file to expand
+ * 
+ * @param  {string} path - of file to expand
  */
 export function expandToFile(path) {
   return function (dispatch, getState) {
+
+    console.warn('Selection: expandToFile method is deprecated.')
 
     let state = getState()
 
@@ -140,7 +144,8 @@ export function dirPrevious() {
 /**
  * used by arrow right/left navigation
  * selects active or first file in the folder
- * @param  {string} root path
+ * 
+ * @param  {string} root - path
  */
 export function dirSet(root) {
   return function (dispatch, getState) {
@@ -185,6 +190,7 @@ export function selectAll() {
 export let fileNavUp = () => fileNav(-1)
 export let fileNavDown = () => fileNav(+1)
 function fileNav(direction) {
+  console.warn('Selection: fileNav method is deprecated.')
   return function (dispatch, getState) {
     let props = {
       path: selectors.getSelection( getState() ).get('root') || // selected Folder
@@ -209,6 +215,9 @@ function fileNav(direction) {
 export let fileAddUp = () => filesAddFromCurrent(-1)
 export let fileAddDown = () => filesAddFromCurrent(+1)
 function filesAddFromCurrent(direction) {
+
+  console.warn('Selection: filesAddFromCurrent method is deprecated.')
+
   return function (dispatch, getState) {
     
     let selection = selectors.getSelection( getState() )

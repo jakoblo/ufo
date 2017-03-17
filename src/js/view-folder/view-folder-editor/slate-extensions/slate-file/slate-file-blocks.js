@@ -46,19 +46,17 @@ export const getFileBlockProperties = (basename) => {
   return properties
 }
 
+
+export const getIndexOfNodeInDocument = (state, node) => {
+  const rootNode = getRootBlockOfNode(state, node)
+  const index = state.document.get('nodes').indexOf(rootNode)
+
+  return index
+}
+
 export const createFileBlock = (basename) => {
   return Block.create(getFileBlockProperties(basename))
 }
-
-// export const createFileBlock = (fileBase) => {
-
-//   properties.key = generateKey()
-//   properties.data = Data.create({base: fileBase})
-//   properties.isVoid = true
-//   properties.nodes = List( [Text.createFromString(' ')] )
-
-//   return new Block( properties )
-// }
 
 export const getRawFileBlock = (fileBase) => {
   return {

@@ -10,13 +10,6 @@
   padding: 0 @padding__sidebar-horizonal;
   position: relative;
   box-sizing: border-box;
-  // user-select: none;
-
-  *::selection {
-    background: transparent;
-  }
-
-  
 
   .animation__shrink-and-fade(@height__item, 250ms);
 
@@ -24,6 +17,7 @@
   // Item Type Icons
   // ---
 
+  
   &__icon {
     display: block;
     width: 17px;
@@ -201,17 +195,6 @@
     bottom: -2px;
   }
 
-   .slate-editor &--is-cursor &__underlay {
-      border-top: 1px solid #000;
-      left: 0;
-      top: -1px;
-      position: absolute;
-      width: 100%;
-      height: @height__item;
-      animation: cursor-border 1s infinite
-    }
-
-
   // -----------------------------------
   // Other Modifier
   // ---
@@ -223,6 +206,12 @@
   &--selected {
     background-color: @color__main-decoration;
     color: @color__text-white;
+  }
+
+  // Hide Textselection, if file is selected anyway
+  &&--selected::selection,
+  &&--selected *::selection {
+    background: transparent;
   }
 
   &--open-animation {
@@ -246,20 +235,5 @@
     transform: scale(1);
     transform-origin: 10% 50%;
     opacity: 1;
-  }
-}
-
-@keyframes cursor-border {
-  0% {
-    border-color: #000
-  }
-  50% { 
-    border-color: #000
-  }
-  51% {
-    border-color: transparent
-  }
-  100% {
-    border-color: transparent
   }
 }

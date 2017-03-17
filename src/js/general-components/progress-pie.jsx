@@ -52,6 +52,7 @@ export default React.createClass({
   },
 
   render() {
+    
     var size = this.props.size;
     var progress = this.props.progress;
     var r = size/2 - this.props.size/4;

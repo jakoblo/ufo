@@ -1,7 +1,6 @@
-import {Block, Text} from 'slate'
+import {Block, Text, Selection} from 'slate'
 import * as Blocks from './slate-file-blocks'
 import {List} from 'immutable'
-import * as Selection from './slate-file-selection'
 
 export const removeExisting = (transforming, basename) => {
   const existingFileBlock = Blocks.getFileBlockByBase(transforming.state, basename)
@@ -14,13 +13,35 @@ export const removeExisting = (transforming, basename) => {
 
 export const insertFile = (transforming, basename) => transforming.splitBlock()
   .insertBlock(Blocks.createFileBlock(basename))
-  
-export const insetLineAboveFileBlock = (transforming) => {
-  return transforming.splitBlock()
+
+
+
+/*
+* [FileItem]|
+* to:
+* [FileItem]
+* |
+* --- or ---
+* |[FileItem]
+* to:
+* |
+* [FileItem]
+*/
+export const createNewLineAroundFileBlock = (transforming, range) => {
+
+  // Invert Selection Position, to split in the right direction.
+  // Do not really understand why, but works fine.
+  const splitSelectionOffset = (range.focusOffset == 0) ? 1 : 0
+  const splitRange = new Selection({
+    ...range.toJS(),
+    anchorOffset: splitSelectionOffset,
+    focusOffset: splitSelectionOffset,
+  })
+  return transforming.splitBlockAtRange( splitRange )
     .setBlock({
       type: 'markdown',
       isVoid: false,
-      nodes: List([Text.createFromString('')]),
+      // nodes: List([Text.createFromString('')]),
       data: {}
     })
 }
@@ -41,7 +62,7 @@ export const removeFiles = (state, baseList) => {
   baseList.forEach((fileBase) => {
     transforming = removeExisting( transforming, fileBase )
   })
-  return transforming.apply()
+  return transforming.apply({save: false})
 }
 
 export const insertFilesAt = (state, baseList, indexPosition) => {
@@ -49,7 +70,7 @@ export const insertFilesAt = (state, baseList, indexPosition) => {
   baseList.forEach((fileBase) => {
     transforming = transforming.insertNodeByKey(state.document.key, indexPosition, Blocks.createFileBlock(fileBase))
   })
-  return transforming.apply()
+  return transforming.apply({save: false})
 }
 
 

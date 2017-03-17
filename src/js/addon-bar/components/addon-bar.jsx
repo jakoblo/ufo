@@ -6,7 +6,6 @@ import * as selectors from '../addon-bar-selectors'
 import * as actions from '../addon-bar-actions'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
-
 @connect(() => {
   return (state, props) => {
     return {
@@ -46,7 +45,6 @@ export default class AddonBar extends React.Component {
 
   getCurrentView = () => {
 
-    
     switch (this.props.currentView) {
       case 'fs-write':
         return <FsWrite.component/>

@@ -8,13 +8,14 @@
 .slate-editor {
   min-height: 100%;
 
-  >div:not([data-slate-void="true"]) {
+  *::selection {
+    color: @color__text-white; background: @color__main-decoration;
+  }
+
+  // Text Blocks, Not File Blocks
+  >div { //:not([data-slate-void="true"]) {
     color: #555;
     padding: 0 @editor-padding-right 0 @editor-padding-left;
-
-    *::selection {
-      color: @color__text-white; background: @color__main-decoration;
-    }
   }
   
 }
