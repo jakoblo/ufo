@@ -32,8 +32,11 @@ export const createNewLineAroundFileBlock = (transforming, range) => {
   // Invert Selection Position, to split in the right direction.
   // Do not really understand why, but works fine.
   const splitSelectionOffset = (range.focusOffset == 0) ? 1 : 0
+  // console.log(range.toJS())
+  // debugger
   const splitRange = new Selection({
     ...range.toJS(),
+    anchorKey: range.focusKey,
     anchorOffset: splitSelectionOffset,
     focusOffset: splitSelectionOffset,
   })

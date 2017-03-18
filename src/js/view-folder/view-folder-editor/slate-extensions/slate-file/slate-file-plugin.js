@@ -40,6 +40,7 @@ export default function FilePlugin_Factory(options) {
         // Line without text between FileBlocks
         if (prevBlockIsFile && onStartOfBlock && nextBlockIsFile && onEndOfBlock) {
           // Remove Empty Line
+          event.preventDefault()
           return state.transform().removeNodeByKey(startBlock.get('key')).apply()
         }
       }
@@ -50,6 +51,7 @@ export default function FilePlugin_Factory(options) {
       */
       if (event.key == "Backspace") {
         if (prevBlockIsFile && onStartOfBlock) {
+          event.preventDefault()
           return state // Chancel Backspace - would delete previous file block
         }
       }
@@ -60,6 +62,7 @@ export default function FilePlugin_Factory(options) {
       */
       if (event.key == "Delete") {
         if (nextBlockIsFile && onEndOfBlock) {
+          event.preventDefault()
           return state // Chancel Delete - would delete next file block
         }
       }
@@ -78,13 +81,22 @@ export default function FilePlugin_Factory(options) {
       * [FileItem]
       */
       if (event.key == "Enter" && EditorSelection.includesAFileBlock(state)) {
+        event.preventDefault()
         return Transforms.createNewLineAroundFileBlock(state.transform(), state.selection).apply()
       }
 
+
       // Selection is expanded arround FileBlock(s)
-      if (EditorSelection.includesAFileBlock(state)) {
-        return state // Chancel Delete - would delete selected file block
+      if (state.selection.isExpanded && EditorSelection.includesAFileBlock(state)) {
+        if(event.key == "Backspace" || event.key == "Delete") {
+          event.preventDefault() // Chancel Delete - would delete selected file block
+        }
+
+        // Import to allow arrow key movement vom cursor to the other side of the file block
+        // But don't know why
+        return state 
       }
+
     },
 
     schema: { // https://docs.slatejs.org/reference/models/schema.html
@@ -92,19 +104,10 @@ export default function FilePlugin_Factory(options) {
         // Render FileItems in blocks with type file
         [BLOCK_TYPE]: function (editorProps) {
           const { node, editor } = editorProps
-          const selection = editor.getState().selection
-          const { document, startKey, startBlock} = editor.getState()
           const base = node.getIn(['data', 'base'])
 
-          const cursorLeft = selection.hasFocusAtStartOf(node)
-          const cursorRight = selection.hasFocusAtEndOf(node)
-
           return (
-            <VoidCursorEmulator 
-              cursorLeft={cursorLeft} 
-              cursorRight={cursorRight}
-              focusEditor={editor.focus}
-            >
+            <VoidCursorEmulator editor={editor} node={node}>
               <FileItem
                 className='view-folder-item'
                 path={nodePath.join(folderPath, base)}
@@ -126,27 +129,7 @@ export default function FilePlugin_Factory(options) {
                   dragndrop.executeFileDropOnDisk(event, folderPath)
 
                 }}
-
-                onShiftClick={(event) => {
-
-                  const state = editor.getState()
-
-                  const {selection} = state
-                  const startNode = state.document.findDescendant((node) => node.key == selection.startKey)
-
-                  const startIndex = Blocks.getIndexOfNodeInDocument(state, startNode)
-                  const currentIndex =  Blocks.getIndexOfNodeInDocument(state, node)
-
-                  if(startIndex > currentIndex) {
-                    editor.onChange( state.transform().extendToStartOf(node).apply() )
-                  } else {
-                    editor.onChange( state.transform().extendToEndOf(node).apply() )
-                  }
-
-                }}
-
               />
-              
             </VoidCursorEmulator>
           )
         }
@@ -185,22 +168,27 @@ export default function FilePlugin_Factory(options) {
         }
       ]
     },
-
-    /*
-    * | FileItem |
-    * | FileItem | < selection
-    * 
-    * will transform to:
-    * 
-    * | FileItem |
-    * |            < new Empty Text line
-    * | FileItem |
-    */
+    
     onBeforeInput: (event, data, state) => {
       if (EditorSelection.includesAFileBlock(state)) {
-        return  Transforms
-          .createNewLineAroundFileBlock( state.transform(), state.selection )
-          .apply()
+        if(state.selection.isExpanded) {
+          // Would delete Files, not allowed
+          event.preventDefault()
+          return state
+        } else {
+
+          /*
+          * | FileItem |
+          * | FileItem | < selection
+          * 
+          * will transform to:
+          * 
+          * | FileItem |
+          * |            < new Empty Text line
+          * | FileItem |
+          */
+          return Transforms.createNewLineAroundFileBlock( state.transform(), state.selection ).apply()
+        }
       }
     },
 
@@ -231,17 +219,7 @@ export default function FilePlugin_Factory(options) {
 
         return state
       }
-    },
-
-    // onChange: (state) => {
-    //   if(
-    //     (!stateCache && state) || // First State Change, first Selection
-    //     state.selection != stateCache.selection // Selection has changed
-    //   ) {
-    //     onSelectionChange(state)
-    //   }
-    //   stateCache = state
-    // }
+    }
 
   }
 }

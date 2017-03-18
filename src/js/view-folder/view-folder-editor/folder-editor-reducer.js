@@ -2,6 +2,7 @@ import { fromJS, Map } from 'immutable'
 import * as t from './folder-editor-actiontypes'
 import * as c from './folder-editor-constants'
 import SlateFile from './slate-extensions/slate-file/slate-file-index'
+import Preview from '../../view-file/vf-index'
 import App from '../../app/app-index'
 import fsWatch from '../../filesystem/watch/fs-watch-index'
 import fsWrite from '../../filesystem/write/fs-write-index'
@@ -93,30 +94,35 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
         ).apply({save: false}) )
       })()
 
-    case App.actiontypes.APP_CHANGE_PATH:
-      // Set Selection to last folder in pathRoute
-      if(action.payload.pathRoute.length > 1) {
-        const selectedBase = nodePath.basename( _.last(action.payload.pathRoute) )
-        const root = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
-        let editorState = state.get(root)
+    // case App.actiontypes.APP_CHANGE_PATH:
+    //   // Set Selection to last folder in pathRoute
+    //   if(action.payload.pathRoute.length > 1) {
+    //     const selectedBase = nodePath.basename( _.last(action.payload.pathRoute) )
+    //     const root = action.payload.pathRoute[ action.payload.pathRoute.length - 2 ]
+    //     let editorState = state.get(root)
 
-        if(editorState) {
-          const node = SlateFile.Blocks.getFileBlockByBase(editorState, selectedBase)
-          const newSelection = SlateFile.Selection.createSelectionForFile(node)
-          editorState = editorState.transform().select(newSelection).apply({save: false})
-          state = state.set(root, editorState)
-        }
-      }
+    //     if(editorState) {
+    //       const node = SlateFile.Blocks.getFileBlockByBase(editorState, selectedBase)
+    //       const newSelection = SlateFile.Selection.createSelectionForFile(node)
+    //       editorState = editorState.transform().select(newSelection).apply({save: false})
+    //       state = state.set(root, editorState)
+    //     }
+    //   }
 
-      return state
+    //   return state
 
     // case Preview.actiontypes.SHOW_PREVIEW:
     //   // Select File wich is opend in File Preview
-    //   return fromJS({
-    //     root: nodePath.dirname(action.payload.path),
-    //     files: [ nodePath.basename(action.payload.path) ],
-    //     selectTypeInput: ""
-    //   })
+    //   const root = nodePath.dirname(action.payload.path)
+    //   const selectedBase = nodePath.basename(action.payload.path)
+    //   let editorState = state.get(root)
+
+    //   if(editorState) {
+    //     const node = SlateFile.Blocks.getFileBlockByBase(editorState, selectedBase)
+    //     const newSelection = SlateFile.Selection.createSelectionForFile(node)
+    //     editorState = editorState.transform().select(newSelection).apply({save: false})
+    //     state = state.set(root, editorState)
+    //   }
 
     default:
       return state

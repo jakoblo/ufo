@@ -94,11 +94,10 @@ export default class FileItemComp extends React.Component {
         : 
           <div className={className+'__event-catcher'} 
             draggable={true}
-            onDragStart={this.props.onDragStart || this.onDragStart}
-            onMouseDown={this.props.onMouseDown || this.onMouseDown}
-            onMouseUp={this.props.onMouseUp || this.onMouseUp}
-            onContextMenu={this.props.onContextMenu || this.onContextMenu}
-            onDoubleClick={this.props.onDoubleClick || this.onDoubleClick}
+            onDragStart={this.onDragStart}
+            onClick={this.onClick}
+            onContextMenu={this.onContextMenu}
+            onDoubleClick={this.onDoubleClick}
             {...this.enhancedDropZoneListener}
           />
         }
@@ -186,30 +185,30 @@ export default class FileItemComp extends React.Component {
   }
 
   // Adding file to Selection
-  onMouseDown = (event) => {
-    event.stopPropagation()
-    event.preventDefault()
-    if(!this.props.file.get('progress')) {
-      if(event.ctrlKey || event.metaKey) {
-        this.props.onCtrlMetaClick(this.props.file.get('base'), this.props.file)
-        // this.props.dispatch( FileActions.addToSelection(this.props.file) )
-      } else if(event.shiftKey) {
-        // this.props.dispatch( FileActions.expandSelection(this.props.file) )
-        this.props.onShiftClick(this.props.file.get('base'), this.props.file)
-      } else {
-        // Wait for mouse up
-      }
-    }
-  }
+  // onMouseDown = (event) => {
+  //   // event.stopPropagation()
+  //   // event.preventDefault()
+  //   if(!this.props.file.get('progress')) {
+  //     if(event.ctrlKey || event.metaKey) {
+  //       this.props.onCtrlMetaClick(this.props.file.get('base'), this.props.file)
+  //       // this.props.dispatch( FileActions.addToSelection(this.props.file) )
+  //     } else if(event.shiftKey) {
+  //       // this.props.dispatch( FileActions.expandSelection(this.props.file) )
+  //       this.props.onShiftClick(this.props.file.get('base'), this.props.file)
+  //     } else {
+  //       // Wait for mouse up
+  //     }
+  //   }
+  // }
 
   //Show Folder or File in Preview
-  onMouseUp = (event) => {
-    event.stopPropagation()
+  onClick = (event) => {
+    // event.stopPropagation()
     if(!this.props.file.get('progress')) {
       if(!event.ctrlKey && !event.metaKey && !event.shiftKey) {
-        if(!this.props.file.get('selected')) {
+        // if(!this.props.file.get('selected')) {
           this.props.dispatch( FileActions.show(this.props.file) )
-        }
+        // }
       }
     }
   }
