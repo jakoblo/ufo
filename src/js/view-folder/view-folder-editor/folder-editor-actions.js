@@ -65,7 +65,6 @@ export function folderEditorClose(path) {
  * @returns {action}
  */
 export function folderEditorChange(path, editorState) {
-
   return {
     type: t.FOLDER_EDITOR_CHANGE,
     payload: {
@@ -81,11 +80,11 @@ function buildSelectedFiles(path, editorState) {
   return editorState.blocks
     .filter(block => block.type == c.BLOCK_TYPE_FILE) // This block is Fileblock
     .filter(block => selection.isExpanded) // Selection is Expaneded
-    .filter(block => { // Selection wrapps the block
-      if(selection.hasStartAtEndOf(block)) return false
-      if(selection.hasEndAtStartOf(block)) return false
-      return true
-    })
+    // .filter(block => { // Selection wrapps the block
+    //   if(selection.hasStartAtEndOf(block)) return false
+    //   if(selection.hasEndAtStartOf(block)) return false
+    //   return true
+    // })
     .map( (block) => block.getIn( ['data', 'base'] ))
     .toJS()
 }

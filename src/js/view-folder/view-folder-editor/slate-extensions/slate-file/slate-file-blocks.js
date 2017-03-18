@@ -27,7 +27,7 @@ export function getFilesInState(state) {
 export function getRootBlockOfNode(state, node) {
   let block = node
   while(state.document.get('nodes').indexOf(block) < 0) {
-    block = state.document.getParent(block)
+    block = state.document.getParent(block.key)
   }
   return block
 }
