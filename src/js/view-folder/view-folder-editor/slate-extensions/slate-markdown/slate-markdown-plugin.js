@@ -1,13 +1,13 @@
-import React from 'react'
-import {Mark, Character} from 'slate'
-import Prism from 'prismjs'
-import * as c from '../../folder-editor-constants'
+import React from "react";
+import { Mark, Character } from "slate";
+import Prism from "prismjs";
+import * as c from "../../folder-editor-constants";
 
-require('prismjs/components/prism-markdown');
+require("prismjs/components/prism-markdown");
 
 // Existing Languages: http://prismjs.com/#languages-list
-const language = 'markdown'
-const grammar = Prism.languages[language]
+const language = "markdown";
+const grammar = Prism.languages[language];
 
 /**
  * Define a Prism.js decorator
@@ -19,21 +19,20 @@ const grammar = Prism.languages[language]
  */
 
 function prismDecorator(text, block) {
-  let characters = text.characters.asMutable()
-  const string = text.text
+  let characters = text.characters.asMutable();
+  const string = text.text;
 
   // Prism will split the string in nested tokes
   // These tokens contain the information to style the characters
-  const tokens = Prism.tokenize(string, grammar)
+  const tokens = Prism.tokenize(string, grammar);
 
   // Current Token position in the string
-  const offset = 0
+  const offset = 0;
 
-  characters = mergePrismTokensInCharacters(characters, tokens, offset)
+  characters = mergePrismTokensInCharacters(characters, tokens, offset);
 
-  return characters.asImmutable()
+  return characters.asImmutable();
 }
-
 
 /**
  * Define Marks by the Prism tokens and add them to the characters
@@ -45,32 +44,35 @@ function prismDecorator(text, block) {
  */
 
 function mergePrismTokensInCharacters(characters, tokens, offset = 0) {
-  tokens.forEach((token) => {
-    if (typeof token == 'string') {
+  tokens.forEach(token => {
+    if (typeof token == "string") {
       // It not a token, just is string to indicate the content of the Parent token
       // Nothing to do here
-      offset += token.length
-      return
+      offset += token.length;
+      return;
     }
 
-    const length = offset + token.length
+    const length = offset + token.length;
 
     // The Type of the Mark
     // This has to be styled in Schema.marks
-    const type = getTokenType(token)
+    const type = getTokenType(token);
 
-    characters = applyMarksToCharacters(characters, offset, length, type)
+    characters = applyMarksToCharacters(characters, offset, length, type);
 
     if (Array.isArray(token.content)) {
       // This Tokens has child tokens, same again
-      characters = mergePrismTokensInCharacters(characters, token.content, offset)
+      characters = mergePrismTokensInCharacters(
+        characters,
+        token.content,
+        offset
+      );
     }
-    offset = length
-  })
+    offset = length;
+  });
 
-  return characters
+  return characters;
 }
-
 
 /**
  * Adds Marks to the characters in the given range
@@ -84,67 +86,67 @@ function mergePrismTokensInCharacters(characters, tokens, offset = 0) {
 
 function applyMarksToCharacters(characters, offset, length, markType) {
   for (let i = offset; i < length; i++) {
-    let char = characters.get(i)
-    let { marks } = char
-    marks = marks.add(Mark.create({ type: markType }))
-    char = char.merge({ marks })
-    characters = characters.set(i, char)
+    let char = characters.get(i);
+    let { marks } = char;
+    marks = marks.add(Mark.create({ type: markType }));
+    char = char.merge({ marks });
+    characters = characters.set(i, char);
   }
-  return characters
+  return characters;
 }
-
 
 function getTokenType(token) {
-  if(token.type == "title") {
-    if(token.content[0].type == "punctuation") {
-      return token.type+'-'+token.content[0].length
+  if (token.type == "title") {
+    if (token.content[0].type == "punctuation") {
+      return token.type + "-" + token.content[0].length;
     }
   }
-  return token.type
+  return token.type;
 }
-
 
 const MarkdownPlugin = {
   schema: {
-    rules: [{
-      match: (node) => !node.isVoid,
-      decorate: prismDecorator
-    }],
+    rules: [
+      {
+        match: node => !node.isVoid,
+        decorate: prismDecorator
+      }
+    ],
     marks: {
-      'title-1': {
-        fontSize: '25px',
+      "title-1": {
+        fontSize: "25px",
         margin: "20px 0 10px 0",
         display: "inline-block"
       },
-      'title-2': {
-        fontSize: '16px',
+      "title-2": {
+        fontSize: "16px",
         margin: "10px 0 0px 0",
         display: "inline-block"
       },
-      'title-3': {
-        textTransform: 'uppercase'
+      "title-3": {
+        textTransform: "uppercase"
       },
-      'bold': {
-        fontWeight: 'bold'
+      bold: {
+        fontWeight: "bold"
       },
-      'italic': {
-        fontStyle: 'italic'
+      italic: {
+        fontStyle: "italic"
       },
-      'punctuation': {
+      punctuation: {
         opacity: 0.5
       },
-      'list': {
-        paddingLeft: '10px',
-        paddingRight: '10px',
-        color: '#000'
+      list: {
+        paddingLeft: "10px",
+        paddingRight: "10px",
+        color: "#000"
       },
-      'hr': {
-        borderBottom: '2px solid #000',
-        display: 'block',
+      hr: {
+        borderBottom: "2px solid #000",
+        display: "block",
         opacity: 0.5
       }
     }
   }
-}
+};
 
-export default MarkdownPlugin
+export default MarkdownPlugin;
