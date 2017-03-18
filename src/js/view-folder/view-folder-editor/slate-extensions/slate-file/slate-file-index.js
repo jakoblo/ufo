@@ -1,7 +1,6 @@
-import * as Blocks from './slate-file-blocks'
-import * as Selection from './slate-file-selection'
-import * as Serialize from './slate-file-serialize'
-import * as Transforms from './slate-file-transforms'
-import SlatePlugin_Factory from './slate-file-plugin'
+import * as utils from './slate-file-utils'
+import * as serialize from './slate-file-serialize'
+import * as stateTransforms from './slate-file-state-transforms'
+import slatePlugin_Factory from './slate-file-plugin'
 
-export default { Blocks, Selection, Serialize, Transforms, SlatePlugin_Factory };
+export default { utils, serialize, stateTransforms, slatePlugin_Factory };

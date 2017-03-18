@@ -20,7 +20,7 @@ export function folderEditorInit(props) {
     if(fileList.indexOf(c.INDEX_BASE_NAME) > -1) {
       const fileContent = Utils.fs.loadFile( nodePath.join(props.path, c.INDEX_BASE_NAME) )
         .then((fileContent) => {
-          editorState = SlateFile.Serialize.plainToState(fileContent)
+          editorState = SlateFile.serialize.plainToState(fileContent)
           editorState = mapFilesToEditorState(props, editorState)
 
           dispatch({
@@ -44,7 +44,6 @@ export function folderEditorInit(props) {
     }
   }
 }
-
 
 /**
  * @param {string} path
@@ -70,23 +69,9 @@ export function folderEditorChange(path, editorState) {
     payload: {
       path : path,
       editorState: editorState,
-      selectedFiles: buildSelectedFiles(path, editorState)
+      selectedFiles: SlateFile.utils.buildSelectedFiles(editorState)
     }
   }
-}
-
-function buildSelectedFiles(path, editorState) {
-  const selection = editorState.selection
-  return editorState.blocks
-    .filter(block => block.type == c.BLOCK_TYPE_FILE) // This block is Fileblock
-    .filter(block => selection.isExpanded) // Selection is Expaneded
-    // .filter(block => { // Selection wrapps the block
-    //   if(selection.hasStartAtEndOf(block)) return false
-    //   if(selection.hasEndAtStartOf(block)) return false
-    //   return true
-    // })
-    .map( (block) => block.getIn( ['data', 'base'] ))
-    .toJS()
 }
 
 /**
@@ -102,18 +87,18 @@ function mapFilesToEditorState(props, editorState) {
 
   const filesOnDisk = props.fileList
 
-  const filesInEditor = SlateFile.Blocks.getFilesInState(editorState)
+  const filesInEditor = SlateFile.utils.getFilesInState(editorState)
   const filesNotInEditor = _.difference(filesOnDisk, filesInEditor)
   const fileNotOnDisk = _.difference(filesInEditor, filesOnDisk)
 
   let transforming = editorState.transform()
 
   fileNotOnDisk.forEach((base, index) => {
-    transforming = SlateFile.Transforms.removeExisting(transforming, base)
+    transforming = SlateFile.stateTransforms.removeExisting(transforming, base)
   })
   filesNotInEditor.forEach((base, index) => {
     if(base != c.INDEX_BASE_NAME) {
-      transforming = SlateFile.Transforms.insertFileAtEnd(transforming, editorState.get('document'), base)
+      transforming = SlateFile.stateTransforms.insertFileAtEnd(transforming, editorState.get('document'), base)
     }
   })
 

@@ -2,13 +2,13 @@ import React from 'react'
 import FileItem from '../../../../file-item/components/file-item'
 import Selection from '../../../../filesystem/selection/sel-index'
 import nodePath from 'path'
+import * as dragndrop from '../../../../utils/dragndrop'
+
 import {Block} from 'slate'
 import VoidCursorEmulator from './components/void-cursor-emulator'
 import * as c from '../../folder-editor-constants'
-import * as dragndrop from '../../../../utils/dragndrop'
-import * as EditorSelection from './slate-file-selection'
-import * as Transforms from './slate-file-transforms'
-import * as Blocks from './slate-file-blocks'
+import * as stateTransforms from './slate-file-state-transforms'
+import * as slateUtils from './slate-file-utils'
 
 const defaultBlock = {
   type: 'markdown',
@@ -80,14 +80,14 @@ export default function FilePlugin_Factory(options) {
       * |
       * [FileItem]
       */
-      if (event.key == "Enter" && EditorSelection.includesAFileBlock(state)) {
+      if (event.key == "Enter" && slateUtils.includesAFileBlock(state)) {
         event.preventDefault()
-        return Transforms.createNewLineAroundFileBlock(state.transform(), state.selection).apply()
+        return stateTransforms.createNewLineAroundFileBlock(state.transform(), state.selection).apply()
       }
 
 
       // Selection is expanded arround FileBlock(s)
-      if (state.selection.isExpanded && EditorSelection.includesAFileBlock(state)) {
+      if (state.selection.isExpanded && slateUtils.includesAFileBlock(state)) {
         if(event.key == "Backspace" || event.key == "Delete") {
           event.preventDefault() // Chancel Delete - would delete selected file block
         }
@@ -117,13 +117,13 @@ export default function FilePlugin_Factory(options) {
                   const baselist = fileList.map(filePath => nodePath.basename(filePath))
                   let state = editor.getState()
 
-                  state = Transforms.removeFiles(state, baselist)
+                  state = stateTransforms.removeFiles(state, baselist)
 
                   // Need to be calcualted after remove Files
                   const nodeIndex = state.document.getParent(node).get('nodes').indexOf(node)
                   const position = (cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP) ? nodeIndex : nodeIndex + 1
                   
-                  state = Transforms.insertFilesAt(state, baselist, position)
+                  state = stateTransforms.insertFilesAt(state, baselist, position)
 
                   editor.onChange(state)
                   dragndrop.executeFileDropOnDisk(event, folderPath)
@@ -170,7 +170,7 @@ export default function FilePlugin_Factory(options) {
     },
     
     onBeforeInput: (event, data, state) => {
-      if (EditorSelection.includesAFileBlock(state)) {
+      if (slateUtils.includesAFileBlock(state)) {
         if(state.selection.isExpanded) {
           // Would delete Files, not allowed
           event.preventDefault()
@@ -187,7 +187,7 @@ export default function FilePlugin_Factory(options) {
           * |            < new Empty Text line
           * | FileItem |
           */
-          return Transforms.createNewLineAroundFileBlock( state.transform(), state.selection ).apply()
+          return stateTransforms.createNewLineAroundFileBlock( state.transform(), state.selection ).apply()
         }
       }
     },
@@ -201,16 +201,16 @@ export default function FilePlugin_Factory(options) {
         const baselist = fileList.map(filePath => nodePath.basename(filePath))
         const selection = data.target
 
-        state = Transforms.removeFiles(state, baselist)
+        state = stateTransforms.removeFiles(state, baselist)
       
         // Set Selection to Drop Position and create a Break there
         state = state.transform().deselect().select(selection).splitBlock().apply({save: false})
 
         const node = state.document.findDescendant((node) => (node.key == selection.focusKey))
-        const block = Blocks.getRootBlockOfNode(state, node)
+        const block = SlateUtils.getRootBlockOfNode(state, node)
         const blockIndex = state.document.get('nodes').indexOf(block)
         
-        state = Transforms.insertFilesAt(state, baselist, blockIndex+1)
+        state = stateTransforms.insertFilesAt(state, baselist, blockIndex+1)
 
         // state = state.transform().deselect().apply()
         

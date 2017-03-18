@@ -1,9 +1,9 @@
 import {Block, Text, Selection} from 'slate'
-import * as Blocks from './slate-file-blocks'
+import * as slateUtils from './slate-file-utils'
 import {List} from 'immutable'
 
 export const removeExisting = (transforming, basename) => {
-  const existingFileBlock = Blocks.getFileBlockByBase(transforming.state, basename)
+  const existingFileBlock = slateUtils.getFileBlockByBase(transforming.state, basename)
   if(existingFileBlock) {
     transforming = transforming
       .removeNodeByKey(existingFileBlock.get('key'))
@@ -12,7 +12,7 @@ export const removeExisting = (transforming, basename) => {
 }
 
 export const insertFile = (transforming, basename) => transforming.splitBlock()
-  .insertBlock(Blocks.createFileBlock(basename))
+  .insertBlock(slateUtils.createFileBlock(basename))
 
 
 
@@ -50,14 +50,14 @@ export const createNewLineAroundFileBlock = (transforming, range) => {
 }
 
 export const insertFileAtEnd = (transforming, document, basename) => {
-  const block = Block.create( Blocks.getFileBlockProperties(basename) ) 
+  const block = Block.create( slateUtils.getFileBlockProperties(basename) ) 
   return transforming.insertNodeByKey(document.key, document.nodes.size, block)
 }
 
 export const renameFile = (state, transforming, sourceBase, targetBase) => {
-  const sourceBlock = Blocks.getFileBlockByBase( state, sourceBase )
+  const sourceBlock = slateUtils.getFileBlockByBase( state, sourceBase )
   if(!sourceBlock) return transforming
-  return transforming.setNodeByKey(sourceBlock.key, Blocks.getFileBlockProperties(targetBase))
+  return transforming.setNodeByKey(sourceBlock.key, slateUtils.getFileBlockProperties(targetBase))
 }
 
 export const removeFiles = (state, baseList) => {
@@ -71,7 +71,7 @@ export const removeFiles = (state, baseList) => {
 export const insertFilesAt = (state, baseList, indexPosition) => {
   let transforming = state.transform()
   baseList.forEach((fileBase) => {
-    transforming = transforming.insertNodeByKey(state.document.key, indexPosition, Blocks.createFileBlock(fileBase))
+    transforming = transforming.insertNodeByKey(state.document.key, indexPosition, slateUtils.createFileBlock(fileBase))
   })
   return transforming.apply({save: false})
 }

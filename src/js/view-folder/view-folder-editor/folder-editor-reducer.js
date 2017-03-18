@@ -33,19 +33,19 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
       if(action.payload.base == c.INDEX_BASE_NAME) return state
 
       // File Exists already ?
-      if(SlateFile.Blocks.getFileBlockByBase(state.get(action.payload.root), action.payload.base)) return state
+      if(SlateFile.utils.getFileBlockByBase(state.get(action.payload.root), action.payload.base)) return state
       
       // Add file at the end of the Document
       const document = state.get(action.payload.root).get('document')
       let transformAddFile = state.get(action.payload.root).transform()
-          transformAddFile = SlateFile.Transforms.insertFileAtEnd(transformAddFile, document, action.payload.base)
+          transformAddFile = SlateFile.stateTransforms.insertFileAtEnd(transformAddFile, document, action.payload.base)
 
       return state.set(action.payload.root, transformAddFile.apply({save: false}))
 
     // Remove file from document is exists
     case fsWatch.actiontypes.FILE_UNLINK:
       let transformRemoveFile = state.get(action.payload.root).transform()
-          transformRemoveFile = SlateFile.Transforms.removeExisting(transformRemoveFile, action.payload.base)
+          transformRemoveFile = SlateFile.stateTransforms.removeExisting(transformRemoveFile, action.payload.base)
       return state.set(action.payload.root, transformRemoveFile.apply({save: false}))
     
 
@@ -63,7 +63,7 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
         if(!renamingEditor) return state
 
-        return state.set(renamingSourceRoot, SlateFile.Transforms.renameFile( 
+        return state.set(renamingSourceRoot, SlateFile.stateTransforms.renameFile( 
           renamingEditor,
           renamingEditor.transform(),
           renamingSourceBase,
@@ -86,7 +86,7 @@ export default function folderEditorReducer(state = INITIAL_STATE, action = { ty
 
         if(!renamingEditor) return state
 
-        return state.set(renamingSourceRoot, SlateFile.Transforms.renameFile( 
+        return state.set(renamingSourceRoot, SlateFile.stateTransforms.renameFile( 
           renamingEditor,
           renamingEditor.transform(),
           renamingTargetBase, // Inverted

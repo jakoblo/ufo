@@ -1,5 +1,5 @@
 import {Raw} from 'slate'
-import * as Blocks from './slate-file-blocks'
+import * as slateUtils from './slate-file-utils'
 import * as c from '../../folder-editor-constants'
 
 /**
@@ -20,7 +20,7 @@ export function plainToState(string, options = {}) {
         if(line.match( /<.*>/ )){
           // insert Void Block with filename as data
           const fileBase = line.substring(1, line.length - 1)
-          return Blocks.getRawFileBlock( fileBase )
+          return slateUtils.getRawFileBlock( fileBase )
         } else {
           return {
             kind: 'block',

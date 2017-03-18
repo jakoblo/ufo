@@ -1,12 +1,14 @@
 import * as c from '../../folder-editor-constants'
-import {generateKey, Data, Block, Text} from 'slate'
+import {Block, Text, Selection} from 'slate'
 import {List} from 'immutable'
+
 
 export function getFileBlockByBase(state, base) {
   return state.get('document').findDescendant((node) => {
     return (node.getIn(['data', 'base']) == base)
   })
 }
+
 
 export const getFilesInNodes = (nodes) => {
   return nodes.filter((node) => {
@@ -46,6 +48,21 @@ export const getFileBlockProperties = (basename) => {
   return properties
 }
 
+/**
+ * Creats an base array of the fileblocks in the selection
+ * 
+ * @param {State} editorState
+ * @returns {Array<string>} - file bases
+ */
+export function buildSelectedFiles(editorState) {
+  const selection = editorState.selection
+  return editorState.blocks
+    .filter(block => block.type == c.BLOCK_TYPE_FILE) // This block is Fileblock
+    .filter(block => selection.isExpanded) // Selection is Expaneded
+    .map( (block) => block.getIn( ['data', 'base'] ))
+    .toJS()
+}
+
 
 export const getIndexOfNodeInDocument = (state, node) => {
   const rootNode = getRootBlockOfNode(state, node)
@@ -79,4 +96,22 @@ export const getRawFileBlock = (fileBase) => {
       base: fileBase
     }
   }
+}
+
+export const includesAFileBlock = (state) => state.blocks.some(block => block.type == c.BLOCK_TYPE_FILE)
+
+export function createSelectionForFile(node) {
+  const childTextNodeKey = node.get('nodes').first().get('key')
+  return new Selection({
+    anchorKey: childTextNodeKey,
+    anchorOffset: 0,
+    focusKey: childTextNodeKey,
+    focusOffset: 1,
+    isBackward: false,
+    isFocused: false
+  })
+}
+
+export const getSelectedFiles = (state) => {
+  return Blocks.getFilesInNodes(state.blocks)
 }

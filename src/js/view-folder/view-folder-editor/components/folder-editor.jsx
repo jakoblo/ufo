@@ -30,7 +30,7 @@ export default class FolderEditor extends React.Component {
 
   constructor(props) {
     super(props)
-    this.filePlugin = FileExtension.SlatePlugin_Factory({
+    this.filePlugin = FileExtension.slatePlugin_Factory({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
       folderPath: props.path,
       dispatch: this.props.dispatch

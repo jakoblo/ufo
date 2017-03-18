@@ -1,8 +1,7 @@
 "use strict"
 import React from 'react'
 import classnames from 'classnames'
-import * as Selection from '../slate-file-selection'
-import * as Blocks from '../slate-file-blocks'
+import * as slateUtils from '../slate-file-utils'
 
 export default class VoidCursorEmulator extends React.Component {
 
@@ -31,11 +30,9 @@ export default class VoidCursorEmulator extends React.Component {
           event.stopPropagation()
           event.preventDefault()
           this.props.editor.focus()
-        }} 
-        data-dings={node.key}
+        }}
         onMouseDown = {(event) => {
           event.stopPropagation()
-          //event.preventDefault()
           if(event.shiftKey) {
             this.expandSelection()
           }
@@ -59,8 +56,8 @@ export default class VoidCursorEmulator extends React.Component {
       const state = editor.getState()
       const {selection} = state
       const startNode = state.document.findDescendant((node) => node.key == selection.startKey)
-      const startIndex = Blocks.getIndexOfNodeInDocument(state, startNode)
-      const currentIndex =  Blocks.getIndexOfNodeInDocument(state, node)
+      const startIndex = slateUtils.getIndexOfNodeInDocument(state, startNode)
+      const currentIndex =  slateUtils.getIndexOfNodeInDocument(state, node)
       const transformFunc = (startIndex > currentIndex) ? "extendToStartOf" : "extendToEndOf"
 
       editor.onChange( state.transform()[transformFunc](node).focus().apply() )
@@ -71,10 +68,9 @@ export default class VoidCursorEmulator extends React.Component {
       const {editor, node} = this.props
       const state = editor.getState()
 
-      const newSelection = Selection.createSelectionForFile(node)
+      const newSelection = slateUtils.createSelectionForFile(node)
 
       editor.onChange( state.transform().select( newSelection ).apply() )
-
     }
 
 
