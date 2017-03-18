@@ -10,7 +10,7 @@ import * as c from "../folder-editor-constants";
 import * as Actions from "../folder-editor-actions";
 import * as selectors from "../folder-editor-selectors";
 import Filter from "../../../filesystem/filter/filter-index";
-import FileExtension from "../slate-extensions/slate-file/slate-file-index";
+import SlateFile from "../slate-extensions/slate-file/slate-file-index";
 import MarkdownPlugin
   from "../slate-extensions/slate-markdown/slate-markdown-plugin";
 import Config from "../../../config/config-index";
@@ -47,11 +47,12 @@ const mapStateToProps = (state: any, props: ComponentProps) => {
 class FolderEditor extends React.Component {
   props: Props;
   state: State;
+
   filePlugin: any;
 
   constructor(props: Props) {
     super(props);
-    this.filePlugin = FileExtension.slatePlugin_Factory({
+    this.filePlugin = SlateFile.slatePlugin_Factory({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
       folderPath: props.path,
       dispatch: this.props.dispatch
@@ -103,9 +104,7 @@ class FolderEditor extends React.Component {
     this.savingTimout = null;
     console.log("save " + this.props.path);
     const path = nodePath.join(this.props.path, c.INDEX_BASE_NAME);
-    const content = FileExtension.Serialize.stateToPlain(
-      this.props.editorState
-    );
+    const content = SlateFile.serialize.stateToPlain(this.props.editorState);
     Utils.fs.saveFile(path, content);
   };
 
