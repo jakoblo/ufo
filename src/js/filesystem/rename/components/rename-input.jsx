@@ -1,3 +1,5 @@
+// @flow
+
 "use strict"
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -22,23 +24,21 @@ export default class RenameInput extends React.Component {
         ref="editField"
         className={this.props.className}
         value={this.state.fileName}
-        onMouseDown={this.onMouseDown}
-        onMouseUp={this.onMouseUp}
         onBlur={this.onBlur}
         onChange={this.onChange}
         onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)}
 
-        // Stop all events slate could catch
+        // Stop & Cancel events
+        onMouseDown={this.stopEvent}
+        onMouseUp={this.stopEvent}
         onSelect={this.stopEvent}
-        onCompositionEnd={this.stopEvent}
-        onCompositionStart={this.stopEvent}
         onCopy={this.stopEvent}
         onCut={this.stopEvent}
-        onDragEnd={this.stopEvent}
-        onDragOver={this.stopEvent}
+        onDragEnd={this.cancelEvent}
+        onDragOver={this.cancelEvent}
         onClick={this.stopEvent}
-        onDragStart={this.stopEvent}
-        onDrop={this.stopEvent}
+        onDragStart={this.cancelEvent}
+        onDrop={this.cancelEvent}
         onInput={this.stopEvent}
         onKeyUp={this.stopEvent}
         onPaste={this.stopEvent}
@@ -65,7 +65,8 @@ export default class RenameInput extends React.Component {
     }
   }
 
-  stopEvent = (event) => { event.preventDefault(); event.stopPropagation() }
+  cancelEvent = (event) => { event.preventDefault(); event.stopPropagation() }
+  stopEvent = (event) => { event.stopPropagation() }
 
   onBlur = (event) => { this.renameSave(event) }
 
