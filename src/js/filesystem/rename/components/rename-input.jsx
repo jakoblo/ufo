@@ -1,21 +1,20 @@
 // @flow
 
-"use strict"
-import React from 'react'
-import ReactDOM from 'react-dom'
-import classNames from 'classnames'
-import * as actions from '../rename-actions'
-import nodePath from 'path'
-import { keyEventHandler } from '../../../shortcuts/key-event-handler'
-import { keyMap } from '../../../shortcuts/key-map'
+"use strict";
+import React from "react";
+import ReactDOM from "react-dom";
+import classNames from "classnames";
+import * as actions from "../rename-actions";
+import nodePath from "path";
+import { keyEventToActionMapper } from "../../../shortcuts/key-event-handler";
+import { keyMap } from "../../../shortcuts/key-map";
 
 export default class RenameInput extends React.Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       fileName: nodePath.basename(this.props.path)
-    }
+    };
   }
 
   render() {
@@ -26,8 +25,10 @@ export default class RenameInput extends React.Component {
         value={this.state.fileName}
         onBlur={this.onBlur}
         onChange={this.onChange}
-        onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)}
-
+        onKeyDown={keyEventToActionMapper(
+          keyMap.renameInput,
+          this.shortcutHandler
+        )}
         // Stop & Cancel events
         onMouseDown={this.stopEvent}
         onMouseUp={this.stopEvent}
@@ -43,7 +44,7 @@ export default class RenameInput extends React.Component {
         onKeyUp={this.stopEvent}
         onPaste={this.stopEvent}
       />
-    )
+    );
   }
 
   componentDidMount(prevProps, prevState) {
@@ -54,36 +55,43 @@ export default class RenameInput extends React.Component {
   }
 
   shortcutHandler = (action, event) => {
-    event.stopPropagation()
+    event.stopPropagation();
     switch (action) {
       case "cancel":
-        this.renameCancel()
+        this.renameCancel();
         break;
       case "save":
         this.renameSave(event);
         break;
     }
-  }
+  };
 
-  cancelEvent = (event) => { event.preventDefault(); event.stopPropagation() }
-  stopEvent = (event) => { event.stopPropagation() }
+  cancelEvent = event => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  stopEvent = event => {
+    event.stopPropagation();
+  };
 
-  onBlur = (event) => { this.renameSave(event) }
+  onBlur = event => {
+    this.renameSave(event);
+  };
 
-  onChange = (event) => {
-    this.setState({'fileName': event.target.value})
-  }
+  onChange = event => {
+    this.setState({ fileName: event.target.value });
+  };
 
-  renameSave = (event) => {
-    var val = this.state.fileName.trim()
+  renameSave = event => {
+    var val = this.state.fileName.trim();
     if (val != nodePath.basename(this.props.path)) {
-      this.props.dispatch( actions.renameSave( this.props.path, val) )
+      this.props.dispatch(actions.renameSave(this.props.path, val));
     } else {
-      this.renameCancel()
+      this.renameCancel();
     }
-  }
+  };
 
   renameCancel = () => {
-    this.props.dispatch( actions.renameCancel( this.props.path) )
-  }
+    this.props.dispatch(actions.renameCancel(this.props.path));
+  };
 }
