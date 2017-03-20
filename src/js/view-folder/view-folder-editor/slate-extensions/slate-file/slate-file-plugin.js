@@ -21,6 +21,8 @@ export default function FilePlugin_Factory(options) {
 
   return {
     onKeyDown(event, data, state) {
+      console.log("editor key down");
+
       const { document, startKey, startBlock } = state;
       const prevBlock = document.getPreviousBlock(startKey);
       const nextBlock = document.getNextBlock(startKey);
@@ -230,7 +232,7 @@ export default function FilePlugin_Factory(options) {
         const node = state.document.findDescendant(
           node => node.key == selection.focusKey
         );
-        const block = SlateUtils.getRootBlockOfNode(state, node);
+        const block = slateUtils.getRootBlockOfNode(state, node);
         const blockIndex = state.document.get("nodes").indexOf(block);
 
         state = stateTransforms.insertFilesAt(state, baselist, blockIndex + 1);

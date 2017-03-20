@@ -2,9 +2,11 @@
 
 import React from "react";
 import { shell } from "electron";
+import type { Children } from "react";
 
 type Props = {
-  url: string
+  url: string,
+  children?: Children
 };
 
 export default class Link extends React.Component {
