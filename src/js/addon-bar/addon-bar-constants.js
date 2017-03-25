@@ -1,1 +1,2 @@
-export const NAME = 'addonBar';
+//@flow
+export const NAME = "addonBar";

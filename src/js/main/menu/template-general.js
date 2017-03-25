@@ -1,120 +1,116 @@
-
-export default function getGeneralMenuTemplate(handleNewWindow) {
+//@flow
+export default function getGeneralMenuTemplate(handleNewWindow: Function) {
   return [
     {
-      label: 'File',
+      label: "File",
       submenu: [
         {
-          label: 'New Window',
-          accelerator: 'CmdOrCtrl+N',
-          click: (item, focusedWindow) => {
-            handleNewWindow()
+          label: "New Window",
+          accelerator: "CmdOrCtrl+N",
+          click: (item: any, focusedWindow: any) => {
+            handleNewWindow();
           }
-        },
+        }
       ]
     },
     {
-      label: 'Edit',
+      label: "Edit",
       submenu: [
         {
-          label: 'Undo',
-          accelerator: 'CmdOrCtrl+Z',
-          role: 'undo'
+          label: "Undo",
+          accelerator: "CmdOrCtrl+Z",
+          role: "undo"
         },
         {
-          label: 'Redo',
-          accelerator: 'Shift+CmdOrCtrl+Z',
-          role: 'redo'
+          label: "Redo",
+          accelerator: "Shift+CmdOrCtrl+Z",
+          role: "redo"
         },
         {
-          type: 'separator'
+          type: "separator"
         },
         {
-          label: 'Cut',
-          accelerator: 'CmdOrCtrl+X',
-          role: 'cut'
+          label: "Cut",
+          accelerator: "CmdOrCtrl+X",
+          role: "cut"
         },
         {
-          label: 'Copy',
-          accelerator: 'CmdOrCtrl+C',
-          role: 'copy'
+          label: "Copy",
+          accelerator: "CmdOrCtrl+C",
+          role: "copy"
         },
         {
-          label: 'Paste',
-          accelerator: 'CmdOrCtrl+V',
-          role: 'paste'
+          label: "Paste",
+          accelerator: "CmdOrCtrl+V",
+          role: "paste"
         },
         {
-          label: 'Select All',
-          accelerator: 'CmdOrCtrl+A',
-          role: 'selectall'
-        },
+          label: "Select All",
+          accelerator: "CmdOrCtrl+A",
+          role: "selectall"
+        }
       ]
     },
     {
-      label: 'View',
+      label: "View",
       submenu: [
         {
-          label: 'Reload',
-          accelerator: 'CmdOrCtrl+R',
-          click: function(item, focusedWindow) {
-            if(focusedWindow)
-              focusedWindow.reload();
+          label: "Reload",
+          accelerator: "CmdOrCtrl+R",
+          click: function(item: any, focusedWindow: any) {
+            if (focusedWindow) focusedWindow.reload();
           }
         },
         {
-          label: 'Toggle Full Screen',
+          label: "Toggle Full Screen",
           accelerator: (function() {
-            if (process.platform == 'darwin')
-              return 'Ctrl+Command+F';
-            else
-              return 'F11';
+            if (process.platform == "darwin") return "Ctrl+Command+F";
+            else return "F11";
           })(),
-          click: function(item, focusedWindow) {
+          click: function(item: any, focusedWindow: any) {
             if (focusedWindow)
               focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
           }
         },
         {
-          label: 'Toggle Developer Tools',
+          label: "Toggle Developer Tools",
           accelerator: (function() {
-            if (process.platform == 'darwin')
-              return 'Alt+Command+I';
-            else
-              return 'Ctrl+Shift+I';
+            if (process.platform == "darwin") return "Alt+Command+I";
+            else return "Ctrl+Shift+I";
           })(),
-          click: function(item, focusedWindow) {
-            if (focusedWindow)
-              focusedWindow.toggleDevTools();
+          click: function(item: any, focusedWindow: any) {
+            if (focusedWindow) focusedWindow.toggleDevTools();
           }
-        },
+        }
       ]
     },
     {
-      label: 'Window',
-      role: 'window',
+      label: "Window",
+      role: "window",
       submenu: [
         {
-          label: 'Minimize',
-          accelerator: 'CmdOrCtrl+M',
-          role: 'minimize'
+          label: "Minimize",
+          accelerator: "CmdOrCtrl+M",
+          role: "minimize"
         },
         {
-          label: 'Close',
-          accelerator: 'CmdOrCtrl+W',
-          role: 'close'
-        },
+          label: "Close",
+          accelerator: "CmdOrCtrl+W",
+          role: "close"
+        }
       ]
     },
     {
-      label: 'Help',
-      role: 'help',
+      label: "Help",
+      role: "help",
       submenu: [
         {
-          label: 'Learn More',
-          click: function() { require('electron').shell.openExternal('http://electron.atom.io') }
-        },
+          label: "Learn More",
+          click: function() {
+            require("electron").shell.openExternal("http://electron.atom.io");
+          }
+        }
       ]
-    },
-  ]
+    }
+  ];
 }

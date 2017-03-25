@@ -1,3 +1,5 @@
+// @flow
+
 import * as actions from "./folder-editor-actions";
 import * as constants from "./folder-editor-constants";
 import * as actiontypes from "./folder-editor-actiontypes";

@@ -1,67 +1,74 @@
-var fs = require('mz/fs')
-var c = require('../fs-write-constants')
-import copy from './fs-write-worker-copy'
-import rimraf from 'rimraf'
+//@flow
+var fs = require("mz/fs");
+var c = require("../fs-write-constants");
+import copy from "./fs-write-worker-copy";
+import rimraf from "rimraf";
+import type { SubTask } from "../fs-write-types";
 
-export default function move(subTask, handleProgress) {
-
-  return new Promise( function(resolve, reject) {
+export default function move(
+  subTask: SubTask,
+  handleProgress: (subTaskProgress: any) => void
+): Promise<*> {
+  return new Promise(function(resolve, reject) {
+    // Start with the easiest and fastest ways for move files/folders
+    // and work up to more expensive ways
 
     if (subTask.clobber) {
       fs.rename(subTask.source, subTask.destination, function(err) {
-        if(err) {
+        if (err) {
           switch (err.code) {
             case c.ERROR_RENAME_CROSS_DEVICE:
-              moveWithCopy(subTask)
-              return
+              moveWithCopy(subTask);
+              return;
             default:
-              reject(err)
-              return
+              reject(err);
+              return;
           }
         }
-        resolve()
+        resolve();
       });
     } else {
       fs.link(subTask.source, subTask.destination, function(err) {
         if (err) {
           switch (err.code) {
-            case c.ERROR_RENAME_CROSS_DEVICE: 
-              moveWithCopy(subTask)
-              return
-            case c.ERROR_IS_DIR: 
-              moveWithCopy(subTask)
-              return
-            case c.ERROR_OPERATION_NOT_PERMITTED: 
-              moveWithCopy(subTask)
-              return
+            case c.ERROR_RENAME_CROSS_DEVICE:
+              moveWithCopy(subTask);
+              return;
+            case c.ERROR_IS_DIR:
+              moveWithCopy(subTask);
+              return;
+            case c.ERROR_OPERATION_NOT_PERMITTED:
+              moveWithCopy(subTask);
+              return;
 
             default:
               reject(err);
               return;
           }
         }
-        fs.unlink(subTask.source, (err) => {
+        fs.unlink(subTask.source, err => {
           if (err) {
-            reject(err)
+            reject(err);
           } else {
-            resolve()
+            resolve();
           }
         });
       });
     }
 
-    var moveWithCopy = (subTask) => {
+    var moveWithCopy = (subTask: SubTask) => {
       copy(subTask, handleProgress)
         .then(() => {
-          rimraf(subTask.source, { disableGlob: true }, (err) => {
-            if(err) {
+          // Start deleting source
+          rimraf(subTask.source, { disableGlob: true }, err => {
+            if (err) {
               reject(err);
-              return
+              return;
             }
-            resolve()
+            resolve();
           });
         })
-        .catch(reject)
-    }
-  })
+        .catch(reject);
+    };
+  });
 }

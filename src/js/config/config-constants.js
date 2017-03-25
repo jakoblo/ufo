@@ -1,1 +1,2 @@
-export const NAME = "config"
+//@flow
+export const NAME = "config";

@@ -1,18 +1,23 @@
-import React from 'react'
+//@flow
+import React from "react";
+
+type Props = {
+  path: string
+};
 
 export default class DisplayImage extends React.Component {
-
-  constructor(props) {
-    super(props)
+  props: Props;
+  constructor(props: Props) {
+    super(props);
   }
 
-  render() {    
-    return(
+  render() {
+    return (
       <div className="render-image__container">
         <div className="render-image__wrapper">
           <img className="render-image__img" src={this.props.path} />
         </div>
       </div>
-    )
+    );
   }
 }

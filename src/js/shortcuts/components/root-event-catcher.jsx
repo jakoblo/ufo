@@ -1,4 +1,4 @@
-"use strict";
+//@flow
 import React from "react";
 import ReactDOM from "react-dom";
 import Config from "../../config/config-index";
@@ -16,11 +16,17 @@ const readOnlyEventHandler = keyEventToActionMapper(
   windowActionHandler
 );
 
-@connect(state => {
+type Props = {
+  readOnly: boolean,
+  children?: Element
+};
+
+const mapStateToProps = state => {
   return { readOnly: Config.selectors.getReadOnlyState(state) };
-})
-export default class EventCatcher extends React.Component {
-  constructor(props) {
+};
+class EventCatcher extends React.Component {
+  props: Props;
+  constructor(props: Props) {
     super(props);
   }
 
@@ -32,7 +38,7 @@ export default class EventCatcher extends React.Component {
     );
   }
 
-  componentDidMount(prevProps, prevState) {
+  componentDidMount() {
     // Focus to catch events
     // var node = ReactDOM.findDOMNode(this.refs["eventCatcher"]);
     // node.focus();
@@ -45,3 +51,4 @@ export default class EventCatcher extends React.Component {
     });
   }
 }
+export default connect(mapStateToProps)(EventCatcher);

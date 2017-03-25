@@ -1,152 +1,154 @@
-import {ipcRenderer} from 'electron'
-import nodePath from 'path'
-import trash from 'trash'
-import fs from 'mz/fs'
-import fsWatch from '../watch/fs-watch-index'
-import fsRename from '../rename/rename-index'
-import {fork} from 'child_process'
-import fsWriteWorker from './child-worker/fs-write-worker'
-import * as c from './fs-write-constants'
-import * as t from './fs-write-actiontypes'
+//@flow
 
-/**
- * @param  {string[]} sources
- */
-export function moveToTrash(sources) {
+import { ipcRenderer } from "electron";
+import nodePath from "path";
+import trash from "trash";
+import fs from "mz/fs";
+import fsWatch from "../watch/fs-watch-index";
+import fsRename from "../rename/rename-index";
+import { fork } from "child_process";
+import fsWriteWorker from "./child-worker/fs-write-worker";
+import * as c from "./fs-write-constants";
+import * as t from "./fs-write-actiontypes";
 
-  let id = window.store.getState()[c.NAME].size 
+import type { Action, ThunkArgs } from "../../types";
+import type { Task, WorkerParams } from "./fs-write-types";
+
+export function moveToTrash(sources: Array<string>) {
+  let id = window.store.getState()[c.NAME].size;
   let payload = {
     id: id,
     type: t.TASK_TRASH,
     sources: sources,
-    target: 'Trash',
-  }
+    target: "Trash"
+  };
   window.store.dispatch({
     type: t.FS_WRITE_NEW,
     payload: payload
-  })
+  });
 
-  sources.forEach((source) => {
-    trash([source]).then(() => {
-      window.store.dispatch({
-        type: t.FS_WRITE_DONE,
-        payload: payload
+  sources.forEach(source => {
+    trash([source])
+      .then(() => {
+        window.store.dispatch({
+          type: t.FS_WRITE_DONE,
+          payload: payload
+        });
       })
-    })
-    .catch((err) => {
-      window.store.dispatch({
-        type: t.FS_WRITE_ERROR,
-        payload: {
-          id: id
-        },
-        error: err
-      })
-    })
-  })
+      .catch(err => {
+        window.store.dispatch({
+          type: t.FS_WRITE_ERROR,
+          payload: {
+            id: id
+          },
+          error: err
+        });
+      });
+  });
 }
 
 /**
- * @param  {string[]} sources
- * @param  {string} target 
+ * target is Folder where should moved in
  */
-export function move(sources, target) {
+export function move(sources: Array<string>, target: string) {
   startFsWorker({
-    sources: sources, 
-    target: target, 
-    type: t.TASK_MOVE, 
+    sources: sources,
+    target: target,
+    type: t.TASK_MOVE,
     clobber: false
-  })
+  });
 }
 
-
 /**
- * @param  {string[]} sources
- * @param  {string} target 
+ * target is Folder where should copied in
  */
-export function copy(sources, target) {
+export function copy(sources: Array<string>, target: string) {
   startFsWorker({
-    sources: sources, 
-    target: target, 
-    type: t.TASK_COPY, 
+    sources: sources,
+    target: target,
+    type: t.TASK_COPY,
     clobber: false
-  })
+  });
 }
 
-
 /**
- * @param  {string} source
- * @param  {string} destination
+ * source & destination = fullpath
  */
-export function rename(source, destination) {
-
+export function rename(source: string, destination: string) {
   let payload = {
     id: window.store.getState()[c.NAME].size,
     type: t.TASK_RENAME,
     sources: [source],
     target: destination
-  }
+  };
 
   window.store.dispatch({
     type: t.FS_WRITE_NEW,
     payload: payload
-  })
+  });
 
-  fs.access(destination, fs.constants.R_OK) // test if already exists
+  fs
+    .access(destination, fs.constants.R_OK) // test if already exists
     .then(() => {
       //destination already exists
       renameError({
-          code: c.ERROR_DEST_ALREADY_EXISTS
-      })
+        code: c.ERROR_DEST_ALREADY_EXISTS
+      });
     })
-    .catch((err) => {
-      if(err = c.ERROR_NOT_EXISTS) {
+    .catch(err => {
+      if ((err = c.ERROR_NOT_EXISTS)) {
         // destination does not exists start renaming
-        fs.rename(source, destination).then(() => {
-          window.store.dispatch({
-            type: t.FS_WRITE_DONE,
-            payload: payload
+        fs
+          .rename(source, destination)
+          .then(() => {
+            window.store.dispatch({
+              type: t.FS_WRITE_DONE,
+              payload: payload
+            });
           })
-        })
-        .catch(renameError)
+          .catch(renameError);
       } else {
         // unknown error
-        renameError(err)
+        renameError(err);
       }
-    })
+    });
 
   function renameError(err) {
     window.store.dispatch({
       type: t.FS_WRITE_ERROR,
       payload: payload,
       error: err
-    })
+    });
   }
 }
 
 /**
  * Remove Action from store
- * @param  {number} id
  */
-export function removeAction(id) {
+export function removeAction(id: number) {
   return {
     type: t.FS_WRITE_REMOVE_ACTION,
     payload: {
       id: id
     }
-  }
+  };
 }
 
-
-/**
- * @param  {string} source
- * @param  {string} destination
- * @param  {Object} options clobber & task: MOVE || COPY 
- * @param  {number} setId optional
- */
-
-export function startFsWorker(task) {
-  
-  task.id = Number.isInteger(task.id) ? task.id : window.store.getState()[c.NAME].size
+export function startFsWorker(
+  workerParams: {
+    id?: number,
+    clobber: boolean,
+    type: string,
+    sources: Array<string>,
+    target: string
+  }
+) {
+  const paramsWithID = {
+    // Create id there isnt one
+    id: window.store.getState()[c.NAME].size,
+    ...workerParams
+  };
+  new fsWriteWorker(paramsWithID);
 
   // var fsWriteWorker = fork(__dirname + '/child-worker/fs-write-worker.js');
 
@@ -156,8 +158,6 @@ export function startFsWorker(task) {
   //   target: target,
   //   options
   // })
-  
-  new fsWriteWorker(task)
 
   // fsWriteWorker.on('message', function(response) {
   //   window.store.dispatch(response)
@@ -170,29 +170,31 @@ export function startFsWorker(task) {
 
 /**
  * Create a blank new folder and start a rename action for that
- * @param  {string} parentFolder
  */
-export function newFolder(parentFolder) {
-  return (dispatch, getState) => {
+export function newFolder(parentFolder: string) {
+  return (dispatch: Function, getState: Function) => {
+    let existingFiles = fsWatch.selectors.getFilesSeqOf(
+      getState(),
+      parentFolder
+    );
+    let folderName = "new Folder";
 
-    let existingFiles = fsWatch.selectors.getFilesSeqOf(getState(), parentFolder)
-    let folderName = "new Folder"
-    
-    if(existingFiles.indexOf(folderName) > -1) {
-      let count = 2
-      while (existingFiles.indexOf(folderName+count) > -1) {
-        count++
+    if (existingFiles.indexOf(folderName) > -1) {
+      let count = 2;
+      while (existingFiles.indexOf(folderName + count) > -1) {
+        count++;
       }
-      folderName = folderName+count
+      folderName = folderName + count;
     }
-    let newFolderPath = nodePath.join(parentFolder, folderName)
-    
-    fs.mkdir(nodePath.join(parentFolder, folderName))
+    let newFolderPath = nodePath.join(parentFolder, folderName);
+
+    fs
+      .mkdir(nodePath.join(parentFolder, folderName))
       .then(() => {
-        dispatch( fsRename.actions.renameStart(newFolderPath) )
+        dispatch(fsRename.actions.renameStart(newFolderPath));
       })
-      .catch((err) => {
-        alert(err)
-      })
-  }
+      .catch(err => {
+        alert(err);
+      });
+  };
 }

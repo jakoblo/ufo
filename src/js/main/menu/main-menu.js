@@ -1,18 +1,18 @@
+//@flow
+
 /**
- * @file sets the Appliaction Menu Edit, View, Window etc.. 
+ * @file sets the Appliaction Menu Edit, View, Window etc..
  * https://github.com/electron/electron/blob/master/docs/api/menu.md
  */
 
-import { Menu } from 'electron'
-import getGeneralTemplate from './template-general'
-import getDarwinTemplate from './template-darwin'
+import { Menu } from "electron";
+import getGeneralTemplate from "./template-general";
+import getDarwinTemplate from "./template-darwin";
 
-export default function loadAppMenu(handleNewWindow) {
-  let template = getGeneralTemplate(handleNewWindow)
-  if (process.platform == 'darwin') {
-    template.push(
-      getDarwinTemplate()
-    )
+export default function loadAppMenu(handleNewWindow: Function) {
+  let template = getGeneralTemplate(handleNewWindow);
+  if (process.platform == "darwin") {
+    template.push(getDarwinTemplate());
   }
-  Menu.setApplicationMenu( Menu.buildFromTemplate(template) )
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }

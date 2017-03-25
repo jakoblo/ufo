@@ -1,3 +1,4 @@
+//@flow
 import { createSelector } from "reselect";
 import nodePath from "path";
 import Watch from "./watch/fs-watch-index";
@@ -5,7 +6,7 @@ import Write from "./write/fs-write-index";
 import Selection from "./selection/sel-index";
 import Rename from "./rename/rename-index";
 import Filter from "./filter/filter-index";
-import { Map } from "immutable";
+import { Map, List } from "immutable";
 
 const unknownFile = Map({
   name: "?",
@@ -13,13 +14,13 @@ const unknownFile = Map({
 });
 
 /**
- * Get the all information to file which are availible 
- * 
+ * Get the all information to file which are availible
+ *
  * @param  {State} state - redux store state
  * @param  {string} path - of the File
  * @returns {ImmuteableMap}
  */
-export const getFile_Factory = () => {
+export const getFile_Factory = (): Function => {
   const getProgressOfFile = Write.selectors.getProgressOfFile__Factory();
   const isFileSelected = Selection.selectors.isFileSelected__Factory();
 
@@ -46,16 +47,19 @@ export const getFile_Factory = () => {
 
 /**
  * Get all filtered filepaths which are in the Folder
- * 
+ *
  * @param  {State} state - redux store state
  * @param  {string} path - of the File
  * @returns {Array} - of file bases / filenames
  */
 export const getFiltedBaseArrayOfFolder_Factory = () => {
   let getFilteredFiles = getFilteredFilesOfFolder_Factory();
-  return createSelector([getFilteredFiles], files => {
-    return files ? files.keySeq().toJS() : [];
-  });
+  return createSelector(
+    [getFilteredFiles],
+    (files: List<any>): Array<string> => {
+      return files ? files.keySeq().toJS() : [];
+    }
+  );
 };
 
 const getFilteredFilesOfFolder_Factory = () => {
@@ -67,7 +71,7 @@ const getFilteredFilesOfFolder_Factory = () => {
       if (filters.length == 0) {
         return files;
       }
-      return files.filter(file => {
+      return files.filter((file: any) => {
         let filename = file.get("base");
         let count = 0;
         while (count < filters.length && filename.match(filters[count])) {
@@ -90,7 +94,7 @@ export const getOpenFileIndex_Factory = () => {
   console.log("getOpenFileIndex_Factory");
   return createSelector(
     [getFilesSeq, Watch.selectors.getOpenFileOf],
-    (filesSeq, openFile) => {
+    (filesSeq, openFile): number => {
       return filesSeq.indexOf(openFile);
     }
   );
@@ -112,17 +116,13 @@ export const getFocusedFileIndexOf_Factory = () => {
 
 /**
  * Current Files the Last Selected or the Active one
- * 
- * @param  {Store} state
- * @param  {string} path
- * @returns {string}
  */
-export const getFocusedFileOf = (state, path) => {
+export const getFocusedFileOf = (state: any, path: string): string => {
   let lastestSelected = undefined;
   let selection = Selection.selectors.getSelection(state, path);
   if (selection.get("root") == path) {
     lastestSelected = selection.get("files").last();
   }
   let openFile = Watch.selectors.getOpenFileOf(state, path);
-  return lastestSelected || openFile;
+  return lastestSelected || openFile || "";
 };

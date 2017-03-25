@@ -1,32 +1,32 @@
+//@flow
+
 import { createSelector } from "reselect";
 import nodePath from "path";
 import FsWrite from "../write/fs-write-index";
 import ViewFile from "../../view-file/vf-index";
+import { Map, List } from "immutable";
+
+import type { WatchedFile } from "./fs-watch-watcher";
 
 const getPath = (state, path) => path;
 const getState = (state, path) => state;
 
-/**
+/*
  * Get FileInformation from Watcher (Disk) to the given file
- * 
- * @param  {State} state - redux store state
- * @param  {string} path - of the File
- * @returns {ImmuteableMap} - of file
  */
-export const getFile = (state, path) => {
+export const getFile = (state: any, path: string): Map<string, any> => {
   const dir = nodePath.dirname(path);
   const base = nodePath.basename(path);
   return state.fs.getIn([dir, "files", base]);
 };
 
-/**
+/*
  * Get all Files with Information from Watcher (Disk) to the given Folder
- * 
- * @param  {State} state - redux store state
- * @param  {string} path - of the File
- * @returns {ImmuteableList} - of files
  */
-export const getFilesOfFolder = (state, path) => {
+export const getFilesOfFolder = (
+  state: any,
+  path: string
+): List<Map<WatchedFile>> => {
   let dir = state.fs.getIn([path, "files"]);
   if (dir) {
     return dir;
@@ -36,50 +36,41 @@ export const getFilesOfFolder = (state, path) => {
   }
 };
 
-/**
+/*
  * Get all Filepaths in the given Folder
- * 
- * @param  {State} state - redux store state
- * @param  {string} path - of the File
- * @returns {Array} - of filespaths
  */
-export const getFilesSeqOf = (state, path) =>
+export const getFilesSeqOf = (state: any, path: string): Array<string> =>
   getFilesOfFolder(state, path).keySeq().toJS();
 
-/**
+/*
  * Get all Folderpaths which are Visible as a View
- * 
- * @param  {State} state - redux store state
- * @returns {Array} - of Folderpaths
  */
-export const getDirSeq = state => state.fs.keySeq().toJS();
+export const getDirSeq = (state: any): Array<string> =>
+  state.fs.keySeq().toJS();
 
-/**
+/*
  * Get the next (right-side) Viewfolder from the given one
- * 
- * @param  {State} state - redux store state 
- * @param  {string} path - of the Folder
- * @returns {string} - next folder path
  */
-export const getDirNext = (state, path) => getDirDirection(state, path, +1);
+export const getDirNext = (state: any, path: string): string =>
+  getDirDirection(state, path, +1);
 
-/**
+/*
  * Get the previous (left-side) Viewfolder from the given one
- * 
- * @param  {State} state - redux store state 
- * @param  {string} path - of the Folder
- * @returns {string} - previous folder path
  */
-export const getDirPrevious = (state, path) => getDirDirection(state, path, -1);
+export const getDirPrevious = (state: any, path: string): string =>
+  getDirDirection(state, path, -1);
 
-/**
+/*
  * Get the Watcher State for the given Folder
- * 
- * @param  {State} state - redux store state 
- * @param  {string} path - of the Folder
- * @returns {path, ready, error}
  */
-export const getDirState = (state, path) => {
+export const getDirState = (
+  state: any,
+  path: string
+): {
+  path: string,
+  ready: boolean,
+  error: Object | null
+} => {
   return {
     path: path,
     ready: state.fs.get(path).get("ready"),
@@ -87,7 +78,7 @@ export const getDirState = (state, path) => {
   };
 };
 
-function getDirDirection(state, path, direction) {
+function getDirDirection(state: any, path: string, direction: number): string {
   let directorySeq = getDirSeq(state);
   let currentIndex = directorySeq.findIndex(dir => {
     return dir == path;
@@ -96,24 +87,22 @@ function getDirDirection(state, path, direction) {
   return nextPath;
 }
 
-/**
+/*
  * openFile
  * is the file/folder which is opend in the next View
- * 
- * @param  {store} state - redux store state 
- * @param  {string} path - of the Folder
- * @returns {string}
  */
 export const getOpenFileOf = createSelector(
   getState,
   getPath,
-  (state, path) => {
+  (state: any, path: string): string => {
     let nextDir = getDirNext(state, path);
     if (!nextDir) {
       // @TODO fs selection has to know things about preview, not nice
       let previewPath = ViewFile.selectors.getViewFilePath(state, path);
       if (previewPath && nodePath.dirname(previewPath) == path) {
         return nodePath.basename(previewPath);
+      } else {
+        return "";
       }
     } else {
       return nodePath.basename(nextDir);
@@ -121,16 +110,16 @@ export const getOpenFileOf = createSelector(
   }
 );
 
-/**
+/*
  * Is the given File opend in an other View?
- * 
- * @param  {store} state - redux store state 
- * @param  {string} path - of the File
- * @returns {boolean}
  */
-export function isFileOpen(state, path) {
+export function isFileOpen(state: any, path: string): boolean {
   const dir = nodePath.dirname(path);
   const base = nodePath.basename(path);
   const openFile = getOpenFileOf(state, dir);
-  return base == openFile;
+  if (!openFile) {
+    return false;
+  } else {
+    return base == openFile;
+  }
 }

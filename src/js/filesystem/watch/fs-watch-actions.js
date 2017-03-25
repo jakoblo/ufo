@@ -1,141 +1,146 @@
-import * as t from './fs-watch-actiontypes'
-import watchHandler from './fs-watch-watcher'
-import nodePath from 'path'
-import App from '../../app/app-index'
+//@flow
+import * as t from "./fs-watch-actiontypes";
+import watchHandler from "./fs-watch-watcher";
+import type {
+  WatchedFile,
+  WatcherSettings,
+  WatcherStack,
+  Callback,
+  UnlinkCallback,
+  ReadyCallback,
+  ErrorCallback
+} from "./fs-watch-watcher";
 
-const watcherSettings = {
+import nodePath from "path";
+import App from "../../app/app-index";
+import type { ThunkArgs, Action } from "../../types";
+
+const watcherSettings: WatcherSettings = {
   persistent: true,
   depth: 0,
   followSymlinks: false, // Symlinks are annoying on windows
   alwaysStat: true
-}
+};
 
 /**
  * Creats a new FileSystem watcher with async Callbacks
  * they will dispatch further actions
- * 
+ *
  * @param  {string} path
  */
-export function watcherRequest(path) {
-  return function (dispatch) {
+export function watcherRequest(path: string) {
+  return function(dispatch: Function, getState: Function) {
+    dispatch(watcherReading(path));
 
-    dispatch(  watcherReading(path)  )
+    const addCallback: Callback = (fileObj: WatchedFile) => {
+      dispatch(fileAdd(fileObj));
+    };
+
+    const unlinkCallback: UnlinkCallback = (
+      fileObj: WatchedFile,
+      activeWatcher: WatcherStack
+    ) => {
+      dispatch(fileUnlink(fileObj, activeWatcher));
+    };
+
+    const changeCallback: Callback = (fileObj: WatchedFile) => {
+      dispatch(fileChange(fileObj));
+    };
+
+    const readyCallback: ReadyCallback = (
+      path: string,
+      files: WatcherStack
+    ) => {
+      dispatch(watcherReady(path, files));
+    };
+
+    const errorCallback: ErrorCallback = (path: string, err: Object) => {
+      dispatch(watcherError(path, err));
+    };
 
     let watcher = watchHandler.watch(
       path,
       watcherSettings,
-      (fileObj)     => {dispatch( fileAdd(fileObj) )},
-      (fileObj, activeWatcher) => {dispatch( fileUnlink(fileObj, activeWatcher) )},
-      (fileObj)     => {dispatch( fileChange(fileObj) )},
-      (path, files) => {dispatch( watcherReady(path, files) )},
-      (err, path) => {dispatch( watcherError(err, path) )}
-    )
-  }
+      addCallback,
+      unlinkCallback,
+      changeCallback,
+      readyCallback,
+      errorCallback
+    );
+  };
 }
 
-/**
+/*
  * Close/Unwatch the FileSystem watcher for the given path
- * 
- * @param  {string} path
- * @returns {Object}
  */
-export function watcherClose(path) {
-  watchHandler.unwatch(path)
+export function watcherClose(path: string): Action {
+  watchHandler.unwatch(path);
   return {
     type: t.WATCHER_CLOSE,
     payload: {
       path: path
     }
-  }
+  };
 }
 
-/**
- * Action Creator
- * 
- * @param  {string} path
- * @returns {Object}
- */
-let watcherReading = (path) => {
+let watcherReading = (path: string): Action => {
   return {
     type: t.WATCHER_READING,
     payload: {
       path: path
     }
-  }
-}
+  };
+};
 
-/**
- * Action Creator
- * 
- * @param  {string} path - the path where the watcher is looking into
- * @param  {Array} files - Array of all fileObj which the watch found
- * @returns {Object}
- */
-function watcherReady(path, files) {
+function watcherReady(path: string, files: WatcherStack) {
   return {
     type: t.WATCHER_READY,
     payload: {
       path: path,
       files: files
     }
-  }
+  };
 }
 
-function watcherError(error, path) {
-  console.log(error, path)
+function watcherError(path: string, error: Object): Action {
+  console.log(error, path);
   return {
     type: t.WATCHER_ERROR,
     payload: {
       error: error,
       path: path
     }
-  }
+  };
 }
 
-/**
- * Action Creator
- * 
- * @param  {Object} fileObj
- * @returns {Object}
- */
-function fileAdd(fileObj) {
+function fileAdd(fileObj: WatchedFile): Action {
   return {
     type: t.FILE_ADD,
     payload: fileObj
-  }
+  };
 }
 
 /**
  * Action Creator to remove file from view
- * It checks the if the removed path is currently watched 
+ * It checks the if the removed path is currently watched
  * and changes the app Path if necessary to not look in an not existing folder
- * 
- * @param  {Object} fileObj
- * @param  {Array} activeWatcher
- * @returns {Object}
  */
 
-function fileUnlink(fileObj, activeWatcher) {
-  return dispatch => {
-    if(activeWatcher[fileObj.path]) {
-      dispatch(App.actions.changeAppPath(null, nodePath.dirname(fileObj.path)))
+function fileUnlink(fileObj: WatchedFile, activeWatcher: WatcherStack) {
+  return (dispatch: Function, getState: Function) => {
+    if (activeWatcher[fileObj.path]) {
+      dispatch(App.actions.changeAppPath(null, nodePath.dirname(fileObj.path)));
     }
     dispatch({
       type: t.FILE_UNLINK,
       payload: fileObj
-    })
-  }
+    });
+  };
 }
 
-/**
- * Action Creator
- * 
- * @param  {Object} fileObj
- * @returns {Object}
- */
-function fileChange(fileObj) {
+function fileChange(fileObj: WatchedFile): Action {
   return {
     type: t.FILE_CHANGE,
     payload: fileObj
-  }
+  };
 }

@@ -1,3 +1,5 @@
+//@flow
+
 import App from "../app/app-index";
 import ViewFile from "../view-file/vf-index";
 import Selection from "../filesystem/selection/sel-index";
@@ -7,11 +9,13 @@ import nodePath from "path";
 import { ipcRenderer, shell, remote } from "electron";
 const { Menu, MenuItem } = remote;
 
+import type { ThunkArgs } from "../types";
+
 /**
  * Open File or Directory or hole Selection
  */
-export function open(file) {
-  return (dispatch, getState) => {
+export function open(file: string) {
+  return (dispatch: Function, getState: Function) => {
     getPathArray(file, getState).forEach(filePath => {
       shell.openItem(filePath);
     });
@@ -19,10 +23,10 @@ export function open(file) {
 }
 
 /**
- * Opens view-folder for directory or view-file for file 
+ * Opens view-folder for directory or view-file for file
  */
-export function show(file, peakInFolder = false) {
-  return (dispatch, getState) => {
+export function show(file: any, peakInFolder: boolean = false) {
+  return (dispatch: Function, getState: Function) => {
     if (file.get("stats").isFile()) {
       //@TODO is Dirty
       dispatch(
@@ -45,14 +49,14 @@ export function show(file, peakInFolder = false) {
 /**
  * Drag of the Single file or the Selection
  */
-export function startDrag(file) {
-  return (dispatch, getState) => {
+export function startDrag(file: any) {
+  return (dispatch: Function, getState: Function) => {
     ipcRenderer.send("ondragstart", getPathArray(file, getState));
   };
 }
 
-export function showContextMenu(file, startRename) {
-  return (dispatch, getState) => {
+export function showContextMenu(file: any) {
+  return (dispatch: Function, getState: Function) => {
     let filePathArray = getPathArray(file, getState);
     let title = filePathArray.length > 1 ? filePathArray.length + " items" : "";
 
@@ -91,7 +95,7 @@ export function showContextMenu(file, startRename) {
  * actions should maybe applied to multiples files if they are part of the selection too.
  * Because of that this function returns an array with the path of the of file or the whole selection
  */
-function getPathArray(file, getState) {
+function getPathArray(file: any, getState: Function) {
   if (file.get("selected")) {
     return Selection.selectors.getSelectionPathList(getState()).toJS();
   } else {

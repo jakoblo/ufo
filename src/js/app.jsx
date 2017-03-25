@@ -1,3 +1,5 @@
+//@flow
+
 /**
  * @file Start of every Window, setup react & redux
  */

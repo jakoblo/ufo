@@ -18,21 +18,16 @@ import * as Utils from "../../../utils/utils-index";
 
 import Loading from "../../../general-components/loading";
 
-type ComponentProps = {
-  path: string
-};
-
 type Props = {
   path: string,
   focused: boolean,
   editorState: any,
+  fileList: Array<string>,
   readOnly: boolean,
-  dispatch: Dispatch
+  dispatch: Function
 };
 
-type State = {};
-
-const mapStateToProps = (state: any, props: ComponentProps) => {
+const mapStateToProps = (state, props) => {
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory();
   return (state, props) => {
     return {
@@ -46,8 +41,6 @@ const mapStateToProps = (state: any, props: ComponentProps) => {
 
 class FolderEditor extends React.Component {
   props: Props;
-  state: State;
-
   filePlugin: any;
 
   constructor(props: Props) {
@@ -83,11 +76,12 @@ class FolderEditor extends React.Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(Actions.folderEditorInit(this.props));
+    this.props.dispatch(
+      Actions.folderEditorInit(this.props.path, this.props.fileList)
+    );
   }
 
   onChange = (editorState: any) => {
-    // console.log('external onchange')
     this.props.dispatch(
       Actions.folderEditorChange(this.props.path, editorState)
     );

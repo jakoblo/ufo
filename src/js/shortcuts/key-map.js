@@ -1,7 +1,9 @@
 // @flow
 import type { KeyMap, keyEntry } from "./key-types.d.js";
 
-export const keyMap: KeyMap = {
+export const keyMap: {
+  [area: string]: KeyMap
+} = {
   // Allways Enabled, but have to bubble to the root
   global: {
     pathUp: {

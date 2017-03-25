@@ -26,10 +26,10 @@ type ActionMap = {
 
 const actionMap: ActionMap = {
   navUp: Selection.actions.fileNavUp,
-  selectUp: Selection.actions.fileAddUp,
+  // selectUp: Selection.actions.fileAddUp,
   pathUp: App.actions.navigateToParentFolder,
   navDown: Selection.actions.fileNavDown,
-  selectDown: Selection.actions.fileAddDown,
+  // selectDown: Selection.actions.fileAddDown,
   navRight: Selection.actions.dirNext,
   navLeft: Selection.actions.dirPrevious,
   selectAll: Selection.actions.selectAll,

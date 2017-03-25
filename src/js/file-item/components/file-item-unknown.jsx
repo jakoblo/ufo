@@ -1,11 +1,16 @@
-"use strict";
+//@flow
 import React from "react";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 import ProgressPie from "../../general-components/progress-pie";
 
+type Props = {
+  className: string
+};
+
 export default class FileItemUnkown extends React.Component {
-  constructor(props) {
+  props: Props;
+  constructor(props: Props) {
     super(props);
   }
 

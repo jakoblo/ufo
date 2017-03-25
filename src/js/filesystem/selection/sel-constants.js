@@ -1,1 +1,2 @@
-export const NAME = 'selection';
+//@flow
+export const NAME = "selection";

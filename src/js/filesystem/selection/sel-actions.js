@@ -1,3 +1,4 @@
+//@flow
 import * as t from "./sel-actiontypes";
 import * as selectors from "./sel-selectors";
 import * as c from "./sel-constants";
@@ -13,14 +14,14 @@ import * as FileActions from "../../file-item/fi-actions";
 import * as _ from "lodash";
 import { ipcRenderer } from "electron";
 
-/**
+import type { ThunkArgs, Action } from "../../types";
+
+/*
  * Sets set selection to the given files
  * used by all selecion actions
- * 
- * @param  {string[]} pathArray
  */
-export function set(pathArray) {
-  return function(dispatch, getState) {
+export function set(pathArray: Array<string>) {
+  return function(dispatch: Function, getState: Function) {
     let fileList = [];
     let lastRoot = null;
 
@@ -51,14 +52,12 @@ export function set(pathArray) {
   };
 }
 
-/**
+/*
  * Adds the List of given paths to the selection
  * Ctrl Click on file & used by expandToFile()
- * 
- * @param  {Array<string>} pathArray
  */
-export function filesAdd(pathArray) {
-  return function(dispatch, getState) {
+export function filesAdd(pathArray: Array<string>) {
+  return function(dispatch: Function, getState: Function) {
     let previousRoot = getState()[c.NAME].get("root");
     let selectedFiles = getState()[c.NAME].get("files").toJS().map(filename => {
       return nodePath.join(previousRoot, filename);
@@ -78,11 +77,11 @@ export function filesAdd(pathArray) {
   };
 }
 
-/**
+/*
  * Base on current selection
  */
 export function dirNext() {
-  return function(dispatch, getState) {
+  return function(dispatch: Function, getState: Function) {
     let currentSelection = selectors.getSelection(getState());
     let nextFolder = fsWatch.selectors.getDirNext(
       getState(),
@@ -92,11 +91,11 @@ export function dirNext() {
   };
 }
 
-/**
+/*
  * Base on current selection
  */
 export function dirPrevious() {
-  return function(dispatch, getState) {
+  return function(dispatch: Function, getState: Function) {
     let currentSelection = selectors.getSelection(getState());
     let prevFolder = fsWatch.selectors.getDirPrevious(
       getState(),
@@ -106,18 +105,15 @@ export function dirPrevious() {
   };
 }
 
-/**
+/*
  * used by arrow right/left navigation
  * selects active or first file in the folder
- * 
- * @param  {string} root - path
  */
-export function dirSet(root) {
-  return function(dispatch, getState) {
+export function dirSet(root: string) {
+  return function(dispatch: Function, getState: Function) {
     const state = getState();
-    console.log(root);
     let openFile = fsWatch.selectors.getOpenFileOf(state, root);
-    console.log(openFile);
+
     // @TODO Use Existing Factory somehow
     let firstFile = FolderEditor.selectors.getFilesInEditor_Factory()(
       state,
@@ -161,8 +157,8 @@ export let fileNavDown = () => fileNav(+1);
  * Base on current Selection the "next" file will be selected
  * Changes the App path to the new folder
  */
-function fileNav(direction) {
-  return function(dispatch, getState) {
+function fileNav(direction: number) {
+  return function(dispatch: Function, getState: Function) {
     const state = getState();
     const currentSelectionRoot = selectors.getSelection(getState()).get("root");
     const firstDir = fsWatch.selectors.getDirSeq(getState())[0];
@@ -194,7 +190,7 @@ function fileNav(direction) {
  * Base on current selection
  */
 export function selectAll() {
-  return function(dispatch, getState) {
+  return function(dispatch: Function, getState: Function) {
     let state = getState();
     let root = state[c.NAME].get("root");
     // @TODO Use Existing Factory somehow
@@ -211,16 +207,18 @@ export function selectAll() {
  * Moves all Selected files to Trash
  */
 export function toTrash() {
-  return function(dispatch, getState) {
-    fsWrite.actions.moveToTrash(selectors.getSelectionPathList(getState()));
+  return function(dispatch: Function, getState: Function) {
+    fsWrite.actions.moveToTrash(
+      selectors.getSelectionPathList(getState()).toJS()
+    );
   };
 }
 
 /*
- * Start a FileDrag for all selected files 
+ * Start a FileDrag for all selected files
  */
 export function startDrag() {
-  return function(dispatch, getState) {
+  return function(dispatch: Function, getState: Function) {
     let selection = selectors.getSelection(getState());
     let selectedFiles = selection.get("files").toJS().map(filename => {
       return nodePath.join(selection.get("root"), filename);

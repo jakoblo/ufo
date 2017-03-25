@@ -1,3 +1,4 @@
+// @flow
 import * as t from "./folder-editor-actiontypes";
 import * as selectors from "./folder-editor-selectors";
 import * as c from "./folder-editor-constants";
@@ -5,23 +6,19 @@ import SlateFile from "./slate-extensions/slate-file/slate-file-index";
 import * as Utils from "../../utils/utils-index";
 import nodePath from "path";
 import _ from "lodash";
-import { Raw } from "slate";
+import { Raw, State } from "slate";
 
-/**
- * @param {string} path
- * @returns {action}
- */
-export function folderEditorInit(props) {
-  return (dispatch, getState) => {
-    const { path, fileList } = props;
-    let editorState;
+import type { ThunkArgs, Action } from "../../types";
 
+export function folderEditorInit(path: string, fileList: Array<string>) {
+  return (dispatch: Function, getState: Function) => {
     if (fileList.indexOf(c.INDEX_BASE_NAME) > -1) {
+      let editorState;
       const fileContent = Utils.fs
-        .loadFile(nodePath.join(props.path, c.INDEX_BASE_NAME))
+        .loadFile(nodePath.join(path, c.INDEX_BASE_NAME))
         .then(fileContent => {
           editorState = SlateFile.serialize.plainToState(fileContent);
-          editorState = mapFilesToEditorState(props, editorState);
+          editorState = mapFilesToEditorState(fileList, editorState);
 
           dispatch({
             type: t.FOLDER_EDITOR_INIT,
@@ -45,11 +42,7 @@ export function folderEditorInit(props) {
   };
 }
 
-/**
- * @param {string} path
- * @returns {action}
- */
-export function folderEditorClose(path) {
+export function folderEditorClose(path: string): Action {
   return {
     type: t.FOLDER_EDITOR_CLOSE,
     payload: {
@@ -58,12 +51,10 @@ export function folderEditorClose(path) {
   };
 }
 
-/**
- * @param {string} path
- * @param {state} editorState
- * @returns {action}
- */
-export function folderEditorChange(path, editorState) {
+export function folderEditorChange(
+  path: string,
+  editorState: Class<State>
+): Action {
   return {
     type: t.FOLDER_EDITOR_CHANGE,
     payload: {
@@ -74,17 +65,11 @@ export function folderEditorChange(path, editorState) {
   };
 }
 
-/**
- * Will create file blocks for each file
- * which is in the props.folder and not jet in the Editor
- *
- * @param {State} state - redux store state
- * @param {Props} props - component props
- * @param {Immuteable} editorState
- * @returns {ActionCreator}
- */
-function mapFilesToEditorState(props, editorState) {
-  const filesOnDisk = props.fileList;
+function mapFilesToEditorState(
+  fileList: Array<string>,
+  editorState: Class<State>
+): Class<State> {
+  const filesOnDisk = fileList;
 
   const filesInEditor = SlateFile.utils.getFilesInState(editorState);
   const filesNotInEditor = _.difference(filesOnDisk, filesInEditor);
@@ -111,7 +96,7 @@ function mapFilesToEditorState(props, editorState) {
 }
 
 // Faster than block transforms, but still slow
-function newStateWithFileNodes(filesNotInEditor) {
+function newStateWithFileNodes(filesNotInEditor): Class<State> {
   let state = {
     document: {
       data: {},
@@ -165,7 +150,7 @@ function newStateWithFileNodes(filesNotInEditor) {
     ]
   });
 
-  const editorState = Raw.deserialize(state, {
+  const editorState: Class<State> = Raw.deserialize(state, {
     terse: false,
     normalize: false
   });

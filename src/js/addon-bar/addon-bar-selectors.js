@@ -1,1 +1,3 @@
-export const getCurrentView = (state) => state.addonBar.get('currentView')
+//@flow
+export const getCurrentView = (state: any): string =>
+  state.addonBar.get("currentView");

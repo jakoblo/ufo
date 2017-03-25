@@ -13,9 +13,9 @@ export const getEditorState = (state: any, path: string) =>
  * @returns {Function} reselect
  */
 export const getFilesInEditor_Factory = () => {
-  return createSelector([getEditorState], editorState => {
+  return createSelector([getEditorState], (editorState): Array<string> => {
     if (!editorState) {
-      return null;
+      return [];
     }
     return Utils.getFilesInState(editorState);
   });

@@ -35,19 +35,16 @@ type State = {
   width: number
 };
 
-@connect(() => {
-  return (state, props) => {
-    const { path } = props;
-    return {
-      focused: Filter.selectors.isFocused(state, path),
-      viewSettings: App.selectors.getViewSettings(state, path),
-      displayType: App.selectors.getDisplayType(state, path)
-    };
+const mapStateToProps = (state, props) => {
+  const { path } = props;
+  return {
+    focused: Filter.selectors.isFocused(state, path),
+    viewSettings: App.selectors.getViewSettings(state, path),
+    displayType: App.selectors.getDisplayType(state, path)
   };
-})
-export default class DisplayList extends React.Component {
+};
+class DisplayList extends React.Component {
   props: Props;
-
   state: State;
 
   constructor(props: Props) {
@@ -82,7 +79,7 @@ export default class DisplayList extends React.Component {
             "view-folder--drop-target": false,
             "view-folder--focused": this.props.focused
           })}
-          onDrop={e => dragndrop.handleFileDrop(e, this.props.path)}
+          onDrop={e => dragndrop.executeFileDropOnDisk(e, this.props.path)}
         >
           <div className="view-folder__toolbar-top">
             <div className="view-folder__name">
@@ -143,3 +140,4 @@ export default class DisplayList extends React.Component {
     this.props.dispatch(App.actions.toggleDisplayType());
   };
 }
+export default connect(mapStateToProps)(DisplayList);
