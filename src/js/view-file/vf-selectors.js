@@ -1,2 +1,3 @@
-
-export const getViewFilePath = (state) => state.preview.get('path')
+//@flow
+export const getViewFilePath = (state: any): string =>
+  state.preview.get("path");

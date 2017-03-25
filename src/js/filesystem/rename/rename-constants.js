@@ -1,1 +1,2 @@
-export const NAME = 'rename'
+//@flow
+export const NAME = "rename";

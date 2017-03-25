@@ -1,3 +1,5 @@
+// @flow
+
 import React from "react";
 import classnames from "classnames";
 import nodePath from "path";
@@ -16,7 +18,16 @@ import * as Utils from "../../../utils/utils-index";
 
 import Loading from "../../../general-components/loading";
 
-@connect(() => {
+type Props = {
+  path: string,
+  focused: boolean,
+  editorState: any,
+  fileList: Array<string>,
+  readOnly: boolean,
+  dispatch: Function
+};
+
+const mapStateToProps = (state, props) => {
   const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory();
   return (state, props) => {
     return {
@@ -26,9 +37,13 @@ import Loading from "../../../general-components/loading";
       readOnly: Config.selectors.getReadOnlyState(state)
     };
   };
-})
-export default class FolderEditor extends React.Component {
-  constructor(props) {
+};
+
+class FolderEditor extends React.Component {
+  props: Props;
+  filePlugin: any;
+
+  constructor(props: Props) {
     super(props);
     this.filePlugin = SlateFile.slatePlugin_Factory({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
@@ -46,34 +61,33 @@ export default class FolderEditor extends React.Component {
               className="slate-editor"
               plugins={[this.filePlugin, MarkdownPlugin]}
               onChange={this.onChange}
-              onDrop={this.onDrop}
               readOnly={this.props.readOnly}
               onDocumentChange={this.onDocumentChange}
-              onSelectionChange={this.onSelectionChange}
             />
           : <Loading />}
       </div>
     );
   }
 
-  stopEvent(e) {
+  stopEvent(e: SyntheticDragEvent) {
     console.log("stop");
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
   }
 
   componentDidMount() {
-    this.props.dispatch(Actions.folderEditorInit(this.props));
+    this.props.dispatch(
+      Actions.folderEditorInit(this.props.path, this.props.fileList)
+    );
   }
 
-  onChange = editorState => {
-    // console.log('external onchange')
+  onChange = (editorState: any) => {
     this.props.dispatch(
       Actions.folderEditorChange(this.props.path, editorState)
     );
   };
 
-  onDocumentChange = (document, state) => {
+  onDocumentChange = (document: any, state: any) => {
     clearTimeout(this.savingTimout);
     this.savingTimout = setTimeout(this.saveDocument, 5000);
   };
@@ -88,7 +102,7 @@ export default class FolderEditor extends React.Component {
     Utils.fs.saveFile(path, content);
   };
 
-  componentWillReceiveProps(nextProps) {}
+  componentWillReceiveProps(nextProps: Props) {}
 
   componentWillUnmount() {
     if (this.savingTimout) {
@@ -98,3 +112,5 @@ export default class FolderEditor extends React.Component {
     this.props.dispatch(Actions.folderEditorClose(this.props.path));
   }
 }
+
+export default connect(mapStateToProps)(FolderEditor);

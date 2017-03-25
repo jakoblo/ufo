@@ -1,7 +1,5 @@
-import * as c from  './config-constants'
+//@flow
+import * as c from "./config-constants";
 
-/**
- * @param {State} state
- * @returns {boolean}
- */
-export const getReadOnlyState = (state) => state[c.NAME].get('readOnly')
+export const getReadOnlyState = (state: any): boolean =>
+  state[c.NAME].get("readOnly");

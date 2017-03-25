@@ -1,93 +1,91 @@
-import * as c from '../../folder-editor-constants'
-import {Block, Text, Selection} from 'slate'
-import {List} from 'immutable'
+// @flow
 
+import * as c from "../../folder-editor-constants";
+import { Block, Text, Selection } from "slate";
+import { List } from "immutable";
 
-export function getFileBlockByBase(state, base) {
-  return state.get('document').findDescendant((node) => {
-    return (node.getIn(['data', 'base']) == base)
-  })
+export function getFileBlockByBase(state: any, base: string): Block {
+  return state.get("document").findDescendant(node => {
+    return node.getIn(["data", "base"]) == base;
+  });
 }
 
+export const getFilesInNodes = (nodes: List<Block>): Array<string> => {
+  return nodes
+    .filter(node => {
+      return node.get("type") == "file";
+    })
+    .map(fileBlock => {
+      return fileBlock.getIn(["data", "base"]);
+    })
+    .toJS();
+};
 
-export const getFilesInNodes = (nodes) => {
-  return nodes.filter((node) => {
-    return node.get('type') == "file"
-  }).map((fileBlock) => {
-    return fileBlock.getIn(['data', 'base'])
-  }).toJS()
+export function getFilesInState(state: any): Array<string> {
+  return getFilesInNodes(state.document.getBlocks());
 }
 
-export function getFilesInState(state) {
-  return state.document.getBlocks().filter((block) => {
-    return block.get('type') == "file"
-  }).map((fileBlock) => {
-    return fileBlock.getIn(['data', 'base'])
-  }).toJS()
-}
-
-export function getRootBlockOfNode(state, node) {
-  let block = node
-  while(state.document.get('nodes').indexOf(block) < 0) {
-    block = state.document.getParent(block.key)
+export function getRootBlockOfNode(state: any, node: Block): Block {
+  let block = node;
+  while (state.document.get("nodes").indexOf(block) < 0) {
+    block = state.document.getParent(block.key);
   }
-  return block
+  return block;
 }
 
-export const getFileBlockProperties = (basename) => {
+export const getFileBlockProperties = (basename: string): Object => {
   const properties = {
     type: c.BLOCK_TYPE_FILE,
     isVoid: true,
-    nodes: List([Text.createFromString(' ')]),
+    nodes: List([Text.createFromString(" ")]),
     data: {
       base: basename
     }
-  }
+  };
 
-  const test = Block.create(properties)
-  return properties
-}
+  const test = Block.create(properties);
+  return properties;
+};
 
 /**
  * Creats an base array of the fileblocks in the selection
- * 
+ *
  * @param {State} editorState
  * @returns {Array<string>} - file bases
  */
-export function buildSelectedFiles(editorState) {
-  const selection = editorState.selection
+export function buildSelectedFiles(editorState: any): Array<string> {
+  const selection = editorState.selection;
   return editorState.blocks
     .filter(block => block.type == c.BLOCK_TYPE_FILE) // This block is Fileblock
     .filter(block => selection.isExpanded) // Selection is Expaneded
-    .map( (block) => block.getIn( ['data', 'base'] ))
-    .toJS()
+    .map(block => block.getIn(["data", "base"]))
+    .toJS();
 }
 
+export const getIndexOfNodeInDocument = (state: any, node: Block): number => {
+  const rootNode = getRootBlockOfNode(state, node);
+  const index = state.document.get("nodes").indexOf(rootNode);
 
-export const getIndexOfNodeInDocument = (state, node) => {
-  const rootNode = getRootBlockOfNode(state, node)
-  const index = state.document.get('nodes').indexOf(rootNode)
+  return index;
+};
 
-  return index
-}
+export const createFileBlock = (basename: string): Block => {
+  return Block.create(getFileBlockProperties(basename));
+};
 
-export const createFileBlock = (basename) => {
-  return Block.create(getFileBlockProperties(basename))
-}
-
-export const getRawFileBlock = (fileBase) => {
+export const getRawFileBlock = (fileBase: string): Object => {
   return {
-    kind: 'block',
+    kind: "block",
     type: c.BLOCK_TYPE_FILE,
     isVoid: true,
     nodes: [
       {
-        "kind": "text",
-        "ranges": [
+        kind: "text",
+        ranges: [
           {
-            "kind": "range",
-            "text": " ",
-            "marks": []
+            kind: "range",
+            text: " ",
+            marks: []
           }
         ]
       }
@@ -95,13 +93,14 @@ export const getRawFileBlock = (fileBase) => {
     data: {
       base: fileBase
     }
-  }
-}
+  };
+};
 
-export const includesAFileBlock = (state) => state.blocks.some(block => block.type == c.BLOCK_TYPE_FILE)
+export const includesAFileBlock = (state: any): boolean =>
+  state.blocks.some(block => block.type == c.BLOCK_TYPE_FILE);
 
-export function createSelectionForFile(node) {
-  const childTextNodeKey = node.get('nodes').first().get('key')
+export function createSelectionForFile(node: any): Selection {
+  const childTextNodeKey = node.get("nodes").first().get("key");
   return new Selection({
     anchorKey: childTextNodeKey,
     anchorOffset: 0,
@@ -109,9 +108,9 @@ export function createSelectionForFile(node) {
     focusOffset: 1,
     isBackward: false,
     isFocused: false
-  })
+  });
 }
 
-export const getSelectedFiles = (state) => {
-  return Blocks.getFilesInNodes(state.blocks)
-}
+export const getSelectedFiles = (state: any): Array<string> => {
+  return getFilesInNodes(state.blocks);
+};

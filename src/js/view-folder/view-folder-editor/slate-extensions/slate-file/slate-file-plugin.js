@@ -1,10 +1,11 @@
+//@flow
 import React from "react";
 import FileItem from "../../../../file-item/components/file-item";
 import Selection from "../../../../filesystem/selection/sel-index";
 import nodePath from "path";
 import * as dragndrop from "../../../../utils/dragndrop";
 
-import { Block } from "slate";
+import { Block, State } from "slate";
 import VoidCursorEmulator from "./components/void-cursor-emulator";
 import * as c from "../../folder-editor-constants";
 import * as stateTransforms from "./slate-file-state-transforms";
@@ -16,11 +17,19 @@ const defaultBlock = {
   data: {}
 };
 
-export default function FilePlugin_Factory(options) {
+type PluginOptions = {
+  folderPath: string,
+  BLOCK_TYPE: string,
+  dispatch: Function
+};
+
+export default function FilePlugin_Factory(options: PluginOptions) {
   const { BLOCK_TYPE, folderPath, dispatch } = options;
 
   return {
-    onKeyDown(event, data, state) {
+    onKeyDown(event: SyntheticKeyboardEvent, data: any, state: Class<State>) {
+      console.log("editor key down");
+
       const { document, startKey, startBlock } = state;
       const prevBlock = document.getPreviousBlock(startKey);
       const nextBlock = document.getNextBlock(startKey);
@@ -155,13 +164,13 @@ export default function FilePlugin_Factory(options) {
       rules: [
         // Rule to insert a paragraph block if the document is empty
         {
-          match: node => {
+          match: (node: any) => {
             return node.kind == "document";
           },
-          validate: document => {
+          validate: (document: any) => {
             return document.nodes.size ? null : true;
           },
-          normalize: (transform, document) => {
+          normalize: (transform: any, document: any) => {
             const block = Block.create(defaultBlock);
             transform.insertNodeByKey(document.key, 0, block);
           }
@@ -169,14 +178,14 @@ export default function FilePlugin_Factory(options) {
         // Rule to insert a paragraph below a void node (File)
         // if that node is the last one in the document
         {
-          match: node => {
+          match: (node: any) => {
             return node.kind == "document";
           },
-          validate: document => {
+          validate: (document: any) => {
             const lastNode = document.nodes.last();
             return lastNode && lastNode.isVoid ? true : null;
           },
-          normalize: (transform, document) => {
+          normalize: (transform: any, document: any) => {
             const block = Block.create(defaultBlock);
             transform.insertNodeByKey(document.key, document.nodes.size, block);
           }
@@ -184,7 +193,11 @@ export default function FilePlugin_Factory(options) {
       ]
     },
 
-    onBeforeInput: (event, data, state) => {
+    onBeforeInput: (
+      event: SyntheticKeyboardEvent,
+      data: any,
+      state: Class<State>
+    ) => {
       if (slateUtils.includesAFileBlock(state)) {
         if (state.selection.isExpanded) {
           // Would delete Files, not allowed
@@ -208,7 +221,12 @@ export default function FilePlugin_Factory(options) {
       }
     },
 
-    onDrop: (event, data, state, editor) => {
+    onDrop: (
+      event: SyntheticDragEvent,
+      data: any,
+      state: Class<State>,
+      editor: any
+    ) => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -230,7 +248,7 @@ export default function FilePlugin_Factory(options) {
         const node = state.document.findDescendant(
           node => node.key == selection.focusKey
         );
-        const block = SlateUtils.getRootBlockOfNode(state, node);
+        const block = slateUtils.getRootBlockOfNode(state, node);
         const blockIndex = state.document.get("nodes").indexOf(block);
 
         state = stateTransforms.insertFilesAt(state, baselist, blockIndex + 1);

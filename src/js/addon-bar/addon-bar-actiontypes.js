@@ -1,2 +1,2 @@
-/* APP */
-export const SET_VIEW = 'addonBar/SET_VIEW'
+//@flow
+export const SET_VIEW = "addonBar/SET_VIEW";

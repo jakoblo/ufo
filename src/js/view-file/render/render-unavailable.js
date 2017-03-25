@@ -1,38 +1,49 @@
-import React from 'react'
+//@flow
+import React from "react";
 
-import electron from 'electron'
-const {app} = electron.remote
+import electron from "electron";
+const { app } = electron.remote;
+
+type Props = {
+  path: string
+};
+
+type State = {
+  previewImage: string
+};
+
 export default class DisplayUnavailable extends React.Component {
-
-  constructor(props) {
-    super(props)
+  props: Props;
+  state: State;
+  constructor(props: Props) {
+    super(props);
     this.state = {
-      previewImage: null
-    }
-    this.requestIcon(this.props.path)
+      previewImage: ""
+    };
+    this.requestIcon(this.props.path);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if(this.props.path != nextProps.path) {
-      this.requestIcon(nextProps.path)
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.path != nextProps.path) {
+      this.requestIcon(nextProps.path);
     }
   }
 
-  requestIcon = (path) => {
-    console.log(path)
+  requestIcon = (path: string) => {
+    console.log(path);
     app.getFileIcon(path, (error, image) => {
       this.setState({
-        previewImage: 'data:image/png;base64,' + image.toPNG().toString('base64')
-      })
-    })
-  }
-  
-  render() {
+        previewImage: "data:image/png;base64," +
+          image.toPNG().toString("base64")
+      });
+    });
+  };
 
-    return(
+  render() {
+    return (
       <div className="render-unavailable">
-          <img src={this.state.previewImage} />
+        <img src={this.state.previewImage} />
       </div>
-    )
+    );
   }
 }

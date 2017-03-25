@@ -1,19 +1,20 @@
-"use strict"
-import React from 'react'
-import ReactDOM from 'react-dom'
-import classNames from 'classnames'
-import * as actions from '../rename-actions'
-import nodePath from 'path'
-import { keyEventHandler } from '../../../shortcuts/key-event-handler'
-import { keyMap } from '../../../shortcuts/key-map'
+// @flow
+
+"use strict";
+import React from "react";
+import ReactDOM from "react-dom";
+import classNames from "classnames";
+import * as actions from "../rename-actions";
+import nodePath from "path";
+import { keyEventToActionMapper } from "../../../shortcuts/key-event-handler";
+import { keyMap } from "../../../shortcuts/key-map";
 
 export default class RenameInput extends React.Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       fileName: nodePath.basename(this.props.path)
-    }
+    };
   }
 
   render() {
@@ -22,28 +23,28 @@ export default class RenameInput extends React.Component {
         ref="editField"
         className={this.props.className}
         value={this.state.fileName}
-        onMouseDown={this.onMouseDown}
-        onMouseUp={this.onMouseUp}
         onBlur={this.onBlur}
         onChange={this.onChange}
-        onKeyDown={keyEventHandler(keyMap.renameInput, this.shortcutHandler)}
-
-        // Stop all events slate could catch
+        onKeyDown={keyEventToActionMapper(
+          keyMap.renameInput,
+          this.shortcutHandler
+        )}
+        // Stop & Cancel events
+        onMouseDown={this.stopEvent}
+        onMouseUp={this.stopEvent}
         onSelect={this.stopEvent}
-        onCompositionEnd={this.stopEvent}
-        onCompositionStart={this.stopEvent}
         onCopy={this.stopEvent}
         onCut={this.stopEvent}
-        onDragEnd={this.stopEvent}
-        onDragOver={this.stopEvent}
+        onDragEnd={this.cancelEvent}
+        onDragOver={this.cancelEvent}
         onClick={this.stopEvent}
-        onDragStart={this.stopEvent}
-        onDrop={this.stopEvent}
+        onDragStart={this.cancelEvent}
+        onDrop={this.cancelEvent}
         onInput={this.stopEvent}
         onKeyUp={this.stopEvent}
         onPaste={this.stopEvent}
       />
-    )
+    );
   }
 
   componentDidMount(prevProps, prevState) {
@@ -54,35 +55,43 @@ export default class RenameInput extends React.Component {
   }
 
   shortcutHandler = (action, event) => {
-    event.stopPropagation()
+    event.stopPropagation();
     switch (action) {
       case "cancel":
-        this.renameCancel()
+        this.renameCancel();
         break;
       case "save":
         this.renameSave(event);
         break;
     }
-  }
+  };
 
-  stopEvent = (event) => { event.preventDefault(); event.stopPropagation() }
+  cancelEvent = event => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  stopEvent = event => {
+    event.stopPropagation();
+  };
 
-  onBlur = (event) => { this.renameSave(event) }
+  onBlur = event => {
+    this.renameSave(event);
+  };
 
-  onChange = (event) => {
-    this.setState({'fileName': event.target.value})
-  }
+  onChange = event => {
+    this.setState({ fileName: event.target.value });
+  };
 
-  renameSave = (event) => {
-    var val = this.state.fileName.trim()
+  renameSave = event => {
+    var val = this.state.fileName.trim();
     if (val != nodePath.basename(this.props.path)) {
-      this.props.dispatch( actions.renameSave( this.props.path, val) )
+      this.props.dispatch(actions.renameSave(this.props.path, val));
     } else {
-      this.renameCancel()
+      this.renameCancel();
     }
-  }
+  };
 
   renameCancel = () => {
-    this.props.dispatch( actions.renameCancel( this.props.path) )
-  }
+    this.props.dispatch(actions.renameCancel(this.props.path));
+  };
 }

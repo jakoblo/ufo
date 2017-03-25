@@ -10,5 +10,7 @@
       "**/js-dist": true
   }
 ,
-"typescript.check.workspaceVersion": false
+"typescript.check.workspaceVersion": false,
+"editor.formatOnSave": true,
+"parser": "flow"
 }

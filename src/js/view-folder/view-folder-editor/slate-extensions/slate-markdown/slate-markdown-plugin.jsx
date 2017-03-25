@@ -12,7 +12,6 @@ require("prismjs/components/prism-markdown");
 const language = "markdown";
 const grammar = Prism.languages[language];
 // Extend Default Prism Markdown
-console.log(grammar);
 grammar.plainURL = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/;
 
 /**
@@ -24,7 +23,7 @@ grammar.plainURL = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+
  * @param {Block} block
  */
 
-function prismDecorator(text, block) {
+function prismDecorator(text: any, block: any) {
   let characters = text.characters.asMutable();
   const string = text.text;
 
@@ -114,7 +113,7 @@ const MarkdownPlugin = {
   schema: {
     rules: [
       {
-        match: node => !node.isVoid,
+        match: (node: any) => !node.isVoid,
         decorate: prismDecorator
       }
     ],
@@ -151,7 +150,7 @@ const MarkdownPlugin = {
         display: "block",
         opacity: 0.5
       },
-      url: props => {
+      url: (props: any) => {
         const { node } = props;
         const { data } = node;
         const urlWithBrackets = node.text.match(/\(.*\)/)[0];
@@ -162,7 +161,7 @@ const MarkdownPlugin = {
           </MarkdownLink>
         );
       },
-      plainURL: props => {
+      plainURL: (props: any) => {
         const { node } = props;
         return (
           <MarkdownLink url={node.text}>
