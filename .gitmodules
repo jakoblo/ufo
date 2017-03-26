@@ -1,4 +1,0 @@
-[submodule "library/pdfjs-gh-pages"]
-	path = library/pdfjs-gh-pages
-	url = https://github.com/mozilla/pdf.js
-	branch = gh-pages
