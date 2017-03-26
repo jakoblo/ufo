@@ -16,7 +16,7 @@ export default class DisplayPDF extends React.Component {
       <iframe
         className="renderer-pdf"
         src={
-          "__dirname/../../../library/pdfjs-gh-pages/web/viewer.html?file=" +
+          "__dirname/../../../node_modules/pdfjs-dist-viewer-min/build/minified/web/viewer.html?file=" +
             this.props.path
         }
       />
