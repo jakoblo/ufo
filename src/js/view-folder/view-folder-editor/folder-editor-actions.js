@@ -4,14 +4,20 @@ import * as selectors from "./folder-editor-selectors";
 import * as c from "./folder-editor-constants";
 import SlateFile from "./slate-extensions/slate-file/slate-file-index";
 import * as Utils from "../../utils/utils-index";
+import * as FsMergedSelector from "../../filesystem/fs-merged-selectors";
 import nodePath from "path";
 import _ from "lodash";
 import { Raw, State } from "slate";
 
 import type { ThunkArgs, Action } from "../../types";
 
-export function folderEditorInit(path: string, fileList: Array<string>) {
+export function folderEditorInit(path: string) {
   return (dispatch: Function, getState: Function) => {
+    const fileList = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory()(
+      getState(),
+      path
+    );
+
     if (fileList.indexOf(c.INDEX_BASE_NAME) > -1) {
       let editorState;
       const fileContent = Utils.fs
