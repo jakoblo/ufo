@@ -29,10 +29,13 @@ type State = {
 
 const mapStateToProps = (state, props) => {
   const getFile = FsMergedSelector.getFile_Factory();
-  return {
-    file: getFile(state, props.path)
+  return (state, props) => {
+    return {
+      file: getFile(state, props.path)
+    };
   };
 };
+
 class FileItemComp extends React.Component {
   props: Props;
   state: State;

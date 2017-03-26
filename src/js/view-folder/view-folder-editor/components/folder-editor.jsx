@@ -5,11 +5,10 @@ import classnames from "classnames";
 import nodePath from "path";
 import { connect } from "react-redux";
 import { Editor } from "slate";
-import * as FsMergedSelector from "../../../filesystem/fs-merged-selectors";
 import * as c from "../folder-editor-constants";
 import * as Actions from "../folder-editor-actions";
 import * as selectors from "../folder-editor-selectors";
-import Filter from "../../../filesystem/filter/filter-index";
+import Selection from "../../../filesystem/selection/sel-index";
 import SlateFile from "../slate-extensions/slate-file/slate-file-index";
 import MarkdownPlugin
   from "../slate-extensions/slate-markdown/slate-markdown-plugin";
@@ -28,20 +27,17 @@ type Props = {
 };
 
 const mapStateToProps = (state, props) => {
-  const getFiltedBaseArrayOfFolder = FsMergedSelector.getFiltedBaseArrayOfFolder_Factory();
-  return (state, props) => {
-    return {
-      focused: Filter.selectors.isFocused(state, props.path),
-      fileList: getFiltedBaseArrayOfFolder(state, props.path),
-      editorState: selectors.getEditorState(state, props.path),
-      readOnly: Config.selectors.getReadOnlyState(state)
-    };
+  return {
+    focused: Selection.selectors.getSelectionRoot(state) == props.path,
+    editorState: selectors.getEditorState(state, props.path),
+    readOnly: Config.selectors.getReadOnlyState(state)
   };
 };
 
 class FolderEditor extends React.Component {
   props: Props;
   filePlugin: any;
+  editor: any;
 
   constructor(props: Props) {
     super(props);
@@ -53,20 +49,39 @@ class FolderEditor extends React.Component {
   }
 
   render() {
+    const editorClasses = classnames("view-folder__editor-container", {
+      "view-folder__editor-container--focused": this.props.focused
+    });
     return (
-      <div className="view-folder__editor-container">
+      <div className={editorClasses}>
         {this.props.editorState
           ? <Editor
               state={this.props.editorState}
               className="slate-editor"
+              ref={editor => this.editor = editor}
               plugins={[this.filePlugin, MarkdownPlugin]}
               onChange={this.onChange}
               readOnly={this.props.readOnly}
               onDocumentChange={this.onDocumentChange}
+              onBlur={() => {
+                process.nextTick(() => {
+                  // Keep focus on editor
+                  // by click on a button or somewhere in the app
+                  if (this.props.focused) {
+                    this.editor.focus();
+                  }
+                });
+              }}
             />
           : <Loading />}
       </div>
     );
+  }
+
+  shouldComponentUpdate(nextProps: Props) {
+    return this.props.editorState != nextProps.editorState ||
+      this.props.readOnly != nextProps.readOnly ||
+      this.props.focused != nextProps.focused;
   }
 
   stopEvent(e: SyntheticDragEvent) {
@@ -76,9 +91,7 @@ class FolderEditor extends React.Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(
-      Actions.folderEditorInit(this.props.path, this.props.fileList)
-    );
+    this.props.dispatch(Actions.folderEditorInit(this.props.path));
   }
 
   onChange = (editorState: any) => {

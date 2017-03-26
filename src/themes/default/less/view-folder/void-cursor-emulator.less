@@ -1,14 +1,17 @@
+
 .void-cursor-emulator {
-
   margin: 0 1px;
+}
 
-   &--cursor-left {
+.view-folder__editor-container--focused {
+
+  .void-cursor-emulator--cursor-left {
     border-left: 1px solid #000;
     margin-left: 0;
     animation: cursor-border 1s infinite
   }
 
-   &--cursor-right {
+  .void-cursor-emulator--cursor-right {
     border-right: 1px solid #000;
     margin-right: 0;
     animation: cursor-border 1s infinite
@@ -19,7 +22,7 @@
   0% {
     border-color: #000
   }
-  50% { 
+  50% {
     border-color: #000
   }
   51% {

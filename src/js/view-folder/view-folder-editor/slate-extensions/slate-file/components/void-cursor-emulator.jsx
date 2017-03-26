@@ -75,7 +75,6 @@ export default class VoidCursorEmulator extends React.Component {
   };
 
   setSelection = () => {
-    console.log("setslection");
     const { editor, node } = this.props;
     const state = editor.getState();
 
