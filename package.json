@@ -48,7 +48,7 @@
     "redux-undo": "^1.0.0-beta9",
     "reselect": "^2.5.3",
     "rimraf": "^2.5.4",
-    "slate": "^0.19.3",
+    "slate": "^0.19.7",
     "trash": "^4.0.0"
   },
   "devDependencies": {
