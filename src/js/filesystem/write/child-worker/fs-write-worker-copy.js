@@ -30,7 +30,7 @@ export default function copy(
 
   var ncpOptions = {
     stopOnErr: true,
-    clobber: subTask.clobber,
+    clobber: false, // Should be moved to trash bevore
     limit: 16,
     transform: (read: ReadStream, write: WriteStream) => {
       // Insert Progress report in ncp stream

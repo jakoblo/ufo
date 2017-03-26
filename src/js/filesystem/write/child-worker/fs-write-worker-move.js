@@ -13,48 +13,19 @@ export default function move(
     // Start with the easiest and fastest ways for move files/folders
     // and work up to more expensive ways
 
-    if (subTask.clobber) {
-      fs.rename(subTask.source, subTask.destination, function(err) {
-        if (err) {
-          switch (err.code) {
-            case c.ERROR_RENAME_CROSS_DEVICE:
-              moveWithCopy(subTask);
-              return;
-            default:
-              reject(err);
-              return;
-          }
-        }
-        resolve();
-      });
-    } else {
-      fs.link(subTask.source, subTask.destination, function(err) {
-        if (err) {
-          switch (err.code) {
-            case c.ERROR_RENAME_CROSS_DEVICE:
-              moveWithCopy(subTask);
-              return;
-            case c.ERROR_IS_DIR:
-              moveWithCopy(subTask);
-              return;
-            case c.ERROR_OPERATION_NOT_PERMITTED:
-              moveWithCopy(subTask);
-              return;
-
-            default:
-              reject(err);
-              return;
-          }
-        }
-        fs.unlink(subTask.source, err => {
-          if (err) {
+    fs.rename(subTask.source, subTask.destination, function(err) {
+      if (err) {
+        switch (err.code) {
+          case c.ERROR_RENAME_CROSS_DEVICE:
+            moveWithCopy(subTask);
+            return;
+          default:
             reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
-    }
+            return;
+        }
+      }
+      resolve();
+    });
 
     var moveWithCopy = (subTask: SubTask) => {
       copy(subTask, handleProgress)

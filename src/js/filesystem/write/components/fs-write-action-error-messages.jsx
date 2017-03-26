@@ -82,7 +82,7 @@ class Message extends React.Component {
         return "Can't rename from One device to an other. You should never see this Message. Else something is wrong with FileFlow.";
 
       case c.ERROR_DEST_ALREADY_EXISTS:
-        return "already exist. I can overwrite that for you, but that is maybe an bad idea?";
+        return "already exists.";
 
       case c.ERROR_MOVE_IN_IT_SELF:
         return "How should I move a folder in to it self? Thats impossible...";
@@ -152,7 +152,7 @@ class Message extends React.Component {
             });
           }}
         >
-          Overwrite
+          Move to trash and try again
         </button>
 
         <button

@@ -2,13 +2,14 @@
 
 "use strict";
 
-var nodePath = require("path");
-var mkdirp = require("mkdirp");
-var fs = require("mz/fs");
-var c = require("../fs-write-constants");
-var t = require("../fs-write-actiontypes");
+import nodePath from "path";
+import mkdirp from "mkdirp";
+import fs from "mz/fs";
+import * as c from "../fs-write-constants";
+import * as t from "../fs-write-actiontypes";
 import move from "./fs-write-worker-move";
 import copy from "./fs-write-worker-copy";
+import trash from "trash";
 
 import type {
   WorkerParams,
@@ -52,53 +53,97 @@ export default class FSWorker {
       payload: this.task
     });
 
+    // First, check if every subtask is valid and possible
+    // Or cancel bevore anything is done
     Promise.all(
-      // First, check if every subtask is valid and possible
       Object.keys(this.task.subTasks).map(key =>
         this.validateSubTask(this.task.subTasks[key]))
     )
       .then(() => {
-        // validation is successfull
-        console.log("Everything fine, start");
+        // all subtasks are valid
+        // Now we check if we have to move existing destinations for to trash
+        // bevore copy/move are able to start
         Promise.all(
           Object.keys(this.task.subTasks).map(key => {
-            switch (this.task.subTasks[key].type) {
-              case t.TASK_MOVE:
-                return move(
-                  this.task.subTasks[key],
-                  this.storeProgress
-                ).then(() => {
-                  delete this.task.subTasks[key];
-                  this.progressReporter.request();
-                });
+            return new Promise((resolve, reject) => {
+              // File exists already?
+              fs.access(
+                this.task.subTasks[key].destination,
+                fs.constants.W_OK,
+                err => {
+                  if (err && err.code == c.ERROR_NO_SUCH_FILE) {
+                    resolve(); // destination doesnt exist already, free space to move to
+                    return;
+                  }
 
-              case t.TASK_COPY:
-                return copy(
-                  this.task.subTasks[key],
-                  this.storeProgress
-                ).then(() => {
-                  delete this.task.subTasks[key];
-                  this.progressReporter.request();
-                });
+                  if (err) {
+                    reject(err); // Unknown error
+                    return;
+                  }
 
-              default:
-                throw "Dont know what to do with subTask type: " +
-                  this.task.subTasks[key].type;
-            }
+                  // No Error, the is already a file/folder at the destination
+                  // And it is write able
+                  if (this.task.subTasks[key].clobber) {
+                    // Allowed to overwrite, move it to trash, to make room
+                    // for the new file/folder
+                    trash(this.task.subTasks[key].destination)
+                      .then(resolve)
+                      .catch(reject);
+                  } else {
+                    // Not allowed to overwrite = error
+                    // Should handeld already by validateSubTask
+                    throw "Not allowed to overwrite, should already be canceld by validateSubTask";
+                  }
+                }
+              );
+            });
           })
         )
           .then(() => {
-            window.store.dispatch({
-              type: t.FS_WRITE_DONE,
-              payload: {
-                id: this.task.id
-              }
-            });
-            // process.exit()
+            // Validation was successfull
+            // And file/move at the destination where moved to trash
+            // Time to start copy/move
+            Promise.all(
+              Object.keys(this.task.subTasks).map(key => {
+                switch (this.task.subTasks[key].type) {
+                  case t.TASK_MOVE:
+                    return move(
+                      this.task.subTasks[key],
+                      this.storeProgress
+                    ).then(() => {
+                      delete this.task.subTasks[key];
+                      this.progressReporter.request();
+                    });
+
+                  case t.TASK_COPY:
+                    return copy(
+                      this.task.subTasks[key],
+                      this.storeProgress
+                    ).then(() => {
+                      delete this.task.subTasks[key];
+                      this.progressReporter.request();
+                    });
+
+                  default:
+                    throw "Dont know what to do with subTask type: " +
+                      this.task.subTasks[key].type;
+                }
+              })
+            )
+              .then(() => {
+                window.store.dispatch({
+                  type: t.FS_WRITE_DONE,
+                  payload: {
+                    id: this.task.id
+                  }
+                });
+                // process.exit()
+              })
+              .catch(this.reportError); // Error in MOVE/COPY
           })
-          .catch(this.reportError);
+          .catch(this.reportError); // Error in move to trash (handlng overwrite)
       })
-      .catch(this.reportError);
+      .catch(this.reportError); // Error in Task validation
   };
 
   storeProgress = (subTaskProgress: ProgressReport) => {
@@ -199,12 +244,12 @@ class ProgressReporter {
 
   constructor(task: Task) {
     this.task = task;
-    this.lastProgressReport = Date.now() + 200;
+    this.lastProgressReport = Date.now() + 100;
     this.selfCallTimeout = null;
   }
 
   request = () => {
-    if (this.lastProgressReport + 1000 > Date.now()) {
+    if (this.lastProgressReport + 300 > Date.now()) {
       // Already a report in the last second.
       // Try in 200ms again
       clearTimeout(this.selfCallTimeout);

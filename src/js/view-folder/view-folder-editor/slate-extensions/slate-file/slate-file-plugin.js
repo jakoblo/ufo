@@ -28,8 +28,6 @@ export default function FilePlugin_Factory(options: PluginOptions) {
 
   return {
     onKeyDown(event: SyntheticKeyboardEvent, data: any, state: Class<State>) {
-      console.log("editor key down");
-
       const { document, startKey, startBlock } = state;
       const prevBlock = document.getPreviousBlock(startKey);
       const nextBlock = document.getNextBlock(startKey);
