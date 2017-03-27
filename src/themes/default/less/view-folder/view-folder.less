@@ -29,15 +29,15 @@
     border-bottom: 1px solid darken(#fff, 10%);
   }
 
-  &__name { 
+  &__name {
     .view-title;
     opacity: 1;
     transition: opacity 0.3s ease-out;
   }
 
-  &:hover &__name {
-    opacity: 0;
-  }
+  // &:hover &__name {
+  //   opacity: 0;
+  // }
 
   &__type-toggle {
     @toggle-distance: 12px;
@@ -55,7 +55,7 @@
     align-items: center;
     display: flex;
     transition: opacity 0.3s ease-out;
-    
+
     &__bullet {
       transition: margin 0.3s ease-out;
       width: 13px;
@@ -119,7 +119,7 @@
   &:hover &__display-toggle:hover {
     opacity: 0.5;
   }
-  
+
   &:active &__display-toggle {
     opacity: 0.7;
   }

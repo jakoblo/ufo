@@ -12,12 +12,12 @@ import Loading from "../general-components/loading";
 import Error from "../general-components/error";
 import fsWrite from "../filesystem/write/fs-write-index";
 
-import ViewFolderList from "./view-folder-list/view-folder-list";
+// import ViewFolderList from "./view-folder-list/view-folder-list";
 import ViewFolderEditor from "./view-folder-editor/components/folder-editor";
 
 import { dragndrop } from "../utils/utils-index";
 
-const DEFAULT_WIDTH = 235;
+const DEFAULT_WIDTH = 330;
 const PADDING_TOP = 50;
 const PADDING_BOTTOM = 30;
 
@@ -85,13 +85,15 @@ class DisplayList extends React.Component {
             <div className="view-folder__name">
               {nodePath.basename(this.props.path)}
             </div>
+
+            {/*  Disable View Features, maybe use in future
             <div className={typeToggleClasses} onClick={this.toggleViewType}>
               <div className="view-folder__type-toggle__bullet" />
             </div>
             <div
               className={displayToggleClasses}
               onClick={this.toggleDisplayType}
-            />
+            /> */}
           </div>
           {this.renderViewType()}
           <div className="view-folder__toolbar-bottom">

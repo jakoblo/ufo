@@ -13,6 +13,7 @@
 
   .animation__shrink-and-fade(@height__item, 250ms);
 
+
   // -----------------------------------
   // Item Type Icons
   // ---
@@ -198,12 +199,17 @@
   // -----------------------------------
   // Other Modifier
   // ---
+  &:hover {
+    background: #f1f1f1;
+  }
 
-  &--active {
+  &--active,
+  &--active:hover {
     background-color: lighten(@color__text-light, 15%);
   }
 
-  &--selected {
+  &--selected,
+  &--selected:hover {
     background-color: @color__main-decoration;
     color: @color__text-white;
   }

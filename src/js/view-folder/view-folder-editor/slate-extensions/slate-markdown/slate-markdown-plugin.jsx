@@ -119,7 +119,7 @@ const MarkdownPlugin = {
     ],
     marks: {
       "title-1": {
-        fontSize: "25px",
+        fontSize: "18px",
         margin: "20px 0 10px 0",
         display: "inline-block"
       },

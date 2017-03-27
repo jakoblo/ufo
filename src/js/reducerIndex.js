@@ -1,6 +1,5 @@
 //@flow
 import { combineReducers } from "redux";
-import undoable from "redux-undo";
 import App from "./app/app-index";
 import fsWatch from "./filesystem/watch/fs-watch-index";
 import fsWrite from "./filesystem/write/fs-write-index";
