@@ -5,7 +5,7 @@
 @import (css) url('nav-bar-item.less');
 
 .nav-bar {
-  height: 100%; 
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 0;
@@ -13,10 +13,9 @@
 
   &--drop-target {
     position: relative;
-    &::before {
+    &::after {
       content: '';
       .drop-zone;
-      display: none;
       z-index: 0;
     }
     & > * {

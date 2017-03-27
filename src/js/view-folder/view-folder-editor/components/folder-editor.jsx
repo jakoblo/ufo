@@ -50,7 +50,9 @@ class FolderEditor extends React.Component {
 
   render() {
     const editorClasses = classnames("view-folder__editor-container", {
-      "view-folder__editor-container--focused": this.props.focused
+      "view-folder__editor-container--focused": this.props.focused,
+      "view-folder__editor-container--edit-mode": !this.props.readOnly,
+      "view-folder__editor-container--readonly-mode": this.props.readOnly
     });
     return (
       <div className={editorClasses}>

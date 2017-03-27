@@ -126,8 +126,8 @@ class DisplayList extends React.Component {
       case App.constants.FOLDER_VIEW_EDITOR:
         return <ViewFolderEditor path={this.props.path} />;
 
-      case App.constants.FOLDER_VIEW_LIST:
-        return <ViewFolderList path={this.props.path} />;
+      // case App.constants.FOLDER_VIEW_LIST:
+      //   return <ViewFolderList path={this.props.path} />;
 
       default:
         throw "No valid folder view type";

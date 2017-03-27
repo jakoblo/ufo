@@ -134,6 +134,10 @@ export default function FilePlugin_Factory(options: PluginOptions) {
 
                   state = stateTransforms.removeFiles(state, baselist);
 
+                  if (!state.document) {
+                    console.log(state);
+                    debugger;
+                  }
                   // Need to be calcualted after remove Files
                   const nodeIndex = state.document
                     .getParent(node)
@@ -197,25 +201,29 @@ export default function FilePlugin_Factory(options: PluginOptions) {
       state: Class<State>
     ) => {
       if (slateUtils.includesAFileBlock(state)) {
+        let stateTransform = state.transform();
+
         if (state.selection.isExpanded) {
-          // Would delete Files, not allowed
-          event.preventDefault();
-          return state;
-        } else {
-          /*
-          * | FileItem |
-          * | FileItem | < selection
-          *
-          * will transform to:
-          *
-          * | FileItem |
-          * |            < new Empty Text line
-          * | FileItem |
-          */
-          return stateTransforms
-            .createNewLineAroundFileBlock(state.transform(), state.selection)
-            .apply();
+          // Would delete Files, collapse first
+          stateTransform.collapseToFocus();
         }
+
+        /*
+        * | FileItem |
+        * | FileItem | < selection
+        *
+        * will transform to:
+        *
+        * | FileItem |
+        * |            < new Empty Text line
+        * | FileItem |
+        */
+        stateTransform = stateTransforms.createNewLineAroundFileBlock(
+          stateTransform,
+          state.selection
+        );
+
+        return stateTransform.apply();
       }
     },
 

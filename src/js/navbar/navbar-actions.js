@@ -5,7 +5,7 @@ import { List, Map, fromJS } from "immutable";
 import * as Utils from "../utils/utils-index";
 import _ from "lodash";
 
-import type { ThunkArgs, Action } from "../types";
+import type { Action } from "../types";
 
 let nextNavGroupId = 1;
 let nextGroupItemId = 0;
@@ -51,7 +51,7 @@ export function removeGroupItem(groupID: number, itemID: number) {
 }
 
 export function removeGroupItemfromDeviceGroup(fileObj: any) {
-  return function({ dispatch, state }: ThunkArgs) {
+  return function(dispatch: Function, state: Function) {
     dispatch({
       type: t.REMOVE_DISKGROUP_ITEM,
       payload: {

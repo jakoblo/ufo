@@ -2,7 +2,9 @@
 @import (reference) '../mixins.less';
 
 .view-folder {
-
+  .loading {
+    .empty-text
+  }
 }
 
 .slate-editor {
@@ -12,10 +14,15 @@
     color: @color__text-white; background: @color__main-decoration;
   }
 
-  // Text Blocks, Not File Blocks
-  >div { //:not([data-slate-void="true"]) {
+  // Lines
+  >div {
     color: #555;
     padding: 0 @editor-padding-right 0 @editor-padding-left;
+  }
+  
+  // Text Blocks, Not File Blocks
+  >div:not([data-slate-void="true"]) {
+    padding: 0 26px 0 26px;
   }
 
   .slate-markdown__link {

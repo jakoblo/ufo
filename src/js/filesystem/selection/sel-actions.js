@@ -186,6 +186,45 @@ function fileNav(direction: number) {
   };
 }
 
+/*
+ * Navigate up in the focused Folder/View
+ */
+export let fileAddUp = () => fileAdd(-1);
+
+/*
+ * Addigate down in the focused Folder/View
+ */
+export let fileAddDown = () => fileAdd(+1);
+
+/*
+ * Addigate Up and Down in the focused Folder/View
+ * Base on current Selection the "next" file will be selected
+ * Changes the App path to the new folder
+ */
+function fileAdd(direction: number) {
+  return function(dispatch: Function, getState: Function) {
+    const state = getState();
+    const currentSelectionRoot = selectors.getSelection(getState()).get("root");
+    const firstDir = fsWatch.selectors.getDirSeq(getState())[0];
+
+    // Path of active Folder
+    // If there is nothing selected, take the first folder
+    const path = currentSelectionRoot || firstDir;
+
+    const fileList = FolderEditor.selectors.getFilesInEditor_Factory()(
+      state,
+      path
+    );
+    const focusedFile = fsMergedSelector.getFocusedFileOf(state, path);
+    const focusedFileIndex = fileList.indexOf(focusedFile);
+    const fileToAdd = fileList[focusedFileIndex + direction];
+
+    if (fileToAdd) {
+      dispatch(filesAdd([nodePath.join(path, fileToAdd)]));
+    }
+  };
+}
+
 /**
  * Base on current selection
  */
