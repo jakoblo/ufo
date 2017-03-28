@@ -9,7 +9,10 @@
 
   display: flex;
   flex-direction: column;
-  padding: 10px 0;
+  padding: 12px 0;
+  width: 100%;
+  z-index: 1; // above drop-zone from navbar
+  position: absolute;
 
   &__title {
 
@@ -93,6 +96,7 @@
 
   &__item-wrapper {
     overflow: hidden;
+    position: relative;
     /*outline: 1px solid #f00;*/
     transition: max-height 350ms ease-out;
   }
@@ -106,6 +110,7 @@
 
   &--is-dragging {
     position: relative;
+    z-index: 100;
     &:after {
       content: '';
       .drop-zone;
@@ -115,14 +120,7 @@
     }
   }
 
-  &--drop-target {
-    position: relative;
-    &:after {
-      content: '';
-      .drop-zone;
-      z-index: -10;
-      top: 0;
-      bottom: 0;
-    }
+  &--drop-target .nav-bar-group__item-wrapper {
+    border-bottom: 2px solid @color__main-decoration;
   }
 }

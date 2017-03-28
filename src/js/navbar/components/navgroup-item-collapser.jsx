@@ -1,7 +1,7 @@
 //@flow
 import React from "react";
 
-const ITEM_HEIGHT = 26;
+const ITEM_HEIGHT = 28;
 const ANIMATION_TIME = 350;
 
 type Props = {
@@ -22,7 +22,7 @@ export default class NavGroupItemCollapser extends React.Component {
   constructor(props: Props) {
     super(props);
     this.state = {
-      height: this.props.collapsed ? 0 : "auto",
+      height: this.props.collapsed ? 0 : this.props.itemCount * ITEM_HEIGHT,
       animationInProgress: false
     };
     this.activeTimeout = null;
@@ -56,7 +56,11 @@ export default class NavGroupItemCollapser extends React.Component {
   };
 
   expand = () => {
-    this.animate(0, this.props.itemCount * ITEM_HEIGHT, "auto");
+    this.animate(
+      0,
+      this.props.itemCount * ITEM_HEIGHT,
+      this.props.itemCount * ITEM_HEIGHT
+    );
   };
 
   animate = (

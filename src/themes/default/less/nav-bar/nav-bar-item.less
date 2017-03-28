@@ -4,12 +4,13 @@
 @import (reference) url('../mixins-animation.less');
 
 .nav-bar-item {
-  
+
   @height_nav-bar-item: 28px;
 
   display: flex;
-  align-items: top;
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
   height: @height_nav-bar-item;
   padding: 0 @padding__sidebar-horizonal;
   transition: background 0.3s;
@@ -75,26 +76,30 @@
   }
 
   &--is-dragging {
-    
-    position: relative;
+
     background: transparent !important;
 
-    // Show Drop Zone
-    &::after {
-      content: '';
-      .drop-zone;
-      top: 0;
-      bottom: 0;
-      left: 5px;
-      right: 5px;
-    }
-
     // Hide Content
-    *,
-    &::before {
+    .nav-bar-item__text,
+    .nav-bar-item__button-remove,
+    &::before,
+    &::after {
       display: none !important;
     }
   }
+
+  &--is-dragging &__underlay {
+    content: '';
+    .drop-zone;
+    display: block;
+    width: auto;
+    height: auto;
+    top: 0;
+    bottom: 0;
+    left: 5px;
+    right: 5px;
+  }
+
 
   &__underlay {
     @drag-over-expand-time: 0.9s;
@@ -108,17 +113,17 @@
     opacity: 0;
     top: calc(@height_nav-bar-item / 2);
     left: 0;
-    transition: 
-      top @drag-over-expand-time linear, 
-      height @drag-over-expand-time linear, 
+    transition:
+      top @drag-over-expand-time linear,
+      height @drag-over-expand-time linear,
       opacity @drag-over-expand-time linear;
   }
-  
+
   &--drop-target &__underlay {
     // drag-over-expand transition
     top: 0;
     height: @height_nav-bar-item;
     opacity: 1;
   }
-  
+
 }

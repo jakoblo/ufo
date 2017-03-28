@@ -3,8 +3,6 @@
 import * as FsWriteActions from "../filesystem/write/fs-write-actions";
 import _ from "lodash";
 
-let dragOverCache: string = "";
-
 export function getFilePathArray(event: SyntheticDragEvent): Array<string> {
   return Object.keys(event.dataTransfer.files).map(
     key => event.dataTransfer.files[key].path
@@ -61,6 +59,9 @@ function getCursorPosition(event: any): string {
  * Drag & Drop events are anoying...
  * This function will return drag & drop listeners which will handle the anoying things
  * and then call the given callbacks in a clean way
+ *
+ * you have to event.preventDefault(); in the dragHover callback if you want to get drop
+ * Or not, if you want to pass the drop to children (used by navbar-items)
  */
 export function getEnhancedDropZoneListener(
   options: {
@@ -86,18 +87,18 @@ export function getEnhancedDropZoneListener(
   return {
     onDragOver: (event: SyntheticDragEvent) => {
       if (shouldAcceptDrop(event, acceptableTypes)) {
-        event.preventDefault();
-        event.stopPropagation();
+        if (event.isDefaultPrevented()) {
+          dragOut(event);
+          return;
+        }
+
         event.dataTransfer.dropEffect = getDropEffectByModifierKey(
           possibleEffects,
           event
         );
 
         const cursorPosition = getCursorPosition(event);
-        if (cursorPosition != dragOverCache) {
-          dragHover(event, cursorPosition);
-          dragOverCache = cursorPosition;
-        }
+        dragHover(event, cursorPosition);
       }
     },
 
@@ -109,7 +110,6 @@ export function getEnhancedDropZoneListener(
         left = event.currentTarget.offsetLeft,
         right = left + event.currentTarget.offsetWidth;
       if (y <= top || y >= bottom || x <= left || x >= right) {
-        dragOverCache = "";
         dragOut(event);
       }
     },
@@ -117,7 +117,6 @@ export function getEnhancedDropZoneListener(
     onDrop: (event: SyntheticDragEvent) => {
       event.preventDefault();
       event.stopPropagation();
-      dragOverCache = "";
       dragOut(event);
       drop(event, getCursorPosition(event));
     }

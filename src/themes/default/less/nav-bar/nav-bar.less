@@ -9,18 +9,14 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 0;
+  position: relative;
   .nicer-scrollbars(@color__main-dark);
 
   &--drop-target {
-    position: relative;
     &::after {
       content: '';
       .drop-zone;
       z-index: 0;
-    }
-    & > * {
-      z-index: 10;
-      position: relative;
     }
   }
 }
