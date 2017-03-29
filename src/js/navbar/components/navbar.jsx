@@ -1,86 +1,157 @@
-"use strict"
-import React from 'react'
-import { connect } from 'react-redux'
-import * as Actions from '../navbar-actions'
-import * as constants from '../navbar-constants'
-import NavGroup from './navgroup'
-import nodePath from 'path'
-import _ from 'lodash'
-import {remote} from 'electron'
-import { DropTarget } from 'react-dnd'
-import classnames from 'classnames'
-import { NativeTypes } from 'react-dnd-html5-backend';
+//@flow
+import React from "react";
+import { connect } from "react-redux";
+import * as Actions from "../navbar-actions";
+import * as constants from "../navbar-constants";
+import NavGroup from "./navgroup";
+import nodePath from "path";
+import _ from "lodash";
+import { remote } from "electron";
+import classnames from "classnames";
+import * as dragndrop from "../../utils/dragndrop";
+import * as types from "../navbar-types";
 
-const NavbarTarget = {
-  drop(props, monitor) {
-    const hasDroppedOnChild = monitor.didDrop()
-    if (hasDroppedOnChild) return
-    
-    if(monitor.getItem().files.length > 0) {
-      let title = _.last(_.split(nodePath.dirname(monitor.getItem().files[0].path), nodePath.sep))
-      
-      let files = []
-      _.forIn(monitor.getItem().files, function(value, key) {
-        if(_.hasIn(value, 'path'))
-        files.push(value.path)
-      })
-      props.dispatch(Actions.addNavGroup(title, files))
-    }
-  }
-}
+type Props = {
+  navbar: any,
+  dispatch: Function
+};
 
-@connect((state) => {
-  return {navbar: state[constants.NAME],
-    state: state
-  }
-})
-@DropTarget(NativeTypes.FILE, NavbarTarget, (connect, monitor) => ({
-  // Call this function inside render()
-  // to let React DnD handle the drag events:
-  connectDropTarget: connect.dropTarget(),
-  // You can ask the monitor about the current drag state:
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop(),
-  itemType: monitor.getItemType()
-}))
-export default class Navbar extends React.Component {
-  constructor(props) {
-    super(props)
+type State = {
+  dragOver: boolean,
+  draggingGroup: types.groupDragData
+};
+
+const mapStateToProps = state => {
+  return {
+    navbar: state[constants.NAME]
+  };
+};
+class Navbar extends React.Component {
+  props: Props;
+  state: State;
+  constructor(props: Props) {
+    super(props);
+
+    props.dispatch(Actions.groupsLoad());
+
+    this.state = {
+      dragOver: false,
+      draggingGroup: false
+    };
   }
 
   render() {
-    let navgroups = null
-    if(this.props.navbar.has('groupItems')) 
-    navgroups = this.props.navbar.get('groupItems').toJS().map(this.createNavGroup)
-    
-    const { isOver, canDrop, connectDropTarget, isOverCurrent } = this.props;
-
+    const { navbar } = this.props;
     let classname = classnames({
-      'nav-bar': true,
-      'nav-bar--hide': this.props.hidden, // For what, hä?
-      'nav-bar--drop-target': isOverCurrent
-    })
+      "nav-bar": true,
+      "nav-bar--drop-target": this.state.dragOver
+    });
 
-    return connectDropTarget(
-      <div className={classname}>
-        {navgroups}
+    const groupsHeight = this.calcGroupsHeight();
+
+    return (
+      <div className={classname} {...this.dropZoneListener}>
+        {navbar.get("groups").map((group, position) => {
+          return this.renderNavGroup(
+            group,
+            position,
+            this.getTopOffset(position, groupsHeight)
+          );
+        })}
       </div>
-    )
+    );
   }
 
-  createNavGroup = (item, index) => {
-    return (<NavGroup
-      key={item.id}
-      index={index}
-      groupID={item.id}
-      activeItem={this.props.navbar.get("activeItem")}
-      title={item.title}
-      items={item.items}
-      hidden={item.hidden}
-      isDiskGroup={item.id === 0 ? true : false} // Devices/Disk Group-ID is always 0
-      dispatch={this.props.dispatch}
-      />)
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.propsnavbar != nextProps.navbar) {
+      //@TODO move to app quit
+      this.props.dispatch(Actions.groupsSave());
+    }
   }
+
+  calcGroupsHeight = () => {
+    return this.props.navbar
+      .get("groups")
+      .map(group => {
+        const itemCount = group.items.size;
+        const hidden = group.hidden;
+
+        let height = constants.TITLE_HEIGHT + constants.GROUP_BUTTOM_PADDING;
+        if (!hidden) {
+          height = height + itemCount * constants.ITEM_HEIGHT;
+        }
+        return height;
+      })
+      .toJS();
+  };
+
+  getTopOffset = (position: number, groupsHeight: Array<number>) => {
+    let offset = 0;
+    this.props.navbar.get("groups").forEach((group, index) => {
+      if (index < position) {
+        offset = offset + groupsHeight[index];
+      }
+    });
+    return offset;
+  };
+
+  renderNavGroup = (group, position, offset) => {
+    return (
+      <NavGroup
+        key={group.id}
+        group={group}
+        position={position}
+        top={offset}
+        activeItem={this.props.navbar.get("activeItem")}
+        dispatch={this.props.dispatch}
+        draggingGroup={this.state.draggingGroup}
+        setDraggingGroup={this.setDraggingGroup}
+        clearDraggingGroup={this.clearDraggingGroup}
+      />
+    );
+  };
+
+  setDraggingGroup = (dragData: types.groupDragData) => {
+    this.setState({ draggingGroup: dragData });
+  };
+
+  clearDraggingGroup = () => {
+    this.setState({
+      draggingGroup: false
+    });
+  };
+
+  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+    acceptableTypes: [dragndrop.constants.TYPE_FILE],
+    possibleEffects: dragndrop.constants.effects.ALL,
+
+    dragHover: event => {
+      event.preventDefault();
+      if (this.state.dragOver != true) {
+        this.setState({
+          dragOver: true
+        });
+      }
+    },
+
+    dragOut: event => {
+      if (this.state.dragOver != false) {
+        this.setState({
+          dragOver: false
+        });
+      }
+    },
+
+    drop: (event, cursorPosition) => {
+      const fileList = dragndrop.getFilePathArray(event);
+
+      if (fileList.length > 0) {
+        let title = _.last(
+          _.split(nodePath.dirname(fileList[0]), nodePath.sep)
+        );
+        this.props.dispatch(Actions.groupCreate__fileList(title, fileList));
+      }
+    }
+  });
 }
-
+export default connect(mapStateToProps)(Navbar);

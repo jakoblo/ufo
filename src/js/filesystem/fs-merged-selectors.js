@@ -1,152 +1,128 @@
-import { createSelector } from 'reselect'
-import nodePath from 'path'
-import Watch from './watch/fs-watch-index'
-import Write from './write/fs-write-index'
-import Selection from './selection/sel-index'
-import Rename from './rename/rename-index'
-import Filter from './filter/filter-index'
+//@flow
+import { createSelector } from "reselect";
+import nodePath from "path";
+import Watch from "./watch/fs-watch-index";
+import Write from "./write/fs-write-index";
+import Selection from "./selection/sel-index";
+import Rename from "./rename/rename-index";
+import Filter from "./filter/filter-index";
+import { Map, List } from "immutable";
+
+const unknownFile = Map({
+  name: "?",
+  type: "unknown"
+});
 
 /**
- * Main Selector to get all Files with all Information 
- * which are need to display the current State of the Folder
- * @return selector(state, {path: string}) => Immuteable Map of Files
+ * Get the all information to file which are availible
+ *
+ * @param  {State} state - redux store state
+ * @param  {string} path - of the File
+ * @returns {ImmuteableMap}
  */
-export const getFilesMergedOf_Factory = () => {
+export const getFile_Factory = (): Function => {
+  const getProgressOfFile = Write.selectors.getProgressOfFile__Factory();
+  const isFileSelected = Selection.selectors.isFileSelected__Factory();
 
-  let getFilteredFiles = getFilteredFiles_Factory()
-  let getSubTasksForFolder = Write.selectors.getSubTasksForFolderFactory()
-
-  /**
-   * Saved Selector
-   * https://github.com/reactjs/reselect
-   */
-  return createSelector(  
+  return createSelector(
     [
-      getFilteredFiles,
-      Watch.selectors.getOpenFileOf,
-      Selection.selectors.getSelectionOf, 
-      getSubTasksForFolder,
-      Rename.selectors.getRenamingForDirectory, 
-      getPath
+      Watch.selectors.getFile,
+      Watch.selectors.isFileOpen,
+      isFileSelected,
+      getProgressOfFile,
+      Rename.selectors.isFileRenaming
     ],
-    (files, openFile, selection, write, renaming, path) => {
-
-      // Merge openFile
-      if(files && openFile) {
-        if(files.get(openFile)) {
-          files = files.setIn([openFile, 'active'], true)
-        } else {
-          // console.error('Try to set a File active which does not exists in the FileSystem', files.toJS(), openFile) 
-        }
+    (file, open, selected, progress, renaming) => {
+      if (!file) {
+        return unknownFile;
       }
+      return file
+        .set("active", open)
+        .set("selected", selected)
+        .set("progress", progress)
+        .set("renaming", renaming);
+    }
+  );
+};
 
-      // Merge Selection
-      if(files && selection) {
-        selection.forEach((selectedFile, index) => {
-          if(files.get(selectedFile)) {
-            files = files.setIn([selectedFile, 'selected'], true)
-          } else {
-            // console.error('Try to set a File selected which does not exists in the FileSystem', files.toJS(), selectedFile)
-          }
-        })
-      }
+/**
+ * Get all filtered filepaths which are in the Folder
+ *
+ * @param  {State} state - redux store state
+ * @param  {string} path - of the File
+ * @returns {Array} - of file bases / filenames
+ */
+export const getFiltedBaseArrayOfFolder_Factory = () => {
+  let getFilteredFiles = getFilteredFilesOfFolder_Factory();
+  return createSelector(
+    [getFilteredFiles],
+    (files: List<any>): Array<string> => {
+      return files ? files.keySeq().toJS() : [];
+    }
+  );
+};
 
-      // Merge write progress for progressbars
-      if(files && write) {
-        write.forEach((subTask) => {
-          if(files.get(nodePath.basename(subTask.get('destination')))) {
-            files = files.setIn([nodePath.basename(subTask.get('destination')), 'progress'], subTask.get('percentage'))
-          }
-        })
-      }
-
-      // Merge Renaming
-      if(files && renaming) {
-        if(files.get(renaming)) {
-          files = files.setIn([renaming, 'renaming'], true)
-        }
-      }
-      return files
-  })
-}
-
-export const getFilteredFiles_Factory = () => {
-   
-  let getFiterForFolder = Filter.selectors.getFiterRegExForFolder_Factory()
+const getFilteredFilesOfFolder_Factory = () => {
+  let getFiterOfFolder = Filter.selectors.getFiterRegExOfFolder_Factory();
 
   return createSelector(
-    [Watch.selectors.getFilesOf, getFiterForFolder],
+    [Watch.selectors.getFilesOfFolder, getFiterOfFolder],
     (files, filters) => {
-      if(filters.length == 0) {
-        return files
+      if (filters.length == 0) {
+        return files;
       }
-      return files.filter((file) => {
-        let filename = file.get('base')
-        let count = 0
+      return files.filter((file: any) => {
+        let filename = file.get("base");
+        let count = 0;
         while (count < filters.length && filename.match(filters[count])) {
-          if(count == filters.length-1) {
-            return true
+          if (count == filters.length - 1) {
+            return true;
           }
-          count++
+          count++;
         }
-        return false
-      })
-  })
-}
-
-export const getFiltedFilesSeq_Factory = () => {
-  let getFilteredFiles = getFilteredFiles_Factory()
-  return createSelector(
-    [getFilteredFiles], files => files.keySeq().toJS()
-  )
-}
-
+        return false;
+      });
+    }
+  );
+};
 
 /**
  * Index of File which is opend in the next View
  */
 export const getOpenFileIndex_Factory = () => {
-  
-  let getFilesSeq = getFiltedFilesSeq_Factory()
-
+  let getFilesSeq = getFiltedBaseArrayOfFolder_Factory();
+  console.log("getOpenFileIndex_Factory");
   return createSelector(
     [getFilesSeq, Watch.selectors.getOpenFileOf],
-    (filesSeq, openFile) => {
-      return filesSeq.indexOf(openFile)
+    (filesSeq, openFile): number => {
+      return filesSeq.indexOf(openFile);
     }
-  )
-}
+  );
+};
 
 /**
  * Index of the last selected or the open one
  */
 export const getFocusedFileIndexOf_Factory = () => {
-  
-  let getFilesSeq = getFiltedFilesSeq_Factory()
+  let getFilesSeq = getFiltedBaseArrayOfFolder_Factory();
 
   return createSelector(
     [getFilesSeq, getFocusedFileOf],
     (filesSeq, focusedFile) => {
-      return filesSeq.indexOf(focusedFile)
+      return filesSeq.indexOf(focusedFile);
     }
-  )
-} 
+  );
+};
 
 /**
  * Current Files the Last Selected or the Active one
- * @param  {store} state
- * @param  {path: string} props
- * @ returns string
  */
-export const getFocusedFileOf = (state, props) => {
-  let lastestSelected = undefined
-  let selection = Selection.selectors.getSelection(state, props)
-  if(selection.get('root') == props.path) {
-    lastestSelected = selection.get('files').last()
+export const getFocusedFileOf = (state: any, path: string): string => {
+  let lastestSelected = undefined;
+  let selection = Selection.selectors.getSelection(state, path);
+  if (selection.get("root") == path) {
+    lastestSelected = selection.get("files").last();
   }
-  let openFile = Watch.selectors.getOpenFileOf(state, props)
-  return lastestSelected || openFile
-}
-
-
-const getPath = (state, props) => props.path
+  let openFile = Watch.selectors.getOpenFileOf(state, path);
+  return lastestSelected || openFile || "";
+};

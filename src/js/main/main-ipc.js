@@ -1,37 +1,27 @@
-import { BrowserWindow, ipcMain } from 'electron'
+//@flow
 
-export default function ipcListener(handleNewWindow) {
+import { BrowserWindow, ipcMain } from "electron";
+import fs from "fs";
 
-  ipcMain.on('ondragstart', (event, filePath) => {
+export default function ipcListener(handleNewWindow: Function) {
+  ipcMain.on("ondragstart", (event, filePath) => {
     event.sender.startDrag({
       files: filePath,
-      icon: appBasePath + '/../../themes/default/img/multiDragPlaceholder.png'
-    })
-  })
+      icon: __dirname + "/../../themes/default/img/multiDragPlaceholder.png"
+    });
+  });
 
-  ipcMain.on('closeWindow', function(event, bwid) {
-      let bw = BrowserWindow.fromId(bwid)
-      bw.close()
-  })
+  ipcMain.on("closeWindow", function(event, bwid) {
+    let bw = BrowserWindow.fromId(bwid);
+    bw.close();
+  });
 
-  ipcMain.on('global.newWindow', function(event, path) {
-    console.log('global.ipcMain.newWindow: '+path);
-      windowManager.newWindow()
-  })
+  ipcMain.on("global.newWindow", function(event, path) {
+    console.log("global.ipcMain.newWindow: " + path);
+    handleNewWindow();
+  });
 
+  ipcMain.on("writeFile", function(event, path, content) {
+    fs.writeFile(path, content);
+  });
 }
-
-// Not needed right now:
-// ipcMain.on('writeFile', function(event, path, content) {
-//   console.log('writeFile: '+path);
-//   let pathObj = Utils.Path.createPathObj(path)
-
-//   fs.access(pathObj.dir, (error) => {
-//       if(!error) {
-//         fs.writeFileSync(path, content)
-//       } else {
-//         console.log(error)
-//       }
-//     }
-//   )
-// })

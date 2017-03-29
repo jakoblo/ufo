@@ -1,2 +1,4 @@
+//@flow
+
 /* CONFIG */
-export const APP_TOGGLE_EDIT_MODE = 'APP_TOGGLE_EDIT_MODE'
+export const APP_READ_ONLY_TOGGLE = "APP_READ_ONLY_TOGGLE";

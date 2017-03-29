@@ -1,71 +1,44 @@
-"use strict"
-import React from 'react'
+//@flow
+import React from "react";
+import { Motion, spring } from "react-motion";
+import * as c from "../navbar-constants";
 
-const ITEM_HEIGHT = 26;
-const ANIMATION_TIME = 350;
+type Props = {
+  children?: Element,
+  itemCount: number,
+  collapsed: boolean
+};
 
 export default class NavGroupItemCollapser extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      height: this.props.collapsed ? 0 : 'auto',
-      animationInProgress: false
-    }
-    this.activeTimeout = null
+  props: Props;
+  defaultHeight: any;
+  constructor(props: Props) {
+    super(props);
+    this.defaultHeight = this.calcHeight(props);
   }
 
   render() {
-    return(
-      <div className="nav-bar-group__item-wrapper" style={{
-        height: this.state.height,
-        overflow: 'hidden',
-        transition: this.state.animationInProgress ? 'height '+ANIMATION_TIME+'ms ease-out' : 'none'
-      }}>
-        {this.props.children}
-      </div>
-    )
+    return (
+      <Motion
+        defaultStyle={{ height: this.defaultHeight }}
+        style={{ height: spring(this.calcHeight(this.props)) }}
+      >
+        {value => (
+          <div
+            className="nav-bar-group__item-wrapper"
+            style={{
+              height: value.height,
+              overflow: "hidden"
+            }}
+          >
+            {this.props.children ? this.props.children : null}
+          </div>
+        )}
+      </Motion>
+    );
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
-    if(this.props.collapsed != nextProps.collapsed) {
-      nextProps.collapsed ? 
-        this.collapse() 
-        : 
-        this.expand()
-      ;
-    }
-  }
-
-  collapse = () => { 
-    this.animate(this.props.itemCount * ITEM_HEIGHT, 0, 0)
-  }
-
-  expand = () => {
-    this.animate(0, this.props.itemCount * ITEM_HEIGHT, 'auto')
-  }
-
-  animate = (startHeight, targetHeight, endHeight) => {
-    requestAnimationFrame(() => {
-      this.setState({
-        height: startHeight,
-        animationInProgress: false
-      })
-      requestAnimationFrame(() => {
-        this.setState({
-          height: targetHeight,
-          animationInProgress: true
-        })
-      })
-
-      clearTimeout(this.activeTimeout)
-      this.activeTimeout = setTimeout(() => {
-        requestAnimationFrame(() => {
-          this.setState({
-            height: endHeight,
-            animationInProgress: false
-          })
-        })
-      }, ANIMATION_TIME)
-    })
+  calcHeight(props: Props) {
+    return props.collapsed ? 0 : props.itemCount * c.ITEM_HEIGHT;
   }
 }

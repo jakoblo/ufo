@@ -1,0 +1,246 @@
+@import (reference) '../variables.less';
+@import (reference) '../mixins.less';
+@import (reference) '../mixins-animation.less';
+
+.view-folder-item {
+  @height__item: 20px;
+  display: flex;
+  flex-shrink: 0;
+  height: @height__item;
+  padding: 0 @padding__sidebar-horizonal;
+  position: relative;
+  box-sizing: border-box;
+  border-radius: calc(@height__item / 2);
+
+  .animation__shrink-and-fade(@height__item, 250ms);
+
+
+  // -----------------------------------
+  // Item Type Icons
+  // ---
+
+
+  &__icon {
+    display: block;
+    width: 17px;
+    height: @height__item;
+    background-size: 17px 20px;
+    background-position: center right;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-right: 10px;
+  }
+
+  // Folder
+  &--theme-folder &__icon {
+    background-image: url('../../img/folder-list-item__icon-folder.svg');
+  }
+  &--theme-folder&--selected &__icon {
+    background-image: url('../../img/folder-list-item__icon-folder--selected.svg');
+  }
+
+  // File Icon in React
+  &--theme-file &__icon {
+    background-size: 16px 16px;
+  }
+
+
+  &--theme-folder&--active::after {
+    .icon(@icon: '../../img/arrow-small-black.svg', @opacity: 0.3, @height: @height__item);
+  }
+  &--theme-folder&--active&--theme-folder&--selected::after {
+    .icon(@icon: '../../img/arrow-small-white.svg', @opacity: 0.5, @height: @height__item);
+  }
+
+  // SVG General File Icon, replaced by electron app.getFileIcon
+  // &--theme-file::before {
+  //   .icon(@icon: '../../img/folder-list-item__icon-file.svg', @opacity: 0.7, @height: @height__item);
+  // }
+  // &--theme-file&--selected::before {
+  //   .icon(@icon: '../../img/folder-list-item__icon-file--selected.svg', @opacity: 1, @height: @height__item);
+  // }
+
+  // -----------------------------------
+  // File Name
+  // ---
+
+  &__name-base {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: @height__item;
+    line-height: @height__item;
+    flex-shrink: 1;
+    flex-grow: 0;
+  }
+
+  &__name-suffix {
+    white-space: nowrap;
+    height: @height__item;
+    line-height: @height__item;
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
+
+  &__event-catcher {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0px;
+    right: 0px;
+    z-index: 10;
+  }
+
+  // -----------------------------------
+  // Renaming
+  // ---
+
+  &__rename-input {
+    width: 100%;
+    font-size: @font__size-base;
+    &::selection, & *::selection {
+      background: @color__main-decoration !important;
+      color: #fff;
+    }
+  }
+
+  &--renaming &__name-base,
+  &--renaming &__name-suffix {
+    display: none;
+  }
+
+  // -----------------------------------
+  // File in Progress Copy & Move
+  // ---
+
+  &__progress-pie {
+    .progress-pie(@progress-color: darken(@color__grey-light, 10%));
+    margin-top: 2px;
+    margin-right: 12px;
+  }
+  &--selected &__progress-pie {
+    .progress-pie(@progress-color: @color__default-bg);
+  }
+
+  &--in-progress::before {
+    display: none !important; // hide file icon
+  }
+
+  &--in-progress &__name-base,
+  &--in-progress &__name-suffix {
+    opacity: 0.6;
+  }
+
+  // -----------------------------------
+  // Underlay Drop Targets
+  // ---
+
+  &__underlay {
+    @drag-over-expand-time: 0.9s;
+    display: block;
+    z-index: -10;
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      z-index: -10;
+      width: 100%;
+      height: 0;
+      background: @color__main-decoration;
+      opacity: 0;
+      top: calc(@height__item / 2);
+      left: 0;
+      transition:
+        top @drag-over-expand-time linear,
+        height @drag-over-expand-time linear,
+        opacity @drag-over-expand-time linear;
+    }
+  }
+
+
+  &--drop-target &__underlay {
+    // .drop-zone;
+    display: block;
+    top: -2px;
+    bottom: -2px;
+    z-index: -10;
+
+    &::before {
+      // drag-over-expand transition
+      top: 0;
+      height: calc(@height__item + 2px);
+      opacity: 1;
+    }
+  }
+
+  &--drop-target-top &__underlay,
+  &--drop-target-bottom &__underlay {
+    border-top: 2px solid @color__main-dark;
+    left: 0;
+    top: -1px;
+    position: absolute;
+    width: 100%;
+    height: @height__item;
+  }
+
+  &--drop-target-bottom &__underlay {
+    border-top: 0;
+    border-bottom: 2px solid @color__main-dark;
+  }
+
+  &--drop-blocked &__underlay {
+    .drop-blocked;
+    display: block;
+    top: -2px;
+    bottom: -2px;
+  }
+
+  // -----------------------------------
+  // Other Modifier
+  // ---
+  &:hover {
+    background: #f1f1f1;
+  }
+
+  &--active,
+  &--active:hover {
+    background-color: lighten(@color__text-light, 15%);
+  }
+
+  &--selected,
+  &--selected:hover {
+    background-color: @color__main-decoration;
+    color: @color__text-white;
+  }
+
+  // Hide Textselection, if file is selected anyway
+  &&--selected::selection,
+  &&--selected *::selection {
+    background: transparent;
+  }
+
+  &--open-animation {
+    animation: zoom 0.2s 1;
+  }
+}
+
+
+@keyframes zoom {
+  0% {
+    transform: scale(1, 1);
+    transform-origin: 10% 50%;
+    opacity: 1;
+  }
+  99.9% {
+    transform: scale(1.7, 1.7);
+    transform-origin: 10% 50%;
+    opacity: .3;
+  }
+  100% {
+    transform: scale(1);
+    transform-origin: 10% 50%;
+    opacity: 1;
+  }
+}

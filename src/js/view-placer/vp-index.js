@@ -1,11 +1,10 @@
-// import * as actions from './viewcontainer-actions'
-import ViewPlacer from './components/view-placer'
-import ViewWrapper from './components/view-wrapper'
-import * as constants from './vp-constants'
+//@flow
+import ViewPlacer from "./components/view-placer";
+import * as constants from "./vp-constants";
 
+// Changed ViewPlacer to ViewPlacerEditor for better Slate.js testing
 const components = {
-  parent: ViewPlacer,
-  child: ViewWrapper
-}
+  parent: ViewPlacer
+};
 
 export default { components, constants };

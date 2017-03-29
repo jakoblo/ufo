@@ -1,18 +1,24 @@
-"use strict"
-import * as t from './config-actiontypes'
-import { Map } from 'immutable'
+//@flow
+import * as t from "./config-actiontypes";
+import { Map } from "immutable";
+
+import type { Action } from "../types";
 
 const INITIAL_STATE = Map({
   windowWidth: 800,
   windowHeight: 600,
-  editMode: false
-})
+  readOnly: false,
+  indexBase: "index.md"
+});
 
-export default function configReducer(state = INITIAL_STATE, action = { type: '' }) {
+export default function configReducer(
+  state: any = INITIAL_STATE,
+  action: Action = { type: "", payload: {} }
+) {
   switch (action.type) {
-    case t.APP_TOGGLE_EDIT_MODE:
-      return state.set('editMode', action.payload.editMode)
+    case t.APP_READ_ONLY_TOGGLE:
+      return state.set("readOnly", action.payload.readOnly);
     default:
-      return state
+      return state;
   }
 }

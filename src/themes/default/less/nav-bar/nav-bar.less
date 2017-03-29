@@ -5,23 +5,18 @@
 @import (css) url('nav-bar-item.less');
 
 .nav-bar {
-  height: 100%; 
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 0;
+  position: relative;
   .nicer-scrollbars(@color__main-dark);
 
   &--drop-target {
-    position: relative;
-    &::before {
+    &::after {
       content: '';
       .drop-zone;
-      display: none;
       z-index: 0;
-    }
-    & > * {
-      z-index: 10;
-      position: relative;
     }
   }
 }

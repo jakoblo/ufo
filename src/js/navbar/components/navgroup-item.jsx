@@ -1,153 +1,222 @@
-"use strict"
-import React from 'react'
-import classnames from 'classnames'
-import Icon from '../../general-components/icon'
-import Button from '../../general-components/button'
-import { DropTarget, DragSource } from 'react-dnd'
-import { findDOMNode } from 'react-dom'
-import { NativeTypes } from 'react-dnd-html5-backend'
-import { DnDTypes } from '../navbar-constants'
+//@flow
+import React from "react";
+import classnames from "classnames";
+import Icon from "../../general-components/icon";
+import Button from "../../general-components/button";
+import { findDOMNode } from "react-dom";
+import { DnDTypes } from "../navbar-constants";
+import * as dragndrop from "../../utils/dragndrop";
+import * as types from "../navbar-types";
+import * as c from "../navbar-constants";
+import { Motion, spring } from "react-motion";
 
-const itemSource = {
-  canDrag(props, monitor) {
-    return !props.isDiskGroup
-  },
-  beginDrag(props) {
-    return {
-      id: props.index,
-      index: props.index,
-      groupID: props.groupID
-    };
-  }
-}
+type Props = {
+  active: boolean, // Selected or open
+  draggingItem: types.itemDragData,
+  item: any,
+  position: number,
+  groupId: number,
+  onClick: Function,
+  onItemRemove: Function,
+  setDraggingItem: (types.itemDragData) => void,
+  clearDraggingItem: Function,
+  saveFavbar: Function,
+  onMoveGroupItem: Function
+};
 
-const itemTarget = { 
-  // Sort Navgroups by drag and drop
-  drop(props, monitor, component) {
-    if(monitor.getItemType() === DnDTypes.GROUPITEM) {
-      props.saveFavbar()
-    }
-  },
-  hover(props, monitor, component) {
-    if(monitor.getItemType() !== DnDTypes.GROUPITEM) return
-    if(props.groupID !== monitor.getItem().groupID) return
+type State = {
+  dropTarget: boolean
+};
 
-    const dragIndex = monitor.getItem().index;
-    const hoverIndex = props.index;
-
-    // Don't replace items with themselves
-    if (dragIndex === hoverIndex) {
-      return;
-    }
-
-    // Determine rectangle on screen
-    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-
-    // Get vertical middle
-    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-    // Determine mouse position
-    const clientOffset = monitor.getClientOffset();
-
-    // Get pixels to the top
-    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-    // Only perform the move when the mouse has crossed half of the items height
-    // When dragging downwards, only move when the cursor is below 50%
-    // When dragging upwards, only move when the cursor is above 50%
-
-    // Dragging downwards
-    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-      return;
-    }
-
-    // Dragging upwards
-    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-      return;
-    }
-
-    // Time to actually perform the action
-    //props.moveCard(dragIndex, hoverIndex);
-    props.onMoveGroupItem(dragIndex, hoverIndex)
-
-    // Note: we're mutating the monitor item here!
-    // Generally it's better to avoid mutations,
-    // but it's good here for the sake of performance
-    // to avoid expensive index searches.
-    monitor.getItem().index = hoverIndex;
-  }
-}
-
-@DropTarget([DnDTypes.GROUPITEM, NativeTypes.FILE], itemTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver() && (monitor.getItemType() === NativeTypes.FILE),
-  isOverCurrent: monitor.isOver({ shallow: true }) && (monitor.getItemType() === NativeTypes.FILE),
-}))
-@DragSource(DnDTypes.GROUPITEM, itemSource, (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-}))
 export default class NavGroupItem extends React.Component {
-  constructor(props) {
-    super(props)
-    this.dragOverTimeout = null
+  props: Props;
+  state: State;
+  startTopOffset: number;
+  inTransition: boolean; // Avoid dragOver handling in transations
+  constructor(props: Props) {
+    super(props);
+    this.inTransition = false;
+    this.startTopOffset = this.props.position * c.ITEM_HEIGHT;
     this.state = {
       dropTarget: false
-    }
+    };
   }
 
- render() {
-    const { isOver, isDragging, connectDragSource, connectDropTarget } = this.props;
-    let className = classnames(
-      this.props.className,
-      'nav-bar-item--theme-'+this.props.type, 
+  render() {
+    const className = classnames(
+      "nav-bar-item",
+      "nav-bar-item--theme-" + this.props.item.type,
       {
         "nav-bar-item": true,
         "nav-bar-item--active": this.props.active,
-        "nav-bar-item--is-dragging": isDragging,
+        "nav-bar-item--is-dragging": this.props.draggingItem &&
+          this.props.draggingItem.itemPosition === this.props.position,
         "nav-bar-item--drop-target": this.state.dropTarget
-      })
-    let deleteButton = <Button className="nav-bar-item__button-remove" onClick={this.props.onItemRemove} />
-    return connectDragSource(connectDropTarget(
-      <div onClick={this.props.onClick} className={className}>
-        <div className="nav-bar-item__underlay" />
-        <span className="nav-bar-item__text">
-          {this.props.title}
-        </span>
-        {!this.props.isDiskGroup && deleteButton}
-      </div>
-    ))
+      }
+    );
+
+    return (
+      <Motion
+        defaultStyle={{ top: this.startTopOffset }}
+        style={{ top: spring(this.props.position * c.ITEM_HEIGHT) }}
+      >
+        {value => (
+          <div
+            className={className}
+            onClick={this.props.onClick}
+            draggable={true}
+            style={{
+              top: value.top
+            }}
+            onDragStart={this.onDragStart}
+            onDragEnd={this.onDragEnd}
+            {...this.dropZoneListener}
+          >
+            <div className="nav-bar-item__underlay" />
+            <span className="nav-bar-item__text">
+              {this.props.item.name}
+            </span>
+            {!this.props.isDiskGroup
+              ? <Button
+                  className="nav-bar-item__button-remove"
+                  onClick={this.props.onItemRemove}
+                />
+              : null}
+          </div>
+        )}
+      </Motion>
+    );
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    if (!this.props.isOver && nextProps.isOver) {
-      // You can use this as enter handler
-      this.dragOverTimeout = setTimeout(this.props.onClick, 1000)
-      this.setState({
-        dropTarget: true
-      })
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.position != nextProps.position) {
+      // Avoid dragOver handling in transations
+      this.inTransition = true;
+
+      setTimeout(
+        () => {
+          this.inTransition = false;
+        },
+        c.ANIMATION_TIME
+      );
     }
-    if (this.props.isOver && !nextProps.isOver) {
-      // You can use this as leave handler
-      clearTimeout(this.dragOverTimeout)
+  }
+
+  /**
+   * Drag Listener
+   * to Drag the Group arround the sort them in the other Group
+   */
+
+  onDragStart = (event: SyntheticDragEvent) => {
+    event.stopPropagation(); //Avoid dragStart on nav-group
+
+    // Store dragData this Group, to access them in other Groups onDragOver
+    const dragData: types.itemDragData = {
+      itemPosition: this.props.position,
+      groupId: this.props.groupId
+    };
+
+    // We use the DataType of the event, but we cant access the data in dragOver.. useless
+    event.dataTransfer.setData(DnDTypes.GROUPITEM, "uselesData");
+    setTimeout(
+      () => {
+        // Wait, to do not apply the dragging css to the dragging image
+        this.props.setDraggingItem(dragData);
+      },
+      1
+    );
+  };
+
+  // Clear the stored dragging item
+  onDragEnd = () => {
+    this.props.clearDraggingItem();
+  };
+
+  /**
+   * Dropzone
+   *
+   */
+
+  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+    acceptableTypes: [DnDTypes.GROUPITEM, dragndrop.constants.TYPE_FILE],
+    possibleEffects: dragndrop.constants.effects.ALL,
+
+    dragHover: (event, cursorPosition) => {
+      if (dragndrop.shouldAcceptDrop(event, DnDTypes.GROUPITEM)) {
+        event.preventDefault(); // Drop is valid, will avoid cancel animation onDrop
+        this.itemDragOverToSort(event, cursorPosition);
+      } else if (
+        dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)
+      ) {
+        // Drop is not valid, no preventDefault
+        this.fileDragOver(event, cursorPosition);
+      }
+    },
+
+    dragOut: (event: SyntheticDragEvent) => {
+      this.cancelPeakTimeout();
       this.setState({
         dropTarget: false
-      })
+      });
+    },
+
+    drop: (event, cursorPosition) => {
+      if (dragndrop.shouldAcceptDrop(event, DnDTypes.GROUPITEM)) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.props.clearDraggingItem();
+        this.props.saveFavbar();
+      }
     }
-  }
+  });
 
-  shouldComponentUpdate(nextProps, nextState) {
-    // immutable?
-    return(
-      this.state.dropTarget != nextState.dropTarget ||
-      this.props.active != nextProps.active ||
-      this.props.groupID != nextProps.groupID ||
-      this.props.index != nextProps.index ||
-      this.props.isDragging != nextProps.isDragging ||
-      this.props.isOver != nextProps.isOver ||
-      this.props.isOverCurrent != nextProps.isOverCurrent ||
-      this.props.title != nextProps.title
-    )
-  }
+  itemDragOverToSort = (event: SyntheticDragEvent, cursorPosition: string) => {
+    if (this.props.draggingItem === false) return; // no needed data, jet
+    if (this.props.groupId !== this.props.draggingItem.groupId) return; // dragging only navgroup internal
+    if (this.inTransition) return; // Transtion in progess, stop event handling will avoid bouncing
 
+    const dragginOriginPosition = this.props.draggingItem.itemPosition;
+    const overPosition = this.props.position;
+
+    // Don't replace items with themselves
+    if (dragginOriginPosition === overPosition) return;
+
+    // Time to actually perform the action
+    // Set dragging item to new position
+    this.props.setDraggingItem({
+      itemPosition: overPosition,
+      groupId: this.props.groupId
+    });
+    // Move the item in the redux store
+    this.props.onMoveGroupItem(dragginOriginPosition, overPosition);
+  };
+
+  fileDragOver = (event: SyntheticDragEvent, cursorPosition: string) => {
+    this.startPeakTimeout();
+    this.setState({
+      dropTarget: true
+    });
+  };
+
+  dragOverTimeout = null;
+
+  startPeakTimeout = () => {
+    if (
+      (this.props.type == "folder" || this.props.type == "device") &&
+      this.dragOverTimeout == null
+    ) {
+      this.dragOverTimeout = setTimeout(
+        () => {
+          console.log("click", this.props.onClick);
+          this.props.onClick();
+        },
+        1000
+      );
+    }
+  };
+
+  cancelPeakTimeout = () => {
+    clearTimeout(this.dragOverTimeout);
+    this.dragOverTimeout = null;
+  };
 }

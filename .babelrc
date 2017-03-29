@@ -1,11 +1,13 @@
 {
   "plugins": [
-    "transform-async-to-generator",
+    ["transform-flow-strip-types"],
     "transform-decorators-legacy",
     "transform-object-rest-spread",
     "transform-class-properties",
     ["transform-es2015-modules-commonjs", { "loose": true }],
-    "transform-react-jsx"
+    "transform-react-jsx",
+    "transform-react-inline-elements",
+    "transform-react-constant-elements"
   ],
   "sourceMaps": "inline",
   "ignore": [

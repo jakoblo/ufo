@@ -3,7 +3,7 @@
 
 .view-wrapper {
   position: relative;
-  width: 235px;
+  width: 330px;
   display: flex;
   flex-shrink: 0;
   flex-grow: 0;
@@ -14,6 +14,12 @@
   padding-bottom: 15px;
   will-change: transform;
 
+  .view-placer--display-single & {
+    width: 100%;
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
+
   &::-webkit-resizer {
     background: url('../../img/view-wrapper__resize-arrows.svg');
     background-repeat: no-repeat;
@@ -22,4 +28,5 @@
     width: 15px;
     height: 15px;
   }
+
 }
