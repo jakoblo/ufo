@@ -1,165 +1,264 @@
 //@flow
-
-import * as t from "./navbar-actiontypes";
-import { List, Map, fromJS } from "immutable";
-import * as Utils from "../utils/utils-index";
+import storage from "electron-json-storage";
+import { remote } from "electron";
 import _ from "lodash";
+import nodePath from "path";
+import drivelist from "drivelist";
+import DrivelistWatcher from "drivelist-watcher";
+import * as t from "./navbar-actiontypes";
+import * as c from "./navbar-constants";
 
+import type { GroupItem, ActionGroupItems } from "./navbar-types";
 import type { Action } from "../types";
 
-let nextNavGroupId = 1;
-let nextGroupItemId = 0;
+let driveScanner;
 
-export function saveFavbartoStorage() {
+export function groupsSave() {
   return function(dispatch: Function, getState: Function) {
-    Utils.storage.saveFavbartoStorage(getState());
-  };
-}
+    let navbarState = getState()[c.NAME];
+    let diskGrouPosition = navbarState
+      .get("groups")
+      .findIndex(group => group.id == c.DISKS_GROUP_ID);
 
-export function toggleGroup(groupID: number): Action {
-  // Action Creator
-  return {
-    // action
-    type: t.NAVBAR_TOGGLE_GROUP,
-    payload: { groupID: groupID }
-  };
-}
+    // Device Group Items cant be saved
+    navbarState = navbarState
+      .deleteIn(["groups", diskGrouPosition, "items"])
+      .delete("activeItem");
 
-export function changeGroupTitle(groupID: number, newTitle: string) {
-  // Action Creator
-  return function(dispatch: Function, getState: Function) {
-    dispatch({
-      type: t.NAVBAR_CHANGE_GROUP_TITLE,
-      payload: { groupID: groupID, newTitle: newTitle }
+    storage.set(c.NAME, navbarState, error => {
+      if (error) throw error;
     });
-    Utils.storage.saveFavbartoStorage(getState());
   };
 }
 
-export function removeGroupItem(groupID: number, itemID: number) {
-  // Action Creator
+export function groupsLoad() {
   return function(dispatch: Function, getState: Function) {
-    dispatch({
-      type: t.NAVBAR_REMOVE_GROUP_ITEM,
-      payload: {
-        groupID: groupID,
-        itemID: itemID
+    storage.get(c.NAME, function(error, data) {
+      if (error || !data.groups) {
+        dispatch(groupsCreateDefault());
+      } else {
+        dispatch({
+          type: t.NAVBAR_LOAD_FROM_STORAGE,
+          payload: {
+            groups: data.groups
+          }
+        });
       }
+      dispatch(drivesInit());
     });
-    Utils.storage.saveFavbartoStorage(getState());
   };
 }
 
-export function removeGroupItemfromDeviceGroup(fileObj: any) {
-  return function(dispatch: Function, state: Function) {
-    dispatch({
-      type: t.REMOVE_DISKGROUP_ITEM,
-      payload: {
-        fileObj: fileObj
+function groupsCreateDefault() {
+  return function(dispatch: Function, getState: Function) {
+    const app = remote.app;
+    dispatch(
+      groupCreate("Favourites", [
+        getItemFromPath(app.getPath("home")),
+        getItemFromPath(app.getPath("desktop")),
+        getItemFromPath(app.getPath("documents")),
+        getItemFromPath(app.getPath("downloads")),
+        getItemFromPath(app.getPath("music")),
+        getItemFromPath(app.getPath("pictures")),
+        getItemFromPath(app.getPath("videos"))
+      ])
+    );
+    dispatch(groupCreate(c.DISKS_GROUP_NAME, [], null, false, false, true));
+  };
+}
+
+export function drivesInit() {
+  return function(dispatch: Function, getState: Function) {
+    drivelist.list((error, drives) => {
+      if (error) {
+        throw error;
       }
+      dispatch(drivesSet(drives));
+    });
+
+    driveScanner = new DrivelistWatcher({
+      callbackDeviceAdded: drives => {
+        dispatch(drivesSet(drives));
+      },
+      callbackDeviceRemoved: drives => {
+        dispatch(drivesSet(drives));
+      },
+      intervalTime: 5000
     });
   };
 }
 
-/**
- *
- * NAVGROUP
- * @export
- * @param {string} title
- * @param {array} items
- * @param {boolean} loading
- * @returns
- */
-export function addNavGroup(
-  title: string,
-  items: Array<string>,
-  position?: number,
-  hidden?: boolean,
-  loading?: boolean,
-  diskGroup?: boolean
-) {
+function drivesSet(drives) {
   return function(dispatch: Function, getState: Function) {
-    if (items)
-      dispatch({
-        // action
-        type: t.ADD_NAVGROUP,
-        payload: {
-          id: diskGroup ? 0 : nextNavGroupId++,
-          title: title,
-          items: getItemList(items),
-          position: position,
-          hidden: hidden
-        }
-      });
-
-    if (loading == undefined) Utils.storage.saveFavbartoStorage(getState());
+    const drivesPosition = groupPosFromId(getState(), c.DISKS_GROUP_ID);
+    dispatch(
+      groupSetItems(
+        drivesPosition,
+        drives
+          .filter(drive => {
+            return drive.mountpoints && drive.mountpoints.length;
+          })
+          .map(drive => ({
+            type: c.ITEM_TYPE_DEVICE,
+            path: _.first(drive.mountpoints).path,
+            name: drive.description
+          }))
+      )
+    );
   };
 }
 
-export function removeNavGroup(groupIndex: number) {
-  return function(dispatch: Function, getState: Function) {
-    dispatch({
-      type: t.REMOVE_NAVGROUP,
-      payload: { groupIndex: groupIndex }
-    });
-
-    Utils.storage.saveFavbartoStorage(getState());
-  };
-}
-
-export function moveNavGroup(dragIndex: number, hoverIndex: number) {
-  return function(dispatch: Function, getState: Function) {
-    dispatch({
-      type: t.MOVE_NAVGROUP,
-      payload: { dragIndex: dragIndex, hoverIndex: hoverIndex }
-    });
-  };
-}
-
-export function moveGroupItem(
-  groupIndex: number,
-  dragIndex: number,
-  hoverIndex: number
-): Action {
+function groupSetItems(groupPosition, items) {
   return {
-    type: t.MOVE_GROUPITEM,
+    type: t.NAVBAR_ITEMS_SET,
     payload: {
-      groupIndex: groupIndex,
-      dragIndex: dragIndex,
-      hoverIndex: hoverIndex
+      groupPosition: groupPosition,
+      items: items
     }
   };
 }
 
-export function addGroupItems(groupID: number, items: Array<string>) {
+export function groupCreate(
+  title: string,
+  items: ActionGroupItems,
+  position?: number | null,
+  hidden?: boolean = false,
+  loading?: boolean = false,
+  diskGroup?: boolean = false
+) {
   return function(dispatch: Function, getState: Function) {
+    const state = getState();
     dispatch({
-      type: t.ADD_GROUP_ITEM,
+      type: t.NAVBAR_GROUP_CREATE,
       payload: {
-        groupID: groupID,
-        items: getItemList(items)
+        title: title,
+        diskGroup: diskGroup,
+        items: items,
+        position: position,
+        hidden: hidden
       }
     });
-    if (groupID !== 0) Utils.storage.saveFavbartoStorage(getState());
+  };
+}
+export function groupCreate__fileList(
+  title: string,
+  fileList: Array<string>,
+  position?: number | null,
+  hidden?: boolean = false,
+  loading?: boolean = false,
+  diskGroup?: boolean = false
+) {
+  return function(dispatch: Function, getState: Function) {
+    const items = fileList.map(path => getItemFromPath(path));
+    dispatch(groupCreate(title, items, position, hidden, loading, diskGroup));
   };
 }
 
-/**
- * Normalize string array and Object to valid object array
- * don't if the new id assignement is necessary.. ?:/
- * little bit wirred
- */
-function getItemList(items: Array<any>) {
-  let itemList = [];
-  items.forEach(
-    function(element) {
-      if (_.isObject(element) && _.has(element, "path")) {
-        itemList.push({ id: nextGroupItemId++, path: element.path });
-      } else if (typeof element == "string") {
-        itemList.push({ id: nextGroupItemId++, path: element });
+export function groupToggle(groupPosition: number): Action {
+  return {
+    type: t.NAVBAR_GROUP_TOGGLE,
+    payload: { groupPosition: groupPosition }
+  };
+}
+
+export function groupTitleChange(groupPosition: number, newTitle: string) {
+  return function(dispatch: Function, getState: Function) {
+    dispatch({
+      type: t.NAVBAR_GROUP_TITLE_CHANGE,
+      payload: { groupPosition: groupPosition, newTitle: newTitle }
+    });
+  };
+}
+
+export function groupRemove(groupPosition: number) {
+  return function(dispatch: Function, getState: Function) {
+    dispatch({
+      type: t.NAVBAR_GROUP_REMOVE,
+      payload: { groupPosition: groupPosition }
+    });
+  };
+}
+
+export function groupMove(fromPosition: number, toPosition: number) {
+  return {
+    type: t.NAVBAR_GROUP_MOVE,
+    payload: { fromPosition: fromPosition, toPosition: toPosition }
+  };
+}
+
+export function itemsCreate_fromPath(
+  groupPosition: number,
+  pathList: Array<string>
+) {
+  return function(dispatch: Function, getState: Function) {
+    dispatch(
+      itemsCreate(groupPosition, pathList.map(path => getItemFromPath(path)))
+    );
+  };
+}
+
+export function itemsCreate(groupPosition: number, items: ActionGroupItems) {
+  return function(dispatch: Function, getState: Function) {
+    const state = getState();
+    const newItems = items.filter(newItem =>
+      itemDoesNotExist(state, groupPosition, newItem));
+    dispatch({
+      type: t.NAVBAR_ITEMS_CREATE,
+      payload: {
+        groupPosition: groupPosition,
+        items: newItems
       }
-    },
-    this
-  );
-  return fromJS(itemList);
+    });
+  };
+}
+
+export function itemRemove(groupPosition: number, itemPosition: number) {
+  return function(dispatch: Function, getState: Function) {
+    dispatch({
+      type: t.NAVBAR_ITEM_REMOVE,
+      payload: {
+        groupPosition: groupPosition,
+        itemPosition: itemPosition
+      }
+    });
+  };
+}
+
+export function itemMove(
+  groupPosition: number,
+  itemFromPosition: number,
+  itemToPosition: number
+): Action {
+  return {
+    type: t.NAVBAR_ITEM_MOVE,
+    payload: {
+      groupPosition: groupPosition,
+      itemFromPosition: itemFromPosition,
+      itemToPosition: itemToPosition
+    }
+  };
+}
+
+function getItemFromPath(path) {
+  return {
+    path: path,
+    type: nodePath.extname(path).length > 0
+      ? c.ITEM_TYPE_FILE
+      : c.ITEM_TYPE_FOLDER,
+    name: nodePath.basename(path)
+  };
+}
+
+const groupPosFromId = (state: any, groupId: string): number => {
+  return state[c.NAME].get("groups").findIndex(group => group.id === groupId);
+};
+
+function itemDoesNotExist(
+  state: any,
+  groupPosition: number,
+  item: GroupItem
+): boolean {
+  return state[c.NAME]
+    .getIn(["groups", groupPosition, "items"])
+    .findIndex(existingItem => existingItem.path == item.path) < 0;
 }

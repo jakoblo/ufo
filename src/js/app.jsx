@@ -7,7 +7,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { storeSetup } from "./store-setup";
-import Config from "./config/config-index";
 import { ipcRenderer, remote } from "electron";
 import * as Utils from "./utils/utils-index";
 
@@ -32,13 +31,11 @@ export function getStore() {
 window.store = store;
 window.utils = Utils.storage;
 
-// Store State loading & saving
-store.dispatch(Config.actions.loadPreviousState(windowID));
-ipcRenderer.on("saveState", function(event) {
-  Utils.storage.saveStatetoStorage(store.getState(), windowID, function() {
-    ipcRenderer.send("closeWindow", windowID);
-  });
-});
+// ipcRenderer.on("saveState", function(event) {
+//   Utils.storage.saveStatetoStorage(store.getState(), windowID, function() {
+//     ipcRenderer.send("closeWindow", windowID);
+//   });
+// });
 
 ReactDOM.render(
   <Provider store={store}>

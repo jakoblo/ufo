@@ -10,66 +10,6 @@ import _ from "lodash";
 
 import type { ThunkArgs, Action } from "../types";
 
-export function loadPreviousState(windowID: number) {
-  return (dispatch: Function, getState: Function) => {
-    /**
-     * Loads NAVBAR GroupItems from Storage
-     */
-
-    Utils.storage.loadNavbarfromStorage(data => {
-      let diskGroupPosition = 1;
-      if (data.groupItems !== undefined) {
-        data.groupItems.forEach((item, index) => {
-          if (item.title != Navbar.constants.DISKS_GROUP_NAME) {
-            dispatch(
-              Navbar.actions.addNavGroup(
-                item.title,
-                item.items,
-                index,
-                item.hidden,
-                true
-              )
-            );
-          } else {
-            diskGroupPosition = index;
-          }
-        });
-
-        Utils.storage.loadSystemVolumes(
-          // Devices/Disk Group always gets a fixed ID of 0
-          fileObj => {
-            dispatch(Navbar.actions.addGroupItems(0, [fileObj.path]));
-          },
-          (fileObj, activeWatcher) => {
-            dispatch(Navbar.actions.removeGroupItemfromDeviceGroup(fileObj));
-          },
-          fileObj => {},
-          (title, items) => {
-            dispatch(
-              Navbar.actions.addNavGroup(
-                title,
-                items,
-                diskGroupPosition,
-                false,
-                true,
-                true
-              )
-            );
-          }
-        );
-      }
-    });
-    // if(devicesPosition == undefined)
-    /**
-     * Loads the last Redux STATE from Storage
-     */
-    Utils.storage.loadStatefromStorage(windowID, function(data) {
-      // if(data.fs)
-      dispatch(App.actions.changeAppPath(os.homedir()));
-    });
-  };
-}
-
 export function toggleReadOnly() {
   return (dispatch: Function, getState: Function) => {
     dispatch({

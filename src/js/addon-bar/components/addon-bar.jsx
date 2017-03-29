@@ -5,7 +5,6 @@ import FsWrite from "../../filesystem/write/fs-write-index";
 import { connect } from "react-redux";
 import * as selectors from "../addon-bar-selectors";
 import * as actions from "../addon-bar-actions";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 const mapStateToProps = (state, props) => {
   return {
@@ -24,18 +23,13 @@ class AddonBar extends React.Component {
           {this.getViewIcon("search")}
           {this.getViewIcon("fs-write")}
         </div>
-        <ReactCSSTransitionGroup
-          className="addon-bar__css-transition-group"
-          transitionName="addon-bar__view-container--animation"
-          transitionEnterTimeout={150}
-          transitionLeaveTimeout={150}
-        >
+        <div className="addon-bar__css-transition-group">
           {this.props.currentView
             ? <div className="addon-bar__view-container">
                 {this.getCurrentView()}
               </div>
             : null}
-        </ReactCSSTransitionGroup>
+        </div>
       </div>
     );
   }

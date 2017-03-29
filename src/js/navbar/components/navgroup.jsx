@@ -8,40 +8,42 @@ import NavGroupTitle from "./navgroup-title";
 import { remote } from "electron";
 import App from "../../app/app-index";
 import * as Actions from "../navbar-actions";
-import { DnDTypes } from "../navbar-constants";
+import * as c from "../navbar-constants";
 import _ from "lodash";
 const { Menu, MenuItem } = remote;
 import { findDOMNode } from "react-dom";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import NavGroupItemCollapser from "./navgroup-item-collapser";
 import * as dragndrop from "../../utils/dragndrop";
+import * as types from "../navbar-types";
+import { Motion, spring } from "react-motion";
+import ViewFile from "../../view-file/vf-index";
 
 type Props = {
-  isDiskGroup: boolean,
-  hidden: boolean,
-  groupID: number,
-  draggingGroup: any,
-  title: string,
-  hidden: boolean,
-  index: number,
-  items: Array<any>,
+  group: any,
+  top: number,
+  draggingGroup: types.groupDragData,
   activeItem: number,
+  position: number,
   dispatch: Function,
-  setDraggingGroup: Function,
+  setDraggingGroup: (types.groupDragData) => void,
   clearDraggingGroup: Function
 };
 
 type State = {
   isDragging: boolean,
   dragOver: boolean,
-  draggingItem: boolean
+  draggingItem: types.itemDragData
 };
 
 export default class NavGroup extends React.Component {
   props: Props;
   state: State;
+  inTransition: boolean;
+  startTopOffset: number;
   constructor(props: Props) {
     super(props);
+    this.inTransition = false;
+    this.startTopOffset = this.props.top;
     this.state = {
       isDragging: false,
       dragOver: false,
@@ -51,62 +53,84 @@ export default class NavGroup extends React.Component {
 
   render() {
     const { dragOver, isDragging } = this.state;
-    const dg = this.props.isDiskGroup;
+    const { group, position } = this.props;
     let classname = classnames({
       "nav-bar-group": true,
-      "nav-bar-group--collapsed": this.props.hidden,
-      "nav-bar-group--is-dragging": !dg &&
-        this.props.groupID == this.props.draggingGroup.id,
+      "nav-bar-group--collapsed": group.hidden,
+      "nav-bar-group--is-dragging": this.props.draggingGroup &&
+        this.props.draggingGroup.groupId === group.id,
       "nav-bar-group--drop-target": dragOver
     });
 
+    //Disable dragndrop listener, if transition is in progress
+    //this will avoid back and forward bouncing
+
     return (
-      <div
-        className={classname}
-        draggable={true}
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-        data-key={this.props.index}
-        {...this.dropZoneListener}
+      <Motion
+        defaultStyle={{ top: this.startTopOffset }}
+        style={{ top: spring(this.props.top) }}
       >
-        <NavGroupTitle
-          title={this.props.title}
-          isDiskGroup={dg}
-          hidden={this.props.hidden}
-          onGroupTitleChange={this.handleGroupTitleChange}
-          onGroupRemove={this.handleRemoveGroup}
-          onToggleGroup={this.handleToggleGroup.bind(this, this.props.index)}
-        />
-        <NavGroupItemCollapser
-          itemCount={this.props.items.length}
-          collapsed={this.props.hidden}
-        >
-          <ReactCSSTransitionGroup
-            transitionName="nav-bar-item--animation"
-            transitionEnterTimeout={350}
-            transitionLeaveTimeout={350}
+        {value => (
+          <div
+            className={classname}
+            draggable={true}
+            style={{
+              top: value.top
+            }}
+            onDragStart={this.onDragStart}
+            onDragEnd={this.onDragEnd}
+            data-key={position}
+            {...this.dropZoneListener}
           >
-            {this.props.items.map(this.createGroupItem)}
-          </ReactCSSTransitionGroup>
-        </NavGroupItemCollapser>
-      </div>
+            <NavGroupTitle
+              title={group.title}
+              isDiskGroup={group.diskGroup}
+              hidden={group.hidden}
+              onGroupTitleChange={this.handleGroupTitleChange}
+              onGroupRemove={this.handleRemoveGroup}
+              onToggleGroup={this.handleToggleGroup.bind(this, group.id)}
+            />
+            <NavGroupItemCollapser
+              itemCount={group.items.size}
+              collapsed={group.hidden}
+            >
+              {group.items.map(this.renderGroupItem)}
+            </NavGroupItemCollapser>
+          </div>
+        )}
+      </Motion>
     );
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.position != nextProps.position) {
+      this.inTransition = true;
+
+      setTimeout(
+        () => {
+          this.inTransition = false;
+        },
+        c.ANIMATION_TIME
+      );
+    }
   }
 
   // GROUP EVENTS
 
   handleToggleGroup = () => {
-    this.props.dispatch(Actions.toggleGroup(this.props.index));
+    this.props.dispatch(Actions.groupToggle(this.props.position));
   };
 
   handleRemoveGroup = () => {
-    this.props.dispatch(Actions.removeNavGroup(this.props.index));
+    this.props.dispatch(Actions.groupRemove(this.props.position));
   };
 
   // GROUP TITLE EVENTS
 
   handleGroupTitleChange = (newTitle: string) => {
-    this.props.dispatch(Actions.changeGroupTitle(this.props.index, newTitle));
+    this.props.dispatch(
+      Actions.groupTitleChange(this.props.position, newTitle)
+    );
   };
 
   /**
@@ -114,25 +138,17 @@ export default class NavGroup extends React.Component {
    * GROUP ITEM
    *
    */
-  createGroupItem = (item: any, index: number) => {
-    const path = item.path;
-
-    let basePath = nodePath.basename(path);
-    let active = path === this.props.activeItem;
-    let type = "folder";
-    if (this.props.isDiskGroup) type = "device";
-
+  renderGroupItem = (item: any, position: number) => {
     return (
       <NavGroupItem
-        key={item.id}
-        index={index}
-        groupID={this.props.groupID}
-        title={basePath}
-        active={active}
-        type={type}
-        isDiskGroup={this.props.isDiskGroup}
-        onClick={this.handleSelectionChanged.bind(this, path)}
-        onItemRemove={this.handleOnItemRemove.bind(this, index)}
+        key={item.path}
+        item={item}
+        position={position}
+        groupId={this.props.group.id}
+        active={item.path === this.props.activeItem}
+        isDiskGroup={this.props.group.diskGroup}
+        onClick={this.handleSelectionChanged.bind(this, item)}
+        onItemRemove={this.handleOnItemRemove.bind(this, position)}
         onMoveGroupItem={this.handleMoveGroupItem}
         saveFavbar={this.handleSaveFavbar}
         draggingItem={this.state.draggingItem}
@@ -142,32 +158,6 @@ export default class NavGroup extends React.Component {
     );
   };
 
-  // GROUP ITEM EVENTS
-
-  handleOnItemRemove = (itemIndex: number, e: SyntheticMouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    this.props.dispatch(Actions.removeGroupItem(this.props.groupID, itemIndex));
-  };
-
-  handleSelectionChanged = (path: string, e: SyntheticMouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    this.props.dispatch(App.actions.changeAppPath(path));
-  };
-
-  handleMoveGroupItem = (dragIndex: number, hoverIndex: number) => {
-    this.props.dispatch(
-      Actions.moveGroupItem(this.props.index, dragIndex, hoverIndex)
-    );
-  };
-
-  handleSaveFavbar = () => {
-    this.props.dispatch(Actions.saveFavbartoStorage());
-  };
-
   /**
    * Drag Listener
    * to Drag the Group arround the sort them in the other Group
@@ -175,9 +165,9 @@ export default class NavGroup extends React.Component {
 
   onDragStart = (event: SyntheticDragEvent) => {
     // Store ids of this Group, to access them in other Groups onDragOver
-    const dragData = {
-      id: this.props.groupID,
-      index: this.props.index
+    const dragData: types.groupDragData = {
+      groupId: this.props.group.id,
+      groupPosition: this.props.position
     };
     setTimeout(
       () => {
@@ -186,7 +176,8 @@ export default class NavGroup extends React.Component {
       },
       1
     );
-    event.dataTransfer.setData(DnDTypes.NAVGROUP, JSON.stringify(dragData));
+    // We use the DataType of the event, but we cant access the data in dragOver.. useless
+    event.dataTransfer.setData(c.DnDTypes.NAVGROUP, "uselesData");
   };
 
   // Clear the stored
@@ -203,40 +194,44 @@ export default class NavGroup extends React.Component {
 
   dropZoneListener = dragndrop.getEnhancedDropZoneListener({
     acceptableTypes: [
-      DnDTypes.NAVGROUP,
-      !this.props.isDiskGroup ? dragndrop.constants.TYPE_FILE : ""
+      c.DnDTypes.NAVGROUP,
+      !this.props.group.diskGroup ? dragndrop.constants.TYPE_FILE : ""
     ],
     possibleEffects: dragndrop.constants.effects.ALL,
 
     dragHover: (event, cursorPosition) => {
+      if (this.inTransition) return;
+      event.preventDefault();
+
       if (dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)) {
         // File DROP
+        if (this.state.dragOver == true) return;
         this.setState({
           dragOver: true
         });
-      } else if (dragndrop.shouldAcceptDrop(event, DnDTypes.NAVGROUP)) {
+      } else if (dragndrop.shouldAcceptDrop(event, c.DnDTypes.NAVGROUP)) {
         // Navgroup Drag
 
         if (!this.props.draggingGroup) {
           return; // no needed data, jet
         }
 
-        const dragIndex = this.props.draggingGroup.index;
-        const hoverIndex = this.props.index;
+        const draggingOriginPosition = this.props.draggingGroup.groupPosition;
+        const overPosition = this.props.position;
 
         // Don't replace items with themselves
-        if (dragIndex === hoverIndex) {
+        if (draggingOriginPosition === overPosition) {
           return;
         }
 
         if (
-          dragIndex < hoverIndex &&
+          draggingOriginPosition < overPosition &&
           cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP
         ) {
           return; // Not over 50% Group height downwards, do nothing for now
         }
         if (
-          dragIndex > hoverIndex &&
+          draggingOriginPosition > overPosition &&
           cursorPosition == dragndrop.constants.CURSOR_POSITION_BOTTOM
         ) {
           return; // Not over 50% Group height upwards, do nothing for now
@@ -244,39 +239,87 @@ export default class NavGroup extends React.Component {
 
         // Time to actually perform the action
         this.props.setDraggingGroup({
-          id: this.props.draggingGroup.id,
-          index: hoverIndex
+          groupId: this.props.draggingGroup.groupId,
+          groupPosition: overPosition
         });
-        this.props.dispatch(Actions.moveNavGroup(dragIndex, hoverIndex));
+
+        this.props.dispatch(
+          Actions.groupMove(draggingOriginPosition, overPosition)
+        );
       }
     },
 
     dragOut: () => {
+      if (this.state.dragOver === false || this.inTransition) return;
       this.setState({
         dragOver: false
       });
     },
 
     drop: (event, cursorPosition) => {
-      this.props.clearDraggingGroup();
-
+      event.preventDefault(); // Success Animation
+      event.stopPropagation(); // Avoid new Group in navbar
       if (dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)) {
         // Filedrop, add File to Group
+
         if (this.props.isDiskGroup) return;
         const fileList = dragndrop.getFilePathArray(event);
         if (fileList.length > 0) {
           this.props.dispatch(
-            Actions.addGroupItems(this.props.groupID, fileList)
+            Actions.itemsCreate_fromPath(this.props.position, fileList)
           );
         }
-      } else if (dragndrop.shouldAcceptDrop(event, DnDTypes.NAVGROUP)) {
+      } else if (dragndrop.shouldAcceptDrop(event, c.DnDTypes.NAVGROUP)) {
+        this.props.clearDraggingGroup();
         // Navgroup Drop Done, lets save that
-        this.props.dispatch(Actions.saveFavbartoStorage());
+        this.props.dispatch(Actions.groupsSave());
       }
     }
   });
 
-  setDraggingItem = (dragData: any) => {
+  // GROUP ITEM EVENTS
+
+  handleOnItemRemove = (itemIndex: number, e: SyntheticMouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.props.dispatch(
+      Actions.itemRemove(this.props.position, itemIndex)
+    );
+  };
+
+  handleSelectionChanged = (item: any, e: SyntheticMouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (item.type == c.ITEM_TYPE_FILE) {
+      this.props.dispatch(
+        App.actions.changeAppPath(nodePath.dirname(item.path), null)
+      );
+      this.props.dispatch(ViewFile.actions.showPreview(item.path));
+    } else {
+      this.props.dispatch(App.actions.changeAppPath(item.path));
+    }
+  };
+
+  handleMoveGroupItem = (
+    draggingItemPosition: number,
+    overItemPosition: number
+  ) => {
+    this.props.dispatch(
+      Actions.itemMove(
+        this.props.position,
+        draggingItemPosition,
+        overItemPosition
+      )
+    );
+  };
+
+  handleSaveFavbar = () => {
+    this.props.dispatch(Actions.groupsSave());
+  };
+
+  setDraggingItem = (dragData: types.itemDragData) => {
     this.setState({
       draggingItem: dragData
     });
