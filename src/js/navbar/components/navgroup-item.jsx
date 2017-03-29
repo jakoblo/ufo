@@ -10,16 +10,12 @@ import * as types from "../navbar-types";
 import * as c from "../navbar-constants";
 import { Motion, spring } from "react-motion";
 
-const ITEM_HEIGHT = 28; // To Calculate the absolute top distance by position number
-
 type Props = {
-  type: string, // Css theme
   active: boolean, // Selected or open
   draggingItem: types.itemDragData,
+  item: any,
   position: number,
   groupId: number,
-  className?: string,
-  title: string,
   onClick: Function,
   onItemRemove: Function,
   setDraggingItem: (types.itemDragData) => void,
@@ -40,7 +36,7 @@ export default class NavGroupItem extends React.Component {
   constructor(props: Props) {
     super(props);
     this.inTransition = false;
-    this.startTopOffset = this.props.position * ITEM_HEIGHT;
+    this.startTopOffset = this.props.position * c.ITEM_HEIGHT;
     this.state = {
       dropTarget: false
     };
@@ -49,7 +45,7 @@ export default class NavGroupItem extends React.Component {
   render() {
     const className = classnames(
       "nav-bar-item",
-      "nav-bar-item--theme-" + this.props.type,
+      "nav-bar-item--theme-" + this.props.item.type,
       {
         "nav-bar-item": true,
         "nav-bar-item--active": this.props.active,
@@ -62,7 +58,7 @@ export default class NavGroupItem extends React.Component {
     return (
       <Motion
         defaultStyle={{ top: this.startTopOffset }}
-        style={{ top: spring(this.props.position * ITEM_HEIGHT) }}
+        style={{ top: spring(this.props.position * c.ITEM_HEIGHT) }}
       >
         {value => (
           <div
@@ -78,7 +74,7 @@ export default class NavGroupItem extends React.Component {
           >
             <div className="nav-bar-item__underlay" />
             <span className="nav-bar-item__text">
-              {this.props.title}
+              {this.props.item.name}
             </span>
             {!this.props.isDiskGroup
               ? <Button
@@ -149,8 +145,9 @@ export default class NavGroupItem extends React.Component {
       if (dragndrop.shouldAcceptDrop(event, DnDTypes.GROUPITEM)) {
         event.preventDefault(); // Drop is valid, will avoid cancel animation onDrop
         this.itemDragOverToSort(event, cursorPosition);
-      }
-      if (dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)) {
+      } else if (
+        dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)
+      ) {
         // Drop is not valid, no preventDefault
         this.fileDragOver(event, cursorPosition);
       }
@@ -164,8 +161,12 @@ export default class NavGroupItem extends React.Component {
     },
 
     drop: (event, cursorPosition) => {
-      this.props.clearDraggingItem();
-      this.props.saveFavbar();
+      if (dragndrop.shouldAcceptDrop(event, DnDTypes.GROUPITEM)) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.props.clearDraggingItem();
+        this.props.saveFavbar();
+      }
     }
   });
 

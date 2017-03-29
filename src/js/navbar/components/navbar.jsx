@@ -11,8 +11,6 @@ import classnames from "classnames";
 import * as dragndrop from "../../utils/dragndrop";
 import * as types from "../navbar-types";
 
-let groupTopOffset = 0;
-
 type Props = {
   navbar: any,
   dispatch: Function
@@ -53,22 +51,29 @@ class Navbar extends React.Component {
 
     return (
       <div className={classname} {...this.dropZoneListener}>
-        {navbar.get("groups").map(group => {
+        {navbar.get("groups").map((group, position) => {
           return this.renderNavGroup(
             group,
-            this.getTopOffset(group.id, groupsHeight)
+            position,
+            this.getTopOffset(position, groupsHeight)
           );
         })}
       </div>
     );
   }
 
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.propsnavbar != nextProps.navbar) {
+      this.props.dispatch(Actions.saveNavbarToStorage());
+    }
+  }
+
   calcGroupsHeight = () => {
     return this.props.navbar
       .get("groups")
       .map(group => {
-        const itemCount = group.get("items").size;
-        const hidden = group.get("hidden");
+        const itemCount = group.items.size;
+        const hidden = group.hidden;
 
         let height = constants.TITLE_HEIGHT + constants.GROUP_BUTTOM_PADDING;
         if (!hidden) {
@@ -79,19 +84,17 @@ class Navbar extends React.Component {
       .toJS();
   };
 
-  getTopOffset = (id: number, groupsHeight: Array<number>) => {
+  getTopOffset = (position: number, groupsHeight: Array<number>) => {
     let offset = 0;
-    const position = this.props.navbar.get("groupsOrder").indexOf(id);
-    this.props.navbar.get("groupsOrder").forEach((id, index) => {
+    this.props.navbar.get("groups").forEach((group, index) => {
       if (index < position) {
-        offset = offset + groupsHeight[id];
+        offset = offset + groupsHeight[index];
       }
     });
     return offset;
   };
 
-  renderNavGroup = (group, offset) => {
-    const position = this.props.navbar.get("groupsOrder").indexOf(group.id);
+  renderNavGroup = (group, position, offset) => {
     return (
       <NavGroup
         key={group.id}
@@ -145,7 +148,7 @@ class Navbar extends React.Component {
         let title = _.last(
           _.split(nodePath.dirname(fileList[0]), nodePath.sep)
         );
-        this.props.dispatch(Actions.addNavGroup(title, fileList));
+        this.props.dispatch(Actions.addNavGroup__fileList(title, fileList));
       }
     }
   });

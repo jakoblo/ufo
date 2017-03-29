@@ -1,8 +1,7 @@
 //@flow
 import React from "react";
-
-const ITEM_HEIGHT = 28;
-const ANIMATION_TIME = 350;
+import { Motion, spring } from "react-motion";
+import * as c from "../navbar-constants";
 
 type Props = {
   children?: Element,
@@ -10,88 +9,36 @@ type Props = {
   collapsed: boolean
 };
 
-type State = {
-  height: number | string,
-  animationInProgress: boolean
-};
-
 export default class NavGroupItemCollapser extends React.Component {
-  state: State;
   props: Props;
-  activeTimeout: any;
+  defaultHeight: any;
   constructor(props: Props) {
     super(props);
-    this.state = {
-      height: this.props.collapsed ? 0 : this.props.itemCount * ITEM_HEIGHT,
-      animationInProgress: false
-    };
-    this.activeTimeout = null;
+    this.defaultHeight = this.calcHeight(props);
   }
 
   render() {
     return (
-      <div
-        className="nav-bar-group__item-wrapper"
-        style={{
-          height: this.state.height,
-          overflow: "hidden",
-          transition: this.state.animationInProgress
-            ? "height " + ANIMATION_TIME + "ms ease-out"
-            : "none"
-        }}
+      <Motion
+        defaultStyle={{ height: this.defaultHeight }}
+        style={{ height: spring(this.calcHeight(this.props)) }}
       >
-        {this.props.children ? this.props.children : null}
-      </div>
+        {value => (
+          <div
+            className="nav-bar-group__item-wrapper"
+            style={{
+              height: value.height,
+              overflow: "hidden"
+            }}
+          >
+            {this.props.children ? this.props.children : null}
+          </div>
+        )}
+      </Motion>
     );
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.props.collapsed != nextProps.collapsed) {
-      nextProps.collapsed ? this.collapse() : this.expand();
-    }
+  calcHeight(props: Props) {
+    return props.collapsed ? 0 : props.itemCount * c.ITEM_HEIGHT;
   }
-
-  collapse = () => {
-    this.animate(this.props.itemCount * ITEM_HEIGHT, 0, 0);
-  };
-
-  expand = () => {
-    this.animate(
-      0,
-      this.props.itemCount * ITEM_HEIGHT,
-      this.props.itemCount * ITEM_HEIGHT
-    );
-  };
-
-  animate = (
-    startHeight: number,
-    targetHeight: number,
-    endHeight: number | string
-  ) => {
-    requestAnimationFrame(() => {
-      this.setState({
-        height: startHeight,
-        animationInProgress: false
-      });
-      requestAnimationFrame(() => {
-        this.setState({
-          height: targetHeight,
-          animationInProgress: true
-        });
-      });
-
-      clearTimeout(this.activeTimeout);
-      this.activeTimeout = setTimeout(
-        () => {
-          requestAnimationFrame(() => {
-            this.setState({
-              height: endHeight,
-              animationInProgress: false
-            });
-          });
-        },
-        ANIMATION_TIME
-      );
-    });
-  };
 }

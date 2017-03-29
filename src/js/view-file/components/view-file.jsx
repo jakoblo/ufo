@@ -6,6 +6,7 @@ import FS from "../../filesystem/watch/fs-watch-index";
 import filesize from "filesize"; // https://www.npmjs.com/package/filesize
 import classnames from "classnames";
 import getRenderer from "../render/get-renderer";
+import Loading from "../../general-components/loading";
 
 type Props = {
   file: any,
@@ -40,6 +41,7 @@ class ViewFile extends React.Component {
 
   render() {
     let file = this.props.file;
+    if (!file) return <Loading />;
     let FileRenderer = getRenderer(nodePath.extname(this.props.path));
 
     return (

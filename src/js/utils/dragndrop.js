@@ -115,10 +115,10 @@ export function getEnhancedDropZoneListener(
     },
 
     onDrop: (event: SyntheticDragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      dragOut(event);
-      drop(event, getCursorPosition(event));
+      if (shouldAcceptDrop(event, acceptableTypes)) {
+        dragOut(event);
+        drop(event, getCursorPosition(event));
+      }
     }
   };
 }

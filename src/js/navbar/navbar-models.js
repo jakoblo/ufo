@@ -1,17 +1,22 @@
 //@flow
 import { Record, List } from "immutable";
+import * as c from "./navbar-constants";
 
-export const NavGroupRecord = Record({
-  id: null,
-  title: "",
-  diskGroup: false,
-  items: List([]),
-  itemsOrder: List([]),
-  position: null,
-  hidden: false
-});
+export class NavGroup
+  extends Record({
+    id: null,
+    title: "",
+    items: List([]),
+    hidden: false
+  }) {
+  get diskGroup(): boolean {
+    return this.id === c.DISKS_GROUP_ID;
+  }
+}
 
-export const NavGroupItemRecord = Record({
-  id: null,
-  path: ""
-});
+export class NavGroupItem
+  extends Record({
+    type: null,
+    name: null,
+    path: ""
+  }) {}
