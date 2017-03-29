@@ -32,7 +32,7 @@ class Navbar extends React.Component {
   constructor(props: Props) {
     super(props);
 
-    props.dispatch(Actions.loadNavbarfromStorage());
+    props.dispatch(Actions.groupsLoad());
 
     this.state = {
       dragOver: false,
@@ -64,7 +64,8 @@ class Navbar extends React.Component {
 
   componentWillReceiveProps(nextProps: Props) {
     if (this.propsnavbar != nextProps.navbar) {
-      this.props.dispatch(Actions.saveNavbarToStorage());
+      //@TODO move to app quit
+      this.props.dispatch(Actions.groupsSave());
     }
   }
 
@@ -148,7 +149,7 @@ class Navbar extends React.Component {
         let title = _.last(
           _.split(nodePath.dirname(fileList[0]), nodePath.sep)
         );
-        this.props.dispatch(Actions.addNavGroup__fileList(title, fileList));
+        this.props.dispatch(Actions.groupCreate__fileList(title, fileList));
       }
     }
   });

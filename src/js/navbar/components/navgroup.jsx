@@ -118,18 +118,18 @@ export default class NavGroup extends React.Component {
   // GROUP EVENTS
 
   handleToggleGroup = () => {
-    this.props.dispatch(Actions.toggleGroup(this.props.position));
+    this.props.dispatch(Actions.groupToggle(this.props.position));
   };
 
   handleRemoveGroup = () => {
-    this.props.dispatch(Actions.removeNavGroup(this.props.position));
+    this.props.dispatch(Actions.groupRemove(this.props.position));
   };
 
   // GROUP TITLE EVENTS
 
   handleGroupTitleChange = (newTitle: string) => {
     this.props.dispatch(
-      Actions.changeGroupTitle(this.props.position, newTitle)
+      Actions.groupTitleChange(this.props.position, newTitle)
     );
   };
 
@@ -244,7 +244,7 @@ export default class NavGroup extends React.Component {
         });
 
         this.props.dispatch(
-          Actions.moveNavGroup(draggingOriginPosition, overPosition)
+          Actions.groupMove(draggingOriginPosition, overPosition)
         );
       }
     },
@@ -266,13 +266,13 @@ export default class NavGroup extends React.Component {
         const fileList = dragndrop.getFilePathArray(event);
         if (fileList.length > 0) {
           this.props.dispatch(
-            Actions.addGroupItemsFromPathList(this.props.position, fileList)
+            Actions.itemsCreate_fromPath(this.props.position, fileList)
           );
         }
       } else if (dragndrop.shouldAcceptDrop(event, c.DnDTypes.NAVGROUP)) {
         this.props.clearDraggingGroup();
         // Navgroup Drop Done, lets save that
-        this.props.dispatch(Actions.saveNavbarToStorage());
+        this.props.dispatch(Actions.groupsSave());
       }
     }
   });
@@ -283,7 +283,7 @@ export default class NavGroup extends React.Component {
     e.preventDefault();
     e.stopPropagation();
     this.props.dispatch(
-      Actions.removeGroupItem(this.props.position, itemIndex)
+      Actions.itemRemove(this.props.position, itemIndex)
     );
   };
 
@@ -307,7 +307,7 @@ export default class NavGroup extends React.Component {
     overItemPosition: number
   ) => {
     this.props.dispatch(
-      Actions.moveGroupItem(
+      Actions.itemMove(
         this.props.position,
         draggingItemPosition,
         overItemPosition
@@ -316,7 +316,7 @@ export default class NavGroup extends React.Component {
   };
 
   handleSaveFavbar = () => {
-    this.props.dispatch(Actions.saveNavbarToStorage());
+    this.props.dispatch(Actions.groupsSave());
   };
 
   setDraggingItem = (dragData: types.itemDragData) => {

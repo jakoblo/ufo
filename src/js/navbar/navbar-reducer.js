@@ -20,23 +20,20 @@ export default function navbarReducer(
     case App.actiontypes.APP_CHANGE_PATH:
       return state.set("activeItem", action.payload.pathRoute[0]);
 
-    case t.MOVE_NAVGROUP:
-      if (action.payload.hoverPosition < 0) return state;
+    case t.NAVBAR_GROUP_MOVE:
+      if (action.payload.toPosition < 0) return state;
 
-      const draggingGroup = state.getIn([
-        "groups",
-        action.payload.dragPosition
-      ]);
+      const groupMoving = state.getIn(["groups", action.payload.fromPosition]);
 
       return state.set(
         "groups",
         state
           .get("groups")
-          .delete(action.payload.dragPosition)
-          .insert(action.payload.hoverPosition, draggingGroup)
+          .delete(action.payload.fromPosition)
+          .insert(action.payload.toPosition, groupMoving)
       );
 
-    case t.MOVE_GROUPITEM:
+    case t.NAVBAR_ITEM_MOVE:
       if (action.payload.itemToPosition < 0) return state;
       let items = state.getIn([
         "groups",
@@ -71,7 +68,7 @@ export default function navbarReducer(
         )
       );
 
-    case t.NAVBAR_TOGGLE_GROUP:
+    case t.NAVBAR_GROUP_TOGGLE:
       let hidden = state.getIn([
         "groups",
         action.payload.groupPosition,
@@ -82,14 +79,12 @@ export default function navbarReducer(
         !hidden
       );
 
-    case t.ADD_NAVGROUP:
+    case t.NAVBAR_GROUP_CREATE:
       const pl = action.payload;
 
       const groups = state.get("groups");
       const id = pl.diskGroup ? c.DISKS_GROUP_ID : "id_" + new Date().getTime();
       const position = pl.position ? pl.position : groups.size;
-
-      console.log(action);
 
       return state.set(
         "groups",
@@ -104,7 +99,7 @@ export default function navbarReducer(
         )
       );
 
-    case t.ADD_GROUP_ITEM:
+    case t.NAVBAR_ITEMS_CREATE:
       let newItems = state
         .getIn(["groups", action.payload.groupPosition, "items"])
         .push(...action.payload.items.map(item => new NavGroupItem(item)));
@@ -113,7 +108,13 @@ export default function navbarReducer(
         newItems
       );
 
-    case t.NAVBAR_REMOVE_GROUP_ITEM:
+    case t.NAVBAR_ITEMS_SET:
+      return state.setIn(
+        ["groups", action.payload.groupPosition, "items"],
+        List(action.payload.items.map(item => new NavGroupItem(item)))
+      );
+
+    case t.NAVBAR_ITEM_REMOVE:
       return state.deleteIn([
         "groups",
         action.payload.groupPosition,
@@ -121,27 +122,13 @@ export default function navbarReducer(
         action.payload.itemPosition
       ]);
 
-    case t.REMOVE_DISKGROUP_ITEM:
-      const deviceGroupIndex = state
-        .get("groups")
-        .findIndex(group => group.get("id") === 0);
-      const deviceGroupItem = state
-        .getIn(["groups", deviceGroupIndex, "items"])
-        .findIndex(item => item.get("path") === action.payload.fileObj.path);
-      return state.deleteIn([
-        "groups",
-        deviceGroupIndex,
-        "items",
-        deviceGroupItem
-      ]);
-
-    case t.NAVBAR_CHANGE_GROUP_TITLE:
+    case t.NAVBAR_GROUP_TITLE_CHANGE:
       return state.setIn(
         ["groups", action.payload.groupPosition, "title"],
         action.payload.newTitle
       );
 
-    case t.REMOVE_NAVGROUP:
+    case t.NAVBAR_GROUP_REMOVE:
       return state.deleteIn(["groups", action.payload.groupPosition]);
 
     default:
