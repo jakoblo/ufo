@@ -150,7 +150,6 @@ export default class NavGroup extends React.Component {
         onClick={this.handleSelectionChanged.bind(this, item)}
         onItemRemove={this.handleOnItemRemove.bind(this, position)}
         onMoveGroupItem={this.handleMoveGroupItem}
-        saveFavbar={this.handleSaveFavbar}
         draggingItem={this.state.draggingItem}
         setDraggingItem={this.setDraggingItem}
         clearDraggingItem={this.clearDraggingItem}
@@ -271,8 +270,6 @@ export default class NavGroup extends React.Component {
         }
       } else if (dragndrop.shouldAcceptDrop(event, c.DnDTypes.NAVGROUP)) {
         this.props.clearDraggingGroup();
-        // Navgroup Drop Done, lets save that
-        this.props.dispatch(Actions.groupsSave());
       }
     }
   });
@@ -282,9 +279,7 @@ export default class NavGroup extends React.Component {
   handleOnItemRemove = (itemIndex: number, e: SyntheticMouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    this.props.dispatch(
-      Actions.itemRemove(this.props.position, itemIndex)
-    );
+    this.props.dispatch(Actions.itemRemove(this.props.position, itemIndex));
   };
 
   handleSelectionChanged = (item: any, e: SyntheticMouseEvent) => {
@@ -313,10 +308,6 @@ export default class NavGroup extends React.Component {
         overItemPosition
       )
     );
-  };
-
-  handleSaveFavbar = () => {
-    this.props.dispatch(Actions.groupsSave());
   };
 
   setDraggingItem = (dragData: types.itemDragData) => {

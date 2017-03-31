@@ -15,7 +15,6 @@ export default class WindowManager {
   windows = [];
 
   constructor() {
-    app.on("before-quit", this.handleAppQuit);
     app.on("window-all-closed", this.handleAllWindowsClosed);
   }
   /**
@@ -45,21 +44,6 @@ export default class WindowManager {
   handleWindowClose = (window: BrowserWindow) => {
     this.windows.splice(this.windows.indexOf(window), 1);
     window = null; // Dereference the window object, usually you would store windows in an array if your app supports multi windows, this is the time when you should delete the corresponding element.
-  };
-
-  /**
-   * Save window State before window close
-   *
-   * @param {Object} event
-   */
-  handleAppQuit = (event: any) => {
-    if (this.windows.length > 0) {
-      event.preventDefault();
-      for (let index = 0; index < this.windows.length; index++) {
-        let bw = this.windows[index];
-        bw.webContents.send("saveState");
-      }
-    }
   };
 
   /**

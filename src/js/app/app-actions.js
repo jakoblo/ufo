@@ -5,10 +5,39 @@ import _ from "lodash";
 import nodePath from "path";
 import * as selectors from "./app-selectors";
 import FileSystem from "../filesystem/watch/fs-watch-index";
+import * as Storage from "../utils/storage";
+import { remote } from "electron";
+const app = remote.app;
 
 import type { ThunkArgs, Action } from "../types";
 
 let pathRoute = [];
+
+// Window open & Close
+Storage.register(
+  c.NAME,
+  // Save current folders
+  selectors.getCurrentFolders,
+  // Load Folders delivered from app settings
+  loadFromStorage
+);
+
+function loadFromStorage(
+  data:
+    | {
+        from: string,
+        to: string
+      }
+    | boolean
+) {
+  return (dispatch: Function, getState: Function) => {
+    if (data && typeof data.from == "string" && typeof data.to == "string") {
+      dispatch(changeAppPath(data.from, data.to));
+    } else {
+      dispatch(goToHome());
+    }
+  };
+}
 
 /**
  * Change the path of folders that is displayed in the app.
@@ -67,6 +96,12 @@ export function changeAppPath(
       dispatch(FileSystem.actions.watcherRequest(path));
       pathRoute.push(path);
     });
+  };
+}
+
+export function goToHome() {
+  return (dispatch: Function) => {
+    dispatch(changeAppPath(app.getPath("home"), null));
   };
 }
 

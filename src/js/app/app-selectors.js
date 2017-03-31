@@ -13,6 +13,30 @@ export const getHistorySequence = (state: any) =>
 export const getHistoryPosition = (state: any): number =>
   state.app.getIn(["history", "position"]);
 
+export const getCurrentFolders = (
+  state: any
+):
+  | {
+      from: string,
+      to: string
+    }
+  | boolean => {
+  const historyPosition = getHistoryPosition(state);
+  const from = state.app.getIn([
+    "history",
+    "sequence",
+    historyPosition,
+    "from"
+  ]);
+  const to = state.app.getIn(["history", "sequence", historyPosition, "to"]);
+
+  if (from && to) {
+    return { from, to };
+  } else {
+    return false;
+  }
+};
+
 /**
  * @param {State} state
  * @returns {string}

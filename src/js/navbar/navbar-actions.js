@@ -5,6 +5,7 @@ import _ from "lodash";
 import nodePath from "path";
 import drivelist from "drivelist";
 import DrivelistWatcher from "drivelist-watcher";
+import * as Storage from "../utils/storage";
 import * as t from "./navbar-actiontypes";
 import * as c from "./navbar-constants";
 
@@ -13,39 +14,35 @@ import type { Action } from "../types";
 
 let driveScanner;
 
-export function groupsSave() {
-  return function(dispatch: Function, getState: Function) {
-    let navbarState = getState()[c.NAME];
-    let diskGrouPosition = navbarState
-      .get("groups")
-      .findIndex(group => group.id == c.DISKS_GROUP_ID);
+Storage.register(c.NAME, groupsSave, groupsLoad);
 
-    // Device Group Items cant be saved
-    navbarState = navbarState
-      .deleteIn(["groups", diskGrouPosition, "items"])
-      .delete("activeItem");
+export function groupsSave(state: any) {
+  let navbarState = state[c.NAME];
+  let diskGrouPosition = navbarState
+    .get("groups")
+    .findIndex(group => group.id == c.DISKS_GROUP_ID);
 
-    storage.set(c.NAME, navbarState, error => {
-      if (error) throw error;
-    });
-  };
+  // Device Group Items cant be saved
+  navbarState = navbarState
+    .deleteIn(["groups", diskGrouPosition, "items"])
+    .delete("activeItem");
+
+  return navbarState.toJS();
 }
 
-export function groupsLoad() {
-  return function(dispatch: Function, getState: Function) {
-    storage.get(c.NAME, function(error, data) {
-      if (error || !data.groups) {
-        dispatch(groupsCreateDefault());
-      } else {
-        dispatch({
-          type: t.NAVBAR_LOAD_FROM_STORAGE,
-          payload: {
-            groups: data.groups
-          }
-        });
-      }
-      dispatch(drivesInit());
-    });
+export function groupsLoad(data: Object | boolean) {
+  return (dispatch: Function, getState: Function) => {
+    if (typeof data == "object") {
+      dispatch({
+        type: t.NAVBAR_LOAD_FROM_STORAGE,
+        payload: {
+          groups: data.groups
+        }
+      });
+    } else {
+      dispatch(groupsCreateDefault());
+    }
+    dispatch(drivesInit());
   };
 }
 

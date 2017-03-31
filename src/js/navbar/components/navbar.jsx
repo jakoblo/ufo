@@ -32,8 +32,6 @@ class Navbar extends React.Component {
   constructor(props: Props) {
     super(props);
 
-    props.dispatch(Actions.groupsLoad());
-
     this.state = {
       dragOver: false,
       draggingGroup: false
@@ -60,13 +58,6 @@ class Navbar extends React.Component {
         })}
       </div>
     );
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.propsnavbar != nextProps.navbar) {
-      //@TODO move to app quit
-      this.props.dispatch(Actions.groupsSave());
-    }
   }
 
   calcGroupsHeight = () => {

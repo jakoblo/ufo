@@ -20,7 +20,6 @@ type Props = {
   onItemRemove: Function,
   setDraggingItem: (types.itemDragData) => void,
   clearDraggingItem: Function,
-  saveFavbar: Function,
   onMoveGroupItem: Function
 };
 
@@ -165,7 +164,6 @@ export default class NavGroupItem extends React.Component {
         event.preventDefault();
         event.stopPropagation();
         this.props.clearDraggingItem();
-        this.props.saveFavbar();
       }
     }
   });
