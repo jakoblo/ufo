@@ -65,6 +65,11 @@ class FolderEditor extends React.Component {
               onChange={this.onChange}
               readOnly={this.props.readOnly}
               onDocumentChange={this.onDocumentChange}
+              onFocus={() => {
+                this.props.dispatch(
+                  Selection.actions.focusDir(this.props.path)
+                );
+              }}
               onBlur={() => {
                 process.nextTick(() => {
                   // Keep focus on editor
@@ -87,7 +92,6 @@ class FolderEditor extends React.Component {
   }
 
   stopEvent(e: SyntheticDragEvent) {
-    console.log("stop");
     e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
   }

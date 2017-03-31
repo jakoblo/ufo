@@ -11,6 +11,7 @@ import ProgressPie from "../../general-components/progress-pie";
 import FileItemUnkown from "./file-item-unknown";
 import * as DnD from "../../utils/dragndrop";
 import * as FileActions from "../fi-actions";
+import Selection from "../../filesystem/selection/sel-index";
 
 import * as FsMergedSelector from "../../filesystem/fs-merged-selectors";
 
@@ -110,6 +111,7 @@ class FileItemComp extends React.Component {
               className={className + "__event-catcher"}
               draggable={true}
               onDragStart={this.onDragStart}
+              onMouseDown={this.onMouseDown}
               onClick={this.onClick}
               onContextMenu={this.onContextMenu}
               onDoubleClick={this.onDoubleClick}
@@ -205,22 +207,18 @@ class FileItemComp extends React.Component {
     this.dragOverTimeout = null;
   };
 
-  // Adding file to Selection
-  // onMouseDown = (event) => {
-  //   // event.stopPropagation()
-  //   // event.preventDefault()
-  //   if(!this.props.file.get('progress')) {
-  //     if(event.ctrlKey || event.metaKey) {
-  //       this.props.onCtrlMetaClick(this.props.file.get('base'), this.props.file)
-  //       // this.props.dispatch( FileActions.addToSelection(this.props.file) )
-  //     } else if(event.shiftKey) {
-  //       // this.props.dispatch( FileActions.expandSelection(this.props.file) )
-  //       this.props.onShiftClick(this.props.file.get('base'), this.props.file)
-  //     } else {
-  //       // Wait for mouse up
-  //     }
-  //   }
-  // }
+  onMouseDown = (event: SyntheticMouseEvent) => {
+    if (event.ctrlKey || event.metaKey) {
+      // Cmd Click adds the file to selection
+      // This cant be handeled by the editor
+      // The editor has only one selection
+      event.preventDefault();
+      event.stopPropagation();
+      this.props.dispatch(
+        Selection.actions.filesAdd([this.props.file.get("path")])
+      );
+    }
+  };
 
   //Show Folder or File in Preview
   onClick = (event: SyntheticMouseEvent) => {

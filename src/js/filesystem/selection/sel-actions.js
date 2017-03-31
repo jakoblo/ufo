@@ -142,6 +142,21 @@ export function dirSet(root: string) {
   };
 }
 
+export function focusDir(root: string) {
+  return function(dispatch: Function, getState: Function) {
+    const state = getState();
+    if (root != selectors.getSelectionRoot(state)) {
+      dispatch({
+        type: t.SET_SELECTION,
+        payload: {
+          root: root,
+          files: []
+        }
+      });
+    }
+  };
+}
+
 /*
  * Navigate up in the focused Folder/View
  */

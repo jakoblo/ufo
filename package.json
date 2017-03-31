@@ -44,7 +44,7 @@
     "redux-thunk": "^2.2.0",
     "reselect": "^2.5.3",
     "rimraf": "^2.5.4",
-    "slate": "^0.19.8",
+    "slate": "^0.19.13",
     "trash": "^4.0.0"
   },
   "devDependencies": {

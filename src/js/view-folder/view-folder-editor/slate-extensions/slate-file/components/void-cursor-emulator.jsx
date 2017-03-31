@@ -44,13 +44,12 @@ export default class VoidCursorEmulator extends React.Component {
           event.stopPropagation();
           if (event.shiftKey) {
             this.expandSelection();
-          } else {
-            this.setSelection();
           }
         }}
         onMouseUp={event => {
           event.stopPropagation();
           if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+            this.setSelection();
           }
         }}
       >
