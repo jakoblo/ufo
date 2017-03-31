@@ -21,6 +21,7 @@
     "electron-compile": "^6.1.2",
     "electron-compilers": "^5.6.0",
     "electron-json-storage": "^3.0.1",
+    "electron-window-state": "^4.1.0",
     "filesize": "^3.3.0",
     "get-folder-size": "^1.0.0",
     "graceful-ncp": "^3.0.0",

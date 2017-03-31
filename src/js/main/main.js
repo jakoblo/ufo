@@ -6,11 +6,17 @@
 
 import ipcListener from "./main-ipc";
 import { app, BrowserWindow } from "electron";
+import windowStateKeeper from "electron-window-state";
 import os from "os";
 
 let window;
+let mainWindowState;
 
 app.on("ready", function() {
+  mainWindowState = windowStateKeeper({
+    defaultWidth: 1000,
+    defaultHeight: 800
+  });
   startWindow();
   ipcListener();
 });
@@ -33,8 +39,10 @@ app.on("activate", () => {
 
 function startWindow() {
   window = new BrowserWindow({
-    width: 800,
-    height: 600,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     resizable: true,
     frame: false //os.platform() != "darwin" // Windows needs the ugly frame, linux?
   });
@@ -48,6 +56,11 @@ function startWindow() {
   window.on("closed", e => {
     window = null;
   });
+
+  // Let us register listeners on the window, so we can update the state
+  // automatically (the listeners will be removed when the window is closed)
+  // and restore the maximized or full screen state
+  mainWindowState.manage(window);
 }
 
 // Disabled Multiwindow base
