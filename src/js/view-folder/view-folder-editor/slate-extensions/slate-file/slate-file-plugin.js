@@ -134,10 +134,6 @@ export default function FilePlugin_Factory(options: PluginOptions) {
 
                   state = stateTransforms.removeFiles(state, baselist);
 
-                  if (!state.document) {
-                    console.log(state);
-                    debugger;
-                  }
                   // Need to be calcualted after remove Files
                   const nodeIndex = state.document
                     .getParent(node)

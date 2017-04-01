@@ -8,7 +8,6 @@ import { DnDTypes } from "../navbar-constants";
 import * as dragndrop from "../../utils/dragndrop";
 import * as types from "../navbar-types";
 import * as c from "../navbar-constants";
-import { Motion, spring } from "react-motion";
 
 type Props = {
   active: boolean, // Selected or open
@@ -16,6 +15,7 @@ type Props = {
   item: any,
   position: number,
   groupId: number,
+  style: Object,
   onClick: Function,
   onItemRemove: Function,
   setDraggingItem: (types.itemDragData) => void,
@@ -35,7 +35,6 @@ export default class NavGroupItem extends React.Component {
   constructor(props: Props) {
     super(props);
     this.inTransition = false;
-    this.startTopOffset = this.props.position * c.ITEM_HEIGHT;
     this.state = {
       dropTarget: false
     };
@@ -55,35 +54,26 @@ export default class NavGroupItem extends React.Component {
     );
 
     return (
-      <Motion
-        defaultStyle={{ top: this.startTopOffset }}
-        style={{ top: spring(this.props.position * c.ITEM_HEIGHT) }}
+      <div
+        className={className}
+        onClick={this.props.onClick}
+        draggable={true}
+        style={this.props.style}
+        onDragStart={this.onDragStart}
+        onDragEnd={this.onDragEnd}
+        {...this.dropZoneListener}
       >
-        {value => (
-          <div
-            className={className}
-            onClick={this.props.onClick}
-            draggable={true}
-            style={{
-              top: value.top
-            }}
-            onDragStart={this.onDragStart}
-            onDragEnd={this.onDragEnd}
-            {...this.dropZoneListener}
-          >
-            <div className="nav-bar-item__underlay" />
-            <span className="nav-bar-item__text">
-              {this.props.item.name}
-            </span>
-            {!this.props.isDiskGroup
-              ? <Button
-                  className="nav-bar-item__button-remove"
-                  onClick={this.props.onItemRemove}
-                />
-              : null}
-          </div>
-        )}
-      </Motion>
+        <div className="nav-bar-item__underlay" />
+        <span className="nav-bar-item__text">
+          {this.props.item.name}
+        </span>
+        {!this.props.isDiskGroup
+          ? <Button
+              className="nav-bar-item__button-remove"
+              onClick={this.props.onItemRemove}
+            />
+          : null}
+      </div>
     );
   }
 
