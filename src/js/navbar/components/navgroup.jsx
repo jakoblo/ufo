@@ -15,7 +15,7 @@ import { findDOMNode } from "react-dom";
 import NavGroupItemCollapser from "./navgroup-item-collapser";
 import * as dragndrop from "../../utils/dragndrop";
 import * as types from "../navbar-types";
-import { Motion, spring } from "react-motion";
+import { Motion, TransitionMotion, spring } from "react-motion";
 import ViewFile from "../../view-file/vf-index";
 
 type Props = {
@@ -94,7 +94,44 @@ export default class NavGroup extends React.Component {
               itemCount={group.items.size}
               collapsed={group.hidden}
             >
-              {group.items.map(this.renderGroupItem)}
+              <TransitionMotion
+                defaultStyles={this.getDefaultStyles()}
+                styles={this.getStyles()}
+                willLeave={this.willLeave}
+                willEnter={this.willEnter}
+              >
+                {styles => {
+                  return (
+                    <div>
+                      {styles.map(({ key, data, style }, position) => {
+                        return (
+                          <NavGroupItem
+                            key={key}
+                            item={data.item}
+                            style={style}
+                            position={position}
+                            groupId={this.props.group.id}
+                            active={data.item.path === this.props.activeItem}
+                            isDiskGroup={this.props.group.diskGroup}
+                            onClick={this.handleSelectionChanged.bind(
+                              this,
+                              data.item
+                            )}
+                            onItemRemove={this.handleOnItemRemove.bind(
+                              this,
+                              data.position
+                            )}
+                            onMoveGroupItem={this.handleMoveGroupItem}
+                            draggingItem={this.state.draggingItem}
+                            setDraggingItem={this.setDraggingItem}
+                            clearDraggingItem={this.clearDraggingItem}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                }}
+              </TransitionMotion>
             </NavGroupItemCollapser>
           </div>
         )}
@@ -115,6 +152,49 @@ export default class NavGroup extends React.Component {
     }
   }
 
+  // actual animation-related logic
+  getDefaultStyles() {
+    return this.props.group.items
+      .map((item, position) => ({
+        key: item.path,
+        data: { item, position },
+        style: { height: 0, opacity: 1, top: position * c.ITEM_HEIGHT }
+      }))
+      .toJS();
+  }
+
+  getStyles() {
+    return this.props.group.items
+      .map((item, position) => {
+        return {
+          key: item.path,
+          data: { item, position },
+          style: {
+            height: spring(c.ITEM_HEIGHT),
+            opacity: spring(1),
+            top: spring(position * c.ITEM_HEIGHT)
+          }
+        };
+      })
+      .toJS();
+  }
+
+  willEnter(config: any) {
+    return {
+      height: 0,
+      opacity: 1,
+      top: config.data.position * c.ITEM_HEIGHT
+    };
+  }
+
+  willLeave(config: any) {
+    return {
+      height: spring(0),
+      opacity: spring(0),
+      top: config.data.position * c.ITEM_HEIGHT
+    };
+  }
+
   // GROUP EVENTS
 
   handleToggleGroup = () => {
@@ -130,30 +210,6 @@ export default class NavGroup extends React.Component {
   handleGroupTitleChange = (newTitle: string) => {
     this.props.dispatch(
       Actions.groupTitleChange(this.props.position, newTitle)
-    );
-  };
-
-  /**
-   *
-   * GROUP ITEM
-   *
-   */
-  renderGroupItem = (item: any, position: number) => {
-    return (
-      <NavGroupItem
-        key={item.path}
-        item={item}
-        position={position}
-        groupId={this.props.group.id}
-        active={item.path === this.props.activeItem}
-        isDiskGroup={this.props.group.diskGroup}
-        onClick={this.handleSelectionChanged.bind(this, item)}
-        onItemRemove={this.handleOnItemRemove.bind(this, position)}
-        onMoveGroupItem={this.handleMoveGroupItem}
-        draggingItem={this.state.draggingItem}
-        setDraggingItem={this.setDraggingItem}
-        clearDraggingItem={this.clearDraggingItem}
-      />
     );
   };
 

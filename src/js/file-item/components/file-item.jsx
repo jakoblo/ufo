@@ -170,6 +170,7 @@ class FileItemComp extends React.Component {
     possibleEffects: DnD.constants.effects.COPY_MOVE,
 
     dragHover: (event, cursorPosition) => {
+      event.preventDefault();
       this.startPeakTimeout();
       this.setImmState(prevState =>
         prevState.set("dropTarget", cursorPosition));
