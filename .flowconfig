@@ -1,7 +1,11 @@
 [ignore]
-./node_modules/
+*/node_modules/npm/**/*
+*/node_modules/electron-packager/**/*
+*/node_modules/config-chain/**/*
+
 [include]
-./src/
+./src/**/*.js
+./src/**/*.jsx
 
 [libs]
 

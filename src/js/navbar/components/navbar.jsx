@@ -10,6 +10,7 @@ import { remote } from "electron";
 import classnames from "classnames";
 import * as dragndrop from "../../utils/dragndrop";
 import * as types from "../navbar-types";
+import { TransitionMotion, spring } from "react-motion";
 
 type Props = {
   navbar: any,
@@ -29,6 +30,7 @@ const mapStateToProps = state => {
 class Navbar extends React.Component {
   props: Props;
   state: State;
+  groupsHeight: Array<number>;
   constructor(props: Props) {
     super(props);
 
@@ -45,22 +47,92 @@ class Navbar extends React.Component {
       "nav-bar--drop-target": this.state.dragOver
     });
 
-    const groupsHeight = this.calcGroupsHeight();
+    this.groupsHeight = this.calcGroupsHeight();
 
     return (
       <div className={classname} {...this.dropZoneListener}>
-        {navbar.get("groups").map((group, position) => {
-          return this.renderNavGroup(
-            group,
-            position,
-            this.getTopOffset(position, groupsHeight)
-          );
-        })}
+        <TransitionMotion
+          defaultStyles={this.getDefaultStyles()}
+          styles={this.getStyles()}
+          willLeave={this.willLeave}
+          willEnter={this.willEnter}
+        >
+          {groupConfig => {
+            return (
+              <div>
+                {groupConfig.map(({ key, data, style }, position) => (
+                  <NavGroup
+                    key={data.group.id}
+                    group={data.group}
+                    position={position}
+                    style={style}
+                    activeItem={this.props.navbar.get("activeItem")}
+                    dispatch={this.props.dispatch}
+                    draggingGroup={this.state.draggingGroup}
+                    setDraggingGroup={this.setDraggingGroup}
+                    clearDraggingGroup={this.clearDraggingGroup}
+                  />
+                ))}
+              </div>
+            );
+          }}
+        </TransitionMotion>
       </div>
     );
   }
 
-  calcGroupsHeight = () => {
+  // actual animation-related logic
+  getDefaultStyles = () => {
+    return this.props.navbar
+      .get("groups")
+      .map((group, position) => {
+        return {
+          key: group.id,
+          data: { group, position },
+          style: {
+            height: this.groupsHeight[position],
+            opacity: 1,
+            top: this.getTopOffset(position)
+          }
+        };
+      })
+      .toJS();
+  };
+
+  getStyles = () => {
+    return this.props.navbar
+      .get("groups")
+      .map((group, position) => {
+        return {
+          key: group.id,
+          data: { group, position },
+          style: {
+            height: spring(this.groupsHeight[position]),
+            opacity: spring(1),
+            top: spring(this.getTopOffset(position))
+          }
+        };
+      })
+      .toJS();
+  };
+
+  willEnter = (config: any) => {
+    return {
+      height: 0,
+      opacity: 1,
+      top: this.getTopOffset(config.data.position)
+    };
+  };
+
+  willLeave = (config: any) => {
+    return {
+      height: spring(0),
+      opacity: spring(0),
+      top: this.getTopOffset(config.data.position)
+    };
+  };
+
+  calcGroupsHeight = (): Array<number> => {
     return this.props.navbar
       .get("groups")
       .map(group => {
@@ -76,30 +148,14 @@ class Navbar extends React.Component {
       .toJS();
   };
 
-  getTopOffset = (position: number, groupsHeight: Array<number>) => {
+  getTopOffset = (position: number): number => {
     let offset = 0;
     this.props.navbar.get("groups").forEach((group, index) => {
       if (index < position) {
-        offset = offset + groupsHeight[index];
+        offset = offset + this.groupsHeight[index];
       }
     });
     return offset;
-  };
-
-  renderNavGroup = (group, position, offset) => {
-    return (
-      <NavGroup
-        key={group.id}
-        group={group}
-        position={position}
-        top={offset}
-        activeItem={this.props.navbar.get("activeItem")}
-        dispatch={this.props.dispatch}
-        draggingGroup={this.state.draggingGroup}
-        setDraggingGroup={this.setDraggingGroup}
-        clearDraggingGroup={this.clearDraggingGroup}
-      />
-    );
   };
 
   setDraggingGroup = (dragData: types.groupDragData) => {

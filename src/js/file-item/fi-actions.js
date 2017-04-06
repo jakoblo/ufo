@@ -28,7 +28,6 @@ export function open(file: string) {
 export function show(file: any, peakInFolder: boolean = false) {
   return (dispatch: Function, getState: Function) => {
     if (file.get("stats").isFile()) {
-      //@TODO is Dirty
       dispatch(
         App.actions.changeAppPath(
           null,

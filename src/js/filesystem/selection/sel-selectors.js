@@ -62,10 +62,27 @@ export const isFileSelected__Factory = () => {
   return createSelector(
     [getSelectionPathList, (state, path) => path],
     (selectionPathList, path) => {
-      return selectionPathList.find(entry => entry == path);
+      return selectionPathList.indexOf(path) >= 0;
     }
   );
 };
 
 // repalced by filter, but keep it here for now
-// export const getSelectTypeInput = (state) => state.selection.getIn(['selectTypeInput'])
+export const getSelectTypeInput = (state: any): string =>
+  state.selection.get("typeInput");
+
+/*
+ * Focused is the folder where Typing-Filter is applied
+ * Which Filter is focused is deciedet in the Filter-Reducer
+ */
+export const getFocused = (state: any): string => {
+  return state.selection.get("typeFocus");
+};
+
+/*
+ * Focused is the folder where Typing-Filter is applied
+ * Which Filter is focused is deciedet in the Filter-Reducer
+ */
+export const isFocused = (state: any, path: string): boolean => {
+  return getFocused(state) == path;
+};
