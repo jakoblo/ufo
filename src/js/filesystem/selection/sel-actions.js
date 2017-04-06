@@ -4,6 +4,8 @@ import * as selectors from "./sel-selectors";
 import * as c from "./sel-constants";
 import fsWatch from "../watch/fs-watch-index";
 import fsWrite from "../write/fs-write-index";
+import * as FilteActions from "../../file-item/fi-actions";
+import Filter from "../filter/filter-index";
 import * as fsMergedSelector from "../fs-merged-selectors";
 import FolderEditor
   from "../../view-folder/view-folder-editor/folder-editor-index";
@@ -22,6 +24,7 @@ import type { ThunkArgs, Action } from "../../types";
  */
 export function set(pathArray: Array<string>) {
   return function(dispatch: Function, getState: Function) {
+    const state = getState();
     let fileList = [];
     let lastRoot = null;
 
@@ -36,10 +39,18 @@ export function set(pathArray: Array<string>) {
     });
 
     if (fileList.length > 1) {
-      //Close Appending View if multiple files are selected
-      //@TODO is Dirty
-      dispatch(App.actions.changeAppPath(null, lastRoot));
-      dispatch(ViewFile.actions.closePreview());
+      // Close Appending View if multiple files are selected
+      // Cant peak into multiple folder or files
+      // Child Views only allowed if a single file/folder is selected
+
+      if (lastRoot != App.selectors.getCurrentFolders(state).to) {
+        //Close Folders
+        dispatch(App.actions.changeAppPath(null, lastRoot));
+      }
+
+      if (ViewFile.selectors.getViewFilePath(state)) {
+        dispatch(ViewFile.actions.closePreview());
+      }
     }
 
     dispatch({
@@ -122,14 +133,11 @@ export function dirSet(root: string) {
     if (openFile) {
       dispatch(set([nodePath.join(root, openFile)]));
     } else if (firstFile) {
-      dispatch(
-        App.actions.changeAppPath(
-          null,
-          nodePath.join(root, firstFile),
-          false,
-          true
-        )
+      const file = fsWatch.selectors.getFile(
+        state,
+        nodePath.join(root, firstFile)
       );
+      dispatch(FileActions.show(file, true));
     } else {
       dispatch({
         type: t.SET_SELECTION,
@@ -278,5 +286,80 @@ export function startDrag() {
       return nodePath.join(selection.get("root"), filename);
     });
     ipcRenderer.send("ondragstart", selectedFiles);
+  };
+}
+
+/**
+ * USER SEARCH INPUT SELECTION
+ * REPLACED BY FILTER RIGHT NOW, BUT WE WILL SWITCH MAYBE BACK
+ */
+
+export function selectTypeInputAppend(append: string) {
+  return function(dispatch: Function, getState: Function) {
+    let existingFilterString = selectors.getSelectTypeInput(getState());
+    let newFilterString = existingFilterString
+      ? existingFilterString + append
+      : append;
+    dispatch(selectTypeInputSet(newFilterString));
+  };
+}
+
+export function selectTypeInputBackspace() {
+  return function(dispatch: Function, getState: Function) {
+    let existingFilterString = selectors.getSelectTypeInput(getState());
+
+    if (existingFilterString && existingFilterString.length > 0) {
+      dispatch(selectTypeInputSet(existingFilterString.slice(0, -1)));
+    } else {
+      dispatch(selectTypeInputClear());
+    }
+  };
+}
+
+export function selectTypeInputSet(inputString: string) {
+  return function(dispatch: Function, getState: Function) {
+    const state = getState();
+
+    let regEx = new RegExp("^\\.?" + inputString, "i"); // RegExp = /^\.?Filename/i > match .filename & fileName
+
+    let focusedDirPath = selectors.getFocused(state);
+
+    let firstFileMatch = fsMergedSelector
+      .getFiltedBaseArrayOfFolder_Factory()(state, focusedDirPath)
+      .find(filename => {
+        return filename.match(regEx);
+      });
+
+    if (firstFileMatch) {
+      dispatch(
+        App.actions.changeAppPath(
+          null,
+          nodePath.join(focusedDirPath, firstFileMatch),
+          false,
+          true
+        )
+      );
+    }
+
+    if (firstFileMatch) {
+      const file = fsWatch.selectors.getFile(
+        state,
+        nodePath.join(focusedDirPath, firstFileMatch)
+      );
+      dispatch(FileActions.show(file, true));
+    }
+
+    dispatch({
+      type: t.SELECT_TYPE_SET,
+      payload: {
+        input: inputString
+      }
+    });
+  };
+}
+
+export function selectTypeInputClear() {
+  return {
+    type: t.SELECT_TYPE_CLEAR
   };
 }

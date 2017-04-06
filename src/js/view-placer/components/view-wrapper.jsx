@@ -1,34 +1,44 @@
-//@flow
-
+"use strict";
 import React from "react";
-import ResizeSensor from "./resize-sensor";
-import classnames from "classnames";
-
-type Props = {
-  ready: boolean,
-  error: null | Object,
-  children: Element
-};
+import ReactDOM from "react-dom";
+import scrollIntoView from "scroll-into-view";
 
 export default class ViewWrapper extends React.Component {
-  props: Props;
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
   }
 
   render() {
-    let classes = classnames("view-wrapper", {
-      "view-wrapper--ready": this.props.ready
-    });
-    let loading;
-    if (!this.props.ready && !this.props.error) {
-      loading = null;
-    }
     return (
-      <div className={classes}>
-        {loading}
+      <div
+        className="view-wrapper"
+        ref={ref => {
+          this.container = ref;
+        }}
+        style={this.props.style}
+      >
         {this.props.children}
       </div>
     );
   }
+
+  componentDidMount() {
+    this.scrollIntoView();
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    if (
+      this.props.scrollToTrigger === false && nextProps.scrollToTrigger === true
+    ) {
+      this.scrollIntoView();
+    }
+  }
+
+  scrollIntoView = () => {
+    console.log("scroll to");
+    const element: any = ReactDOM.findDOMNode(this.container);
+    scrollIntoView(element, {
+      time: 300
+    });
+  };
 }

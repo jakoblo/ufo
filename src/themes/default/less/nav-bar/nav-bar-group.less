@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   padding: 12px 0;
+  box-sizing: border-box;
   width: 100%;
   z-index: 1; // above drop-zone from navbar
   position: absolute;
@@ -21,9 +22,9 @@
 
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     padding: 0 @padding__sidebar-horizonal;
     height: @height__title;
-
 
     // Arrow Icon
     &__arrow {
@@ -95,10 +96,7 @@
   }
 
   &__item-wrapper {
-    overflow: hidden;
     position: relative;
-    /*outline: 1px solid #f00;*/
-    transition: max-height 350ms ease-out;
   }
 
   // Arrow Icon Rotate on Collapse

@@ -74,7 +74,7 @@ class FolderEditor extends React.Component {
                 process.nextTick(() => {
                   // Keep focus on editor
                   // by click on a button or somewhere in the app
-                  if (this.props.focused) {
+                  if (this.props && this.props.focused) {
                     this.editor.focus();
                   }
                 });

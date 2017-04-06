@@ -14,9 +14,14 @@ export function windowActionHandler(
 ): void {
   if (actionMap[action]) {
     getStore().dispatch(actionMap[action]());
-  } else if (event.key.length == 1 && !event.metaKey && !event.ctrlKey) {
+  }
+}
+
+export function filterHandler(event: SyntheticKeyboardEvent) {
+  if (event.key.length == 1 && !event.metaKey && !event.ctrlKey) {
     // window.store.dispatch( Selection.actions.selectTypeInputAppend(event.key) )
-    getStore().dispatch(Filter.actions.userInputAppend(event.key));
+    event.preventDefault();
+    getStore().dispatch(Selection.actions.selectTypeInputAppend(event.key));
   }
 }
 
@@ -36,11 +41,11 @@ const actionMap: ActionMap = {
   rename: Rename.actions.renameSelected,
   toggleReadOnly: Config.actions.toggleReadOnly,
   moveToTrash: Selection.actions.toTrash,
-  // toggleHiddenFiles: Filter.actions.toggleHiddenFiles,
-  // clearFilter: Selection.actions.selectTypeInputClear,
-  clearFilter: Filter.actions.userInputClear,
-  // deleteFilter: Selection.actions.selectTypeInputBackspace,
-  deleteFilter: Filter.actions.userInputBackspace,
+  toggleHiddenFiles: Filter.actions.toggleHiddenFiles,
+  clearTypeSelect: Selection.actions.selectTypeInputClear,
+  deleteTypeSelect: Selection.actions.selectTypeInputBackspace,
+  // clearFilter: Filter.actions.userInputClear,
+  // deleteFilter: Filter.actions.userInputBackspace,
   filePreview: () =>
     (dispatch, getState) => {
       let selectedFile = Selection.selectors.getFocusedFile(getState());

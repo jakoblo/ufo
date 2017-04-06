@@ -190,7 +190,7 @@ export default class NavGroupItem extends React.Component {
 
   startPeakTimeout = () => {
     if (
-      (this.props.type == "folder" || this.props.type == "device") &&
+      (this.props.item.type == "folder" || this.props.item.type == "device") &&
       this.dragOverTimeout == null
     ) {
       this.dragOverTimeout = setTimeout(

@@ -12,6 +12,7 @@ import FileItemUnkown from "./file-item-unknown";
 import * as DnD from "../../utils/dragndrop";
 import * as FileActions from "../fi-actions";
 import Selection from "../../filesystem/selection/sel-index";
+import scrollIntoView from "dom-scroll-into-view";
 
 import * as FsMergedSelector from "../../filesystem/fs-merged-selectors";
 
@@ -40,6 +41,7 @@ const mapStateToProps = (state, props) => {
 class FileItemComp extends React.Component {
   props: Props;
   state: State;
+  element: any;
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -51,7 +53,7 @@ class FileItemComp extends React.Component {
         icon: null
       })
     };
-    this.requestIcon(this.props.file.get("path"));
+    // this.requestIcon(this.props.file.get("path"));
   }
 
   render() {
@@ -81,6 +83,9 @@ class FileItemComp extends React.Component {
           [className + "--open-animation"]: immState.get("openAnimation"),
           [className + "--in-progress"]: file.get("progress")
         })}
+        ref={ref => {
+          this.element = ref;
+        }}
       >
         <div className={className + "__underlay"} />
 
@@ -129,9 +134,22 @@ class FileItemComp extends React.Component {
   }
 
   componentWillReceiveProps = (nextProps: Props) => {
-    if (this.props.file != nextProps.file) {
-      this.requestIcon(nextProps.file.get("path"));
+    if (
+      this.props.file.get("selected") == false &&
+      nextProps.file.get("selected") == true
+    ) {
+      this.scrollIntoView();
     }
+  };
+
+  scrollIntoView = () => {
+    const element: any = ReactDOM.findDOMNode(this.element);
+    const scrollWrapper = element.closest(".view-folder__editor-container");
+    scrollIntoView(element, scrollWrapper, {
+      onlyScrollIfNeeded: true,
+      offsetTop: 55, // Folder Title Bar
+      offsetBottom: 30 // Bottom Button, add Folder
+    });
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {

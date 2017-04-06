@@ -20,6 +20,7 @@ const mapStateToProps = (state, props) => {
 };
 class ViewFile extends React.Component {
   props: Props;
+  container: any;
   monthNames: Array<string>;
   constructor(props: Props) {
     super(props);
@@ -43,9 +44,13 @@ class ViewFile extends React.Component {
     let file = this.props.file;
     if (!file) return <Loading />;
     let FileRenderer = getRenderer(nodePath.extname(this.props.path));
-
     return (
-      <div className="view-file">
+      <div
+        ref={ref => {
+          this.container = ref;
+        }}
+        className="view-file"
+      >
         <div className="view-file__top-toolbar">
           <div className="view-file__name">{this.props.file.get("base")}</div>
           <div className="view-file__size">

@@ -46,8 +46,8 @@ export const keyMap: {
       windows: "F2",
       linux: "F2"
     },
-    clearFilter: "Escape",
-    deleteFilter: "Backspace",
+    clearTypeSelect: "Escape",
+    deleteTypeSelect: "Backspace",
     filePreview: {
       darwin: " "
     }

@@ -2,14 +2,15 @@
 @import (reference) url('../mixins.less');
 
 .view-wrapper {
-  position: relative;
+  position: absolute;
+  top: 0;
+  bottom: 0;
   width: 330px;
   display: flex;
   flex-shrink: 0;
   flex-grow: 0;
   flex-direction: column;
   box-sizing: border-box;
-  resize: horizontal;
   overflow-x: auto;
   padding-bottom: 15px;
   will-change: transform;
@@ -20,13 +21,21 @@
     flex-grow: 1;
   }
 
-  &::-webkit-resizer {
+  .react-resizable-handle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
     background: url('../../img/view-wrapper__resize-arrows.svg');
     background-repeat: no-repeat;
     background-size: 15px 15px;
     background-position: right;
-    width: 15px;
+    width: 25px;
     height: 15px;
-  }
+    border-radius: 10px 0px 0 0;
 
+    &:hover, &:active, &:focus {
+      background-color: @color__main-decoration;
+    }
+  }
 }

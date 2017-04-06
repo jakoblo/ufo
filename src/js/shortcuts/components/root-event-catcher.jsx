@@ -5,7 +5,7 @@ import Config from "../../config/config-index";
 import { connect } from "react-redux";
 import { keyEventToActionMapper } from "../key-event-handler";
 import { keyMap } from "../key-map";
-import { windowActionHandler } from "../window-action-handler";
+import { windowActionHandler, filterHandler } from "../window-action-handler";
 
 const globalEventHandler = keyEventToActionMapper(
   keyMap.global,
@@ -13,7 +13,8 @@ const globalEventHandler = keyEventToActionMapper(
 );
 const readOnlyEventHandler = keyEventToActionMapper(
   keyMap.readOnly,
-  windowActionHandler
+  windowActionHandler,
+  filterHandler
 );
 
 type Props = {

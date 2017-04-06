@@ -8,7 +8,9 @@
 
   @padding_bar-vertical: 5px;
 
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -22,7 +24,7 @@
     flex-shrink: 1;
     flex-grow: 1;
   }
- 
+
   &__top-toolbar {
     min-height: @height__top-toolbar;
     flex-grow: 0;
@@ -73,7 +75,7 @@
     text-transform: uppercase;
     font-weight: 600;
     margin: 0px 0;
-  } 
+  }
 
   &__date {
     font-size: @font-size__file-time;

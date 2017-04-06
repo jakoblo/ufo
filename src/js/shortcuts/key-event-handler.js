@@ -15,7 +15,8 @@ declare function keyActionCallback(
 // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
 export function keyEventToActionMapper(
   keyMap: KeyMap,
-  callback: keyActionCallback
+  callback: keyActionCallback,
+  noActionCallback?: (event: SyntheticKeyboardEvent) => void
 ) {
   return (event: SyntheticKeyboardEvent) => {
     let eventString = keyEventToString(event);
@@ -33,6 +34,8 @@ export function keyEventToActionMapper(
       event.preventDefault();
       event.stopPropagation();
       callback(action, event);
+    } else if (noActionCallback) {
+      noActionCallback(event);
     }
   };
 }

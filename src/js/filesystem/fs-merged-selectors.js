@@ -31,8 +31,9 @@ export const getFile_Factory = (): Function => {
       isFileSelected,
       getProgressOfFile,
       Rename.selectors.isFileRenaming
+      // Filter.selectors.isHidden
     ],
-    (file, open, selected, progress, renaming) => {
+    (file, open, selected, progress, renaming /*, hidden */) => {
       if (!file) {
         return unknownFile;
       }
@@ -41,6 +42,7 @@ export const getFile_Factory = (): Function => {
         .set("selected", selected)
         .set("progress", progress)
         .set("renaming", renaming);
+      // .set("hidden", hidden);
     }
   );
 };

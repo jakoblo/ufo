@@ -18,6 +18,22 @@ export const getLocal = (state: any, path: string): any => {
   return focused ? state.filter.get("focused") : Map({});
 };
 
+// export const isHidden = (state: any, path: string): boolean => {
+//   const dir = nodePath.dirname(path);
+//   const fileName = nodePath.basename(path);
+//   const filter = getFiterRegExOfFolder_Factory()(state, dir);
+//
+//   var hidden = false;
+//
+//   filter.forEach(filter => {
+//     if (!fileName.match(filter)) {
+//       hidden = true;
+//     }
+//   });
+//
+//   return hidden;
+// };
+
 /*
  * The String which the User is currently Filtering for
  */

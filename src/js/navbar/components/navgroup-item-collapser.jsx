@@ -4,7 +4,6 @@ import { Motion, spring } from "react-motion";
 import * as c from "../navbar-constants";
 
 type Props = {
-  children?: Element,
   itemCount: number,
   collapsed: boolean
 };
