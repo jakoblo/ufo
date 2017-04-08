@@ -73,7 +73,10 @@ export const createFileBlock = (basename: string): Block => {
   return Block.create(getFileBlockProperties(basename));
 };
 
-export const getRawFileBlock = (fileBase: string): Object => {
+export const getRawFileBlock = (
+  fileBase: string,
+  asImage?: boolean = false
+): Object => {
   return {
     kind: "block",
     type: c.BLOCK_TYPE_FILE,
@@ -91,7 +94,8 @@ export const getRawFileBlock = (fileBase: string): Object => {
       }
     ],
     data: {
-      base: fileBase
+      base: fileBase,
+      asImage: asImage
     }
   };
 };

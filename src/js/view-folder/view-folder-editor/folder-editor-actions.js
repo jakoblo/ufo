@@ -23,7 +23,7 @@ export function folderEditorInit(path: string) {
       const fileContent = Utils.fs
         .loadFile(nodePath.join(path, c.INDEX_BASE_NAME))
         .then(fileContent => {
-          editorState = SlateFile.serialize.plainToState(fileContent);
+          editorState = SlateFile.serialize.markdownToState(fileContent);
           editorState = mapFilesToEditorState(fileList, editorState);
 
           dispatch({
