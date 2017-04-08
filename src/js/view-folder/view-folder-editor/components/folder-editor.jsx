@@ -117,7 +117,7 @@ class FolderEditor extends React.Component {
     this.savingTimout = null;
     console.log("save " + this.props.path);
     const path = nodePath.join(this.props.path, c.INDEX_BASE_NAME);
-    const content = SlateFile.serialize.stateToPlain(this.props.editorState);
+    const content = SlateFile.serialize.stateToMarkdown(this.props.editorState);
     Utils.fs.saveFile(path, content);
   };
 
