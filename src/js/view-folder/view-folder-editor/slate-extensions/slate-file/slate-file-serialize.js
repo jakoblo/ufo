@@ -14,7 +14,7 @@ import nodePath from "path";
 // [link](http://url)
 // [file name](./file name) // with space
 const fileLinkRegEx = /!?\[[^\]]+\]\(\.\/[^\s)]+\)/;
-
+const lineBreakSpaces = "  ";
 function getUrl(markdownLink) {
   const urlRegEx = /\]\([^\s\)]+(?=\))/;
   return urlRegEx.exec(markdownLink)[0].slice(2); // ](url.... // remove ](
@@ -47,7 +47,7 @@ export function markdownToState(string: string): Class<State> {
 
       // set line the text which is left
       line = line.slice(fileMatch.index + matchString.length);
-      if (line.length == 0) {
+      if (line.trim().length == 0) {
         // The line is done
         // return to avoid to creation of a empty line
         return;
@@ -69,7 +69,10 @@ export function markdownToState(string: string): Class<State> {
 
   return Raw.deserialize(raw);
 
-  function getTextBlock(text) {
+  function getTextBlock(text: string) {
+    if (text == lineBreakSpaces) {
+      text = "";
+    }
     return {
       kind: "block",
       type: "line",
@@ -97,9 +100,21 @@ export function stateToMarkdown(state: Class<State>): string {
       if (block.type == c.BLOCK_TYPE_FILE) {
         const filename = block.getIn(["data", "base"]);
         const imageFlag = block.getIn(["data", "asImage"]) ? "!" : "";
-        return imageFlag + "[" + filename + "](./" + encodeURI(filename) + ")";
+        return imageFlag +
+          "[" +
+          filename +
+          "](./" +
+          encodeURI(filename) +
+          ")" +
+          lineBreakSpaces;
       } else {
-        return block.text;
+        let text = block.text;
+        console.log(text);
+        if (text.slice(text.length - 2) != lineBreakSpaces) {
+          console.log("ADD SPACES");
+          text = text + lineBreakSpaces;
+        }
+        return text;
       }
     })
     .join("\n");
