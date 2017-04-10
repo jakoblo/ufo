@@ -108,10 +108,9 @@ export function stateToMarkdown(state: Class<State>): string {
           ")" +
           lineBreakSpaces;
       } else {
+        // Markdown needs 2 spacec at the of a line for a linebreak
         let text = block.text;
-        console.log(text);
         if (text.slice(text.length - 2) != lineBreakSpaces) {
-          console.log("ADD SPACES");
           text = text + lineBreakSpaces;
         }
         return text;

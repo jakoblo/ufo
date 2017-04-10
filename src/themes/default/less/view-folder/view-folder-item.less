@@ -53,6 +53,22 @@
     .icon(@icon: '../../img/arrow-small-white.svg', @opacity: 0.5, @height: @height__item);
   }
 
+  &--theme-image {
+    height: auto;
+    flex-wrap: wrap;
+  }
+  &--theme-image &__image-container {
+    width: 100%;
+    text-align: center;
+    img {
+      object-fit: cover;
+      max-width:100%;
+      width: auto;
+      display: block;
+      height: auto;
+    }
+  }
+
   // SVG General File Icon, replaced by electron app.getFileIcon
   // &--theme-file::before {
   //   .icon(@icon: '../../img/folder-list-item__icon-file.svg', @opacity: 0.7, @height: @height__item);

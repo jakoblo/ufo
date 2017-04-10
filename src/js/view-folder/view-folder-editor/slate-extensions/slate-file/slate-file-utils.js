@@ -10,6 +10,14 @@ export function getFileBlockByBase(state: any, base: string): Block {
   });
 }
 
+export function toggleBlockImage(state: any, node: any) {
+  const currentImageState = node.getIn(["data", "asImage"]);
+  return state
+    .transform()
+    .setNodeByKey(node.key, node.setIn(["data", "asImage"], !currentImageState))
+    .apply();
+}
+
 export const getFilesInNodes = (nodes: List<Block>): Array<string> => {
   return nodes
     .filter(node => {

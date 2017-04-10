@@ -120,12 +120,19 @@ export default function FilePlugin_Factory(options: PluginOptions) {
         [BLOCK_TYPE]: function(editorProps) {
           const { node, editor } = editorProps;
           const base = node.getIn(["data", "base"]);
+          const asImage = node.getIn(["data", "asImage"]);
 
           return (
             <VoidCursorEmulator editor={editor} node={node}>
               <FileItem
                 className="view-folder-item"
                 path={nodePath.join(folderPath, base)}
+                asImage={asImage}
+                toggleImageCallback={() => {
+                  editor.onChange(
+                    slateUtils.toggleBlockImage(editor.getState(), node)
+                  );
+                }}
                 onDrop={(event, cursorPosition) => {
                   const fileList = dragndrop.getFilePathArray(event);
                   const baselist = fileList.map(filePath =>

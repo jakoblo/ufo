@@ -19,6 +19,8 @@ import * as FsMergedSelector from "../../filesystem/fs-merged-selectors";
 type Props = {
   file: any,
   path: string,
+  asImage?: boolean,
+  toggleImageCallback?: Function,
   // isFocused: boolean,
   className: string,
   onDrop: Function,
@@ -71,6 +73,7 @@ class FileItemComp extends React.Component {
           [className + "--renaming"]: file.get("renaming"),
           [className + "--theme-folder"]: file.get("stats").isDirectory(),
           [className + "--theme-file"]: file.get("stats").isFile(),
+          [className + "--theme-image"]: this.props.asImage,
           [className + "--active"]: file.get("active"),
           [className + "--selected"]: file.get("selected"),
           // [className + "--is-focused"]: isFocused,
@@ -95,14 +98,23 @@ class FileItemComp extends React.Component {
               progress={file.get("progress")}
               size={16}
             />
-          : <div
-              className={className + "__icon"}
-              style={
-                immState.get("icon")
-                  ? { backgroundImage: 'url("' + immState.get("icon") + '")' }
-                  : null
-              }
-            />}
+          : this.props.asImage
+              ? <div className={className + "__image-container"}>
+                  <img
+                    className={className + "__image"}
+                    src={this.props.file.get("path")}
+                  />
+                </div>
+              : <div
+                  className={className + "__icon"}
+                  style={
+                    immState.get("icon")
+                      ? {
+                          backgroundImage: 'url("' + immState.get("icon") + '")'
+                        }
+                      : null
+                  }
+                />}
 
         <div className={className + "__name-base"}>{file.get("name")}</div>
         <div className={className + "__name-suffix"}>{file.get("suffix")}</div>
@@ -155,7 +167,8 @@ class FileItemComp extends React.Component {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     return nextProps.file !== this.props.file ||
       // nextProps.isFocused !== this.props.isFocused ||
-      nextState.data !== this.state.data;
+      nextState.data !== this.state.data ||
+      this.props.asImage != nextProps.asImage;
   }
 
   requestIcon = (path: string) => {
@@ -274,7 +287,13 @@ class FileItemComp extends React.Component {
     event.preventDefault();
     event.stopPropagation();
     if (!this.props.file.get("progress")) {
-      this.props.dispatch(FileActions.showContextMenu(this.props.file));
+      this.props.dispatch(
+        FileActions.showContextMenu(
+          this.props.file,
+          this.props.asImage,
+          this.props.toggleImageCallback
+        )
+      );
     }
   };
 }
