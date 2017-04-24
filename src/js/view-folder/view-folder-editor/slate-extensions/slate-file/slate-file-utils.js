@@ -10,10 +10,18 @@ export function getFileBlockByBase(state: any, base: string): Block {
   });
 }
 
+export function toggleBlockImage(state: any, node: any) {
+  const currentImageState = node.getIn(["data", "asImage"]);
+  return state
+    .transform()
+    .setNodeByKey(node.key, node.setIn(["data", "asImage"], !currentImageState))
+    .apply();
+}
+
 export const getFilesInNodes = (nodes: List<Block>): Array<string> => {
   return nodes
     .filter(node => {
-      return node.get("type") == "file";
+      return node.get("type") == c.BLOCK_TYPE_FILE;
     })
     .map(fileBlock => {
       return fileBlock.getIn(["data", "base"]);
@@ -57,6 +65,14 @@ export function buildSelectedFiles(editorState: any): Array<string> {
   const selection = editorState.selection;
   return editorState.blocks
     .filter(block => block.type == c.BLOCK_TYPE_FILE) // This block is Fileblock
+    .filter(
+      // Selection ends not at the beginning of the file
+      block => !(selection.isForward && selection.hasFocusAtStartOf(block))
+    )
+    .filter(
+      // Selection start not at the end of the file
+      block => !(!selection.isForward && selection.hasFocusAtEndOf(block))
+    )
     .filter(block => selection.isExpanded) // Selection is Expaneded
     .map(block => block.getIn(["data", "base"]))
     .toJS();

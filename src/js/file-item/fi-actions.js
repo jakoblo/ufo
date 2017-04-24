@@ -4,6 +4,7 @@ import App from "../app/app-index";
 import ViewFile from "../view-file/vf-index";
 import Selection from "../filesystem/selection/sel-index";
 import fsWrite from "../filesystem/write/fs-write-index";
+import * as c from "./file-item-constants";
 import fsRename from "../filesystem/rename/rename-index";
 import nodePath from "path";
 import { ipcRenderer, shell, remote } from "electron";
@@ -54,7 +55,11 @@ export function startDrag(file: any) {
   };
 }
 
-export function showContextMenu(file: any) {
+export function showContextMenu(
+  file: any,
+  asImage?: boolean,
+  toggleImageCallback?: Function
+) {
   return (dispatch: Function, getState: Function) => {
     let filePathArray = getPathArray(file, getState);
     let title = filePathArray.length > 1 ? filePathArray.length + " items" : "";
@@ -76,6 +81,22 @@ export function showContextMenu(file: any) {
         }
       })
     );
+
+    if (
+      toggleImageCallback &&
+      c.chromeImageSuffixes.indexOf(file.get("suffix")) > -1
+    ) {
+      menu.append(
+        new MenuItem({
+          label: "Toggle: Image",
+          click: () => {
+            if (toggleImageCallback) {
+              toggleImageCallback();
+            }
+          }
+        })
+      );
+    }
     menu.append(new MenuItem({ type: "separator" }));
     menu.append(
       new MenuItem({

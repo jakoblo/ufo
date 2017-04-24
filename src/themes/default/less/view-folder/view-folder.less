@@ -1,8 +1,7 @@
 @import (reference) url('../variables.less');
 @import (reference) url('../mixins.less');
 @import (css) url('./view-folder-item.less');
-@import (css) url('./view-folder-editor.less');
-@import (css) url('./void-cursor-emulator.less');
+@import (css) url('./view-folder-editor/editor.less');
 
 
 .view-folder {
@@ -128,12 +127,19 @@
 
   &__item-container,
   &__editor-container {
+    display: flex;
+    align-items: stretch;
+    & > div {
+      width: 100%;
+    }
     overflow-y: scroll !important;
     overflow-x: hidden;
     height: 100%;
     will-change: transform;
     outline: none;
     .nicer-scrollbars(#fff)
+
+
   }
 
   &__editor-container {

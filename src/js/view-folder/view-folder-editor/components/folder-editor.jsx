@@ -4,14 +4,15 @@ import React from "react";
 import classnames from "classnames";
 import nodePath from "path";
 import { connect } from "react-redux";
-import { Editor } from "slate";
+import { Editor, Raw } from "slate";
 import * as c from "../folder-editor-constants";
 import * as Actions from "../folder-editor-actions";
 import * as selectors from "../folder-editor-selectors";
 import Selection from "../../../filesystem/selection/sel-index";
 import SlateFile from "../slate-extensions/slate-file/slate-file-index";
-import MarkdownPlugin
-  from "../slate-extensions/slate-markdown/slate-markdown-plugin";
+import RichText
+  from "../slate-extensions/slate-rich-text/slate-rich-text-plugin";
+
 import Config from "../../../config/config-index";
 import * as Utils from "../../../utils/utils-index";
 
@@ -26,6 +27,10 @@ type Props = {
   dispatch: Function
 };
 
+type State = {
+  scrollPosition: number
+};
+
 const mapStateToProps = (state, props) => {
   return {
     focused: Selection.selectors.getSelectionRoot(state) == props.path,
@@ -37,15 +42,22 @@ const mapStateToProps = (state, props) => {
 class FolderEditor extends React.Component {
   props: Props;
   filePlugin: any;
+  richtTextPlugin: any;
   editor: any;
+  state: State;
+  container: any;
 
   constructor(props: Props) {
     super(props);
+    this.state = {
+      scrollPosition: 0
+    };
     this.filePlugin = SlateFile.slatePlugin_Factory({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
       folderPath: props.path,
       dispatch: this.props.dispatch
     });
+    this.richtTextPlugin = RichText();
   }
 
   render() {
@@ -55,29 +67,53 @@ class FolderEditor extends React.Component {
       "view-folder__editor-container--readonly-mode": this.props.readOnly
     });
     return (
-      <div className={editorClasses}>
+      <div
+        className={editorClasses}
+        ref={ref => {
+          this.container = ref;
+        }}
+        onMouseDown={e => {
+          // Avoid preventDefault by root event catcher
+          // Default event actions is needed by the editor
+          e.stopPropagation();
+        }}
+        onMouseUp={event => {
+          // Focus typeSelection & Scroll to
+          this.props.dispatch(Selection.actions.focusDir(this.props.path));
+        }}
+        onScroll={() => {
+          this.setState({
+            scrollPosition: this.container.scrollTop
+          });
+        }}
+      >
         {this.props.editorState
           ? <Editor
               state={this.props.editorState}
               className="slate-editor"
-              ref={editor => this.editor = editor}
-              plugins={[this.filePlugin, MarkdownPlugin]}
+              ref={editor => (this.editor = editor)}
+              plugins={[this.filePlugin, this.richtTextPlugin]}
               onChange={this.onChange}
               readOnly={this.props.readOnly}
+              scrollPosition={this.state.scrollPosition}
+              getScrollContainer={() => this.container}
               onDocumentChange={this.onDocumentChange}
               onFocus={() => {
-                this.props.dispatch(
-                  Selection.actions.focusDir(this.props.path)
-                );
+                // Not needed right now
+                // this.props.dispatch(
+                //   Selection.actions.focusDir(this.props.path)
+                // );
               }}
               onBlur={() => {
-                process.nextTick(() => {
-                  // Keep focus on editor
-                  // by click on a button or somewhere in the app
-                  if (this.props && this.props.focused) {
-                    this.editor.focus();
-                  }
-                });
+                // Not needed right now
+                //
+                // process.nextTick(() => {
+                //   // Keep focus on editor
+                //   // by click on a button or somewhere in the app
+                //   if (this.props && this.props.focused) {
+                //     this.editor.focus();
+                //   }
+                // });
               }}
             />
           : <Loading />}
@@ -85,10 +121,13 @@ class FolderEditor extends React.Component {
     );
   }
 
-  shouldComponentUpdate(nextProps: Props) {
-    return this.props.editorState != nextProps.editorState ||
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return (
+      this.props.editorState != nextProps.editorState ||
       this.props.readOnly != nextProps.readOnly ||
-      this.props.focused != nextProps.focused;
+      this.state.scrollPosition != nextState.scrollPosition ||
+      this.props.focused != nextProps.focused
+    );
   }
 
   stopEvent(e: SyntheticDragEvent) {
@@ -117,8 +156,9 @@ class FolderEditor extends React.Component {
     this.savingTimout = null;
     console.log("save " + this.props.path);
     const path = nodePath.join(this.props.path, c.INDEX_BASE_NAME);
-    const content = SlateFile.serialize.stateToMarkdown(this.props.editorState);
-    Utils.fs.saveFile(path, content);
+    const content = Raw.serialize(this.props.editorState, { terse: true });
+
+    Utils.fs.saveFile(path, JSON.stringify(content));
   };
 
   componentWillReceiveProps(nextProps: Props) {}

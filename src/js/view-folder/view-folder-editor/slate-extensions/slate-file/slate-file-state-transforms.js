@@ -2,6 +2,7 @@
 import { Block, Text, Selection } from "slate";
 import * as slateUtils from "./slate-file-utils";
 import { List } from "immutable";
+import { DEFAULT_NODE } from "../rich-text-types";
 
 export const removeExisting = (transforming: any, basename: string): any => {
   const existingFileBlock = slateUtils.getFileBlockByBase(
@@ -42,7 +43,7 @@ export const createNewLineAroundFileBlock = (
     focusOffset: splitSelectionOffset
   });
   return transforming.collapseToFocus().splitBlockAtRange(splitRange).setBlock({
-    type: "markdown",
+    type: DEFAULT_NODE.type,
     isVoid: false,
     // nodes: List([Text.createFromString('')]),
     data: {}

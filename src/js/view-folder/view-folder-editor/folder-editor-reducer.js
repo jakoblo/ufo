@@ -6,6 +6,7 @@ import * as c from "./folder-editor-constants";
 import SlateFile from "./slate-extensions/slate-file/slate-file-index";
 import Preview from "../../view-file/vf-index";
 import App from "../../app/app-index";
+import Config from "../../config/config-index";
 import fsWatch from "../../filesystem/watch/fs-watch-index";
 import fsWrite from "../../filesystem/write/fs-write-index";
 import { Raw } from "slate";
@@ -29,6 +30,13 @@ export default function folderEditorReducer(
 
     case t.FOLDER_EDITOR_CLOSE:
       return state.delete(action.payload.path);
+
+    case Config.actiontypes.APP_READ_ONLY_TOGGLE:
+      // Collapse All Selections
+      state = state.map((editorState, key) => {
+        return editorState.transform().collapseToEnd().apply();
+      });
+      return state;
 
     // Add file at the end of the Document if not exists
     case fsWatch.actiontypes.FILE_ADD:

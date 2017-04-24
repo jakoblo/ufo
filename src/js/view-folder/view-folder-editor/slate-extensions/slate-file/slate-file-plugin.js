@@ -5,6 +5,8 @@ import Selection from "../../../../filesystem/selection/sel-index";
 import nodePath from "path";
 import * as dragndrop from "../../../../utils/dragndrop";
 
+import { DEFAULT_NODE } from "../rich-text-types";
+
 import { Block, State } from "slate";
 import VoidCursorEmulator from "./components/void-cursor-emulator";
 import * as c from "../../folder-editor-constants";
@@ -12,7 +14,7 @@ import * as stateTransforms from "./slate-file-state-transforms";
 import * as slateUtils from "./slate-file-utils";
 
 const defaultBlock = {
-  type: "markdown",
+  type: DEFAULT_NODE.type,
   isVoid: false,
   data: {}
 };
@@ -33,9 +35,11 @@ export default function FilePlugin_Factory(options: PluginOptions) {
       const nextBlock = document.getNextBlock(startKey);
       const prevBlockIsFile = prevBlock && prevBlock.get("type") == BLOCK_TYPE;
       const nextBlockIsFile = nextBlock && nextBlock.get("type") == BLOCK_TYPE;
-      const onStartOfBlock = state.selection.hasStartAtStartOf(startBlock) &&
+      const onStartOfBlock =
+        state.selection.hasStartAtStartOf(startBlock) &&
         state.selection.hasEndAtStartOf(startBlock);
-      const onEndOfBlock = state.selection.hasStartAtEndOf(startBlock) &&
+      const onEndOfBlock =
+        state.selection.hasStartAtEndOf(startBlock) &&
         state.selection.hasEndAtEndOf(startBlock);
 
       /*
@@ -46,7 +50,10 @@ export default function FilePlugin_Factory(options: PluginOptions) {
       if (event.key == "Backspace" || event.key == "Delete") {
         // Line without text between FileBlocks
         if (
-          prevBlockIsFile && onStartOfBlock && nextBlockIsFile && onEndOfBlock
+          prevBlockIsFile &&
+          onStartOfBlock &&
+          nextBlockIsFile &&
+          onEndOfBlock
         ) {
           // Remove Empty Line
           event.preventDefault();
@@ -57,7 +64,8 @@ export default function FilePlugin_Factory(options: PluginOptions) {
         }
 
         if (
-          state.selection.isExpanded && slateUtils.includesAFileBlock(state)
+          state.selection.isExpanded &&
+          slateUtils.includesAFileBlock(state)
         ) {
           event.preventDefault(); // Chancel Delete - would delete selected file block
           return state;
@@ -120,16 +128,24 @@ export default function FilePlugin_Factory(options: PluginOptions) {
         [BLOCK_TYPE]: function(editorProps) {
           const { node, editor } = editorProps;
           const base = node.getIn(["data", "base"]);
+          const asImage = node.getIn(["data", "asImage"]);
 
           return (
             <VoidCursorEmulator editor={editor} node={node}>
               <FileItem
                 className="view-folder-item"
                 path={nodePath.join(folderPath, base)}
+                asImage={asImage}
+                toggleImageCallback={() => {
+                  editor.onChange(
+                    slateUtils.toggleBlockImage(editor.getState(), node)
+                  );
+                }}
                 onDrop={(event, cursorPosition) => {
                   const fileList = dragndrop.getFilePathArray(event);
                   const baselist = fileList.map(filePath =>
-                    nodePath.basename(filePath));
+                    nodePath.basename(filePath)
+                  );
                   let state = editor.getState();
 
                   state = stateTransforms.removeFiles(state, baselist);

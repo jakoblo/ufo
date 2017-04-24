@@ -35,7 +35,6 @@ export default class ViewWrapper extends React.Component {
   }
 
   scrollIntoView = () => {
-    console.log("scroll to");
     const element: any = ReactDOM.findDOMNode(this.container);
     scrollIntoView(element, {
       time: 300
