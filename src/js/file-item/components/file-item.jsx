@@ -165,10 +165,12 @@ class FileItemComp extends React.Component {
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    return nextProps.file !== this.props.file ||
+    return (
+      nextProps.file !== this.props.file ||
       // nextProps.isFocused !== this.props.isFocused ||
       nextState.data !== this.state.data ||
-      this.props.asImage != nextProps.asImage;
+      this.props.asImage != nextProps.asImage
+    );
   }
 
   requestIcon = (path: string) => {
@@ -183,7 +185,8 @@ class FileItemComp extends React.Component {
             prevState.set(
               "icon",
               "data:image/png;base64," + image.toPNG().toString("base64")
-            ));
+            )
+          );
         }
       });
     }
@@ -202,12 +205,16 @@ class FileItemComp extends React.Component {
 
     dragHover: (event, cursorPosition) => {
       event.preventDefault();
+      event.stopPropagation();
       this.startPeakTimeout();
       this.setImmState(prevState =>
-        prevState.set("dropTarget", cursorPosition));
+        prevState.set("dropTarget", cursorPosition)
+      );
     },
 
     dragOut: event => {
+      event.preventDefault();
+      event.stopPropagation();
       this.cancelPeakTimeout();
       this.setImmState(prevState => prevState.set("dropTarget", false));
     },
@@ -223,14 +230,12 @@ class FileItemComp extends React.Component {
 
   startPeakTimeout = () => {
     if (
-      this.props.file.get("stats").isDirectory() && this.dragOverTimeout == null
+      this.props.file.get("stats").isDirectory() &&
+      this.dragOverTimeout == null
     ) {
-      this.dragOverTimeout = setTimeout(
-        () => {
-          this.props.dispatch(FileActions.show(this.props.file));
-        },
-        1000
-      );
+      this.dragOverTimeout = setTimeout(() => {
+        this.props.dispatch(FileActions.show(this.props.file));
+      }, 1000);
     }
   };
 
@@ -267,18 +272,16 @@ class FileItemComp extends React.Component {
   //Open File in Default Application
   onDoubleClick = (event: SyntheticMouseEvent) => {
     if (
-      !this.props.file.get("progress") && this.props.file.get("stats").isFile()
+      !this.props.file.get("progress") &&
+      this.props.file.get("stats").isFile()
     ) {
       // Open
       this.props.dispatch(FileActions.open(this.props.file));
 
       this.setImmState(prevState => prevState.set("openAnimation", true));
-      setTimeout(
-        () => {
-          this.setImmState(prevState => prevState.set("openAnimation", false));
-        },
-        1000
-      );
+      setTimeout(() => {
+        this.setImmState(prevState => prevState.set("openAnimation", false));
+      }, 1000);
     }
   };
 

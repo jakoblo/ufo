@@ -1,8 +1,9 @@
 //@flow
 import { Raw, State } from "slate";
-import * as slateUtils from "./slate-file-utils";
-import * as c from "../../folder-editor-constants";
+import * as slateUtils from "./slate-file/slate-file-utils";
+import * as c from "../folder-editor-constants";
 import nodePath from "path";
+import { BLOCK_TYPES, MARKS, DEFAULT_NODE } from "./rich-text-types";
 
 // Global regEx, important for while exec
 //
@@ -73,22 +74,37 @@ export function markdownToState(string: string): Class<State> {
     if (text == lineBreakSpaces) {
       text = "";
     }
-    return {
-      kind: "block",
-      type: "line",
-      nodes: [
-        {
-          kind: "text",
-          ranges: [
+    for (let key in BLOCK_TYPES) {
+      if (text.match(BLOCK_TYPES[key].matchMarkdown)) {
+        // const blockText = getRages;
+
+        return {
+          kind: "block",
+          type: BLOCK_TYPES[key].type,
+          nodes: [
             {
-              text: text,
-              marks: []
+              kind: "text",
+              ranges: [
+                {
+                  text: text.replace(BLOCK_TYPES[key].matchMarkdown, ""),
+                  marks: []
+                }
+              ]
             }
           ]
-        }
-      ]
-    };
+        };
+      }
+    }
   }
+  return;
+  throw "No matching richt-text-type found for line: " + text;
+}
+
+function getRages(text) {
+  let ranges = [];
+  characters.forEach(char => {
+    console.log(char);
+  });
 }
 
 /**
@@ -109,10 +125,8 @@ export function stateToMarkdown(state: Class<State>): string {
           lineBreakSpaces;
       } else {
         // Markdown needs 2 spacec at the of a line for a linebreak
-        let text = block.text;
-        if (text.slice(text.length - 2) != lineBreakSpaces) {
-          text = text + lineBreakSpaces;
-        }
+        console.log(block.toJS());
+        let text = BLOCK_TYPES[block.type].addMarkdown(block.text);
         return text;
       }
     })

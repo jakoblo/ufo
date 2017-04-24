@@ -41,7 +41,6 @@ const mapStateToProps = (state, props) => {
 };
 class DisplayList extends React.Component {
   props: Props;
-
   constructor(props: Props) {
     super(props);
   }
@@ -62,7 +61,6 @@ class DisplayList extends React.Component {
     //   "view-folder__display-toggle--columns": this.props.displayType ==
     //     App.constants.DISPLAY_TYPE_COLUMNS
     // });
-
     return (
       <div
         className={classnames({
@@ -71,9 +69,9 @@ class DisplayList extends React.Component {
           "view-folder--focused": this.props.focused
         })}
         onDrop={e => dragndrop.executeFileDropOnDisk(e, this.props.path)}
-        onClick={() => {
+        onClick={event => {
           // Focus typeSelection & Scroll to
-          this.props.dispatch(Selection.actions.dirSet(this.props.path));
+          this.props.dispatch(Selection.actions.focusDir(this.props.path));
         }}
       >
         <div className="view-folder__toolbar-top">
@@ -113,9 +111,9 @@ class DisplayList extends React.Component {
     switch (this.props.viewSettings.get("type")) {
       case App.constants.FOLDER_VIEW_EDITOR:
         return <ViewFolderEditor path={this.props.path} />;
-
       // case App.constants.FOLDER_VIEW_LIST:
       //   return <ViewFolderList path={this.props.path} />;
+
 
       default:
         throw "No valid folder view type";

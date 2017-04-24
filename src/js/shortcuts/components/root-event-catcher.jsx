@@ -22,6 +22,11 @@ type Props = {
   children?: Element
 };
 
+function stopEvent(e) {
+  e.preventDefault();
+  e.stopPropagation;
+}
+
 const mapStateToProps = state => {
   return { readOnly: Config.selectors.getReadOnlyState(state) };
 };
@@ -33,7 +38,14 @@ class EventCatcher extends React.Component {
 
   render() {
     return (
-      <div className="root-event-catcher" ref="eventCatcher">
+      <div
+        className="root-event-catcher"
+        ref="eventCatcher"
+        // Avoid Focus move away from editor:
+        onClick={stopEvent}
+        onMouseDown={stopEvent}
+        onFocus={stopEvent}
+      >
         {this.props.children}
       </div>
     );

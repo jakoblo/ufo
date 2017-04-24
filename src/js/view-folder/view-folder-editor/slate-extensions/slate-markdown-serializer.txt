@@ -1,0 +1,335 @@
+import React from "react";
+import { Raw } from "slate";
+import typeOf from "type-of";
+import { Record } from "immutable";
+import vfile from "vfile";
+// import * as remark from "remark-parse";
+// import inlineLinks from "remark-inline-links";
+var remark = require("remark");
+var inlineLinks = require("remark-inline-links");
+import { BLOCK_TYPES } from "./rich-text-types";
+/**
+ * String.
+ *
+ * @type {String}
+ */
+
+const String = new Record({
+  kind: "string",
+  text: ""
+});
+
+/**
+ * A rule to (de)serialize text nodes. This is automatically added to the HTML
+ * serializer so that users don't have to worry about text-level serialization.
+ *
+ * @type {Object}
+ */
+
+const BASIC_RULES = [
+  {
+    // Ignore
+    deserialize(element, depth, next) {
+      if (element.type == "root" && depth == 0) {
+        return next(element.children);
+      }
+      if (element.type == "list" && depth == 1) {
+        return next(element.children);
+      }
+      if (element.type == "paragraph" && depth != 1) {
+        return next(element.children);
+      }
+    }
+  },
+  {
+    // TEXT
+    deserialize(element, depth, next) {
+      if (element.type == "text") {
+        return {
+          kind: "text",
+          text: element.value
+        };
+      }
+    }
+  }
+];
+
+/**
+ * HTML serializer.
+ *
+ * @type {Html}
+ */
+
+class Html {
+  /**
+   * Create a new serializer with `rules`.
+   *
+   * @param {Object} options
+   *   @property {Array} rules
+   *   @property {String} defaultBlockType
+   *   @property {String|Object} defaultBlockType
+   */
+
+  rules: [];
+
+  constructor(options: Object = {}) {
+    // this.rules = [...(options.rules || []), TEXT_RULE];
+    this.rules = [
+      ...(() => {
+        const rules = [];
+        for (let key in BLOCK_TYPES) {
+          if (BLOCK_TYPES[key].deserialize) {
+            rules.push({
+              deserialize: BLOCK_TYPES[key].deserialize
+            });
+          }
+        }
+        return rules;
+      })(),
+      ...BASIC_RULES
+    ];
+    this.defaultBlockType = options.defaultBlockType || "paragraph";
+  }
+
+  /**
+   * Deserialize pasted HTML.
+   *
+   * @param {String} markdown
+   * @param {Object} options
+   *   @property {Boolean} toRaw
+   * @return {State}
+   */
+
+  deserialize = async (markdown, options = {}) => {
+    const file = vfile(markdown);
+    const parsed = await remark.run(remark.parse(file, { position: false }));
+
+    console.log(JSON.stringify(parsed, null, 4));
+
+    let nodes = this.deserializeElement(parsed, 0);
+    console.log(nodes);
+    // debugger;
+    const raw = {
+      kind: "state",
+      document: {
+        kind: "document",
+        nodes
+      }
+    };
+
+    if (options.toRaw) {
+      return raw;
+    }
+
+    const state = Raw.deserialize(raw, { terse: true });
+
+    return state;
+  };
+
+  /**
+   * Deserialize an array of Cheerio `elements`.
+   *
+   * @param {Array} elements
+   * @return {Array}
+   */
+
+  deserializeElements = (elements = [], depth) => {
+    let nodes = [];
+    console.log("desElements", elements);
+    elements.forEach(element => {
+      const node = this.deserializeElement(element, depth);
+      switch (typeOf(node)) {
+        case "array":
+          nodes = nodes.concat(node);
+          break;
+        case "object":
+          nodes.push(node);
+          break;
+        case "null":
+        case "undefined":
+          return;
+        default:
+          throw new Error(
+            `A rule returned an invalid deserialized representation: "${node}".`
+          );
+      }
+    });
+
+    return nodes;
+  };
+
+  /**
+   * Deserialize a Cheerio `element`.
+   *
+   * @param {Object} element
+   * @return {Any}
+   */
+
+  deserializeElement = (element, depth) => {
+    console.log("desElement", element);
+    let node;
+
+    const next = elements => {
+      switch (typeOf(elements)) {
+        case "array":
+          return this.deserializeElements(elements, depth + 1);
+        case "object":
+          return this.deserializeElement(elements, depth + 1);
+        case "null":
+        case "undefined":
+          return;
+        default:
+          throw new Error(
+            `The \`next\` argument was called with invalid children: "${elements}".`
+          );
+      }
+    };
+
+    for (const rule of this.rules) {
+      if (!rule.deserialize) continue;
+      const ret = rule.deserialize(element, depth, next);
+      console.log("rules returned", ret);
+      if (!ret) continue;
+      node = ret.kind == "mark" ? this.deserializeMark(ret) : ret;
+      break;
+    }
+
+    return node || next(element.content);
+  };
+
+  /**
+   * Deserialize a `mark` object.
+   *
+   * @param {Object} mark
+   * @return {Array}
+   */
+
+  deserializeMark = mark => {
+    const { type, data } = mark;
+
+    const applyMark = node => {
+      if (node.kind == "mark") {
+        return this.deserializeMark(node);
+      } else if (node.kind == "text") {
+        if (!node.ranges) node.ranges = [{ text: node.text }];
+        node.ranges = node.ranges.map(range => {
+          range.marks = range.marks || [];
+          range.marks.push({ type, data });
+          return range;
+        });
+      } else {
+        node.nodes = node.nodes.map(applyMark);
+      }
+
+      return node;
+    };
+
+    return mark.nodes.reduce((nodes, node) => {
+      const ret = applyMark(node);
+      if (Array.isArray(ret)) return nodes.concat(ret);
+      nodes.push(ret);
+      return nodes;
+    }, []);
+  };
+
+  /**
+   * Serialize a `state` object into an HTML string.
+   *
+   * @param {State} state
+   * @param {Object} options
+   *   @property {Boolean} render
+   * @return {String|Array}
+   */
+
+  serialize = (state, options = {}) => {
+    const { document } = state;
+    const elements = document.nodes.map(this.serializeNode);
+    if (options.render === false) return elements;
+
+    // const markdown = ReactDOMServer.renderToStaticMarkup(<body>{elements}</body>);
+    const inner = markdown.slice(6, -7);
+    return inner;
+  };
+
+  /**
+   * Serialize a `node`.
+   *
+   * @param {Node} node
+   * @return {String}
+   */
+
+  serializeNode = node => {
+    if (node.kind == "text") {
+      const ranges = node.getRanges();
+      return ranges.map(this.serializeRange);
+    }
+
+    const children = node.nodes.map(this.serializeNode);
+
+    for (const rule of this.rules) {
+      if (!rule.serialize) continue;
+      const ret = rule.serialize(node, children);
+      if (ret) return addKey(ret);
+    }
+
+    throw new Error(`No serializer defined for node of type "${node.type}".`);
+  };
+
+  /**
+   * Serialize a `range`.
+   *
+   * @param {Range} range
+   * @return {String}
+   */
+
+  serializeRange = range => {
+    const string = new String({ text: range.text });
+    const text = this.serializeString(string);
+
+    return range.marks.reduce((children, mark) => {
+      for (const rule of this.rules) {
+        if (!rule.serialize) continue;
+        const ret = rule.serialize(mark, children);
+        if (ret) return addKey(ret);
+      }
+
+      throw new Error(`No serializer defined for mark of type "${mark.type}".`);
+    }, text);
+  };
+
+  /**
+   * Serialize a `string`.
+   *
+   * @param {String} string
+   * @return {String}
+   */
+
+  serializeString = string => {
+    for (const rule of this.rules) {
+      if (!rule.serialize) continue;
+      const ret = rule.serialize(string, string.text);
+      if (ret) return ret;
+    }
+  };
+}
+
+/**
+ * Add a unique key to a React `element`.
+ *
+ * @param {Element} element
+ * @return {Element}
+ */
+
+let key = 0;
+
+function addKey(element) {
+  return React.cloneElement(element, { key: key++ });
+}
+
+/**
+ * Export.
+ *
+ * @type {Html}
+ */
+
+export default Html;

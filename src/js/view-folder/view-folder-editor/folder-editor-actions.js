@@ -5,9 +5,11 @@ import * as c from "./folder-editor-constants";
 import SlateFile from "./slate-extensions/slate-file/slate-file-index";
 import * as Utils from "../../utils/utils-index";
 import * as FsMergedSelector from "../../filesystem/fs-merged-selectors";
+import fsWatch from "../../filesystem/watch/fs-watch-index";
 import nodePath from "path";
 import _ from "lodash";
 import { Raw, State } from "slate";
+import { DEFAULT_NODE } from "./slate-extensions/rich-text-types";
 
 import type { ThunkArgs, Action } from "../../types";
 
@@ -17,13 +19,19 @@ export function folderEditorInit(path: string) {
       getState(),
       path
     );
-
-    if (fileList.indexOf(c.INDEX_BASE_NAME) > -1) {
-      let editorState;
+    if (
+      // SAVED Editor State exists?
+      fsWatch.selectors.getFile(
+        getState(),
+        nodePath.join(path, c.INDEX_BASE_NAME)
+      )
+    ) {
       const fileContent = Utils.fs
         .loadFile(nodePath.join(path, c.INDEX_BASE_NAME))
         .then(fileContent => {
-          editorState = SlateFile.serialize.markdownToState(fileContent);
+          let editorState = Raw.deserialize(JSON.parse(fileContent), {
+            terse: true
+          });
           editorState = mapFilesToEditorState(fileList, editorState);
 
           dispatch({
@@ -35,7 +43,6 @@ export function folderEditorInit(path: string) {
           });
         });
     } else {
-      console.time("Init");
       dispatch({
         type: t.FOLDER_EDITOR_INIT,
         payload: {
@@ -43,7 +50,6 @@ export function folderEditorInit(path: string) {
           editorState: newStateWithFileNodes(fileList)
         }
       });
-      console.timeEnd("Init");
     }
   };
 }
@@ -140,8 +146,7 @@ function newStateWithFileNodes(filesNotInEditor): Class<State> {
   //Add empty line at the end
   state.document.nodes.push({
     kind: "block",
-    type: "markdown",
-    isVoid: false,
+    type: DEFAULT_NODE.type,
     nodes: [
       {
         kind: "text",

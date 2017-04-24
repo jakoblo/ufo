@@ -68,6 +68,7 @@ export default class NavGroup extends React.Component {
         className={classname}
         draggable={true}
         style={this.props.style}
+        onMouseDown={e => e.stopPropagation()} // Avoid preventing event by root event catcher, would prevent dragStart
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
         data-key={position}
