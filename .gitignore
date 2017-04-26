@@ -2,12 +2,10 @@
 
 #compiled source
 src/themes/**/*.css
-src/js-dist/**/*
 
 #downloads
 /**/google-fonts
 /**/google-fonts/*
-pdfjs-gh-pages
 
 ### OSX ###
 .DS_Store
