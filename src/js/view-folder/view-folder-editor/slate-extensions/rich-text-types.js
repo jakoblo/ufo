@@ -44,6 +44,14 @@ export const BLOCK_TYPES = {
   }
 };
 
+export const INLINE_TYPES = {
+  LINK: {
+    type: "LINK",
+    short: "a",
+    className: "link"
+  }
+};
+
 export const DEFAULT_NODE = BLOCK_TYPES.PARAGRAPH;
 
 export const MARK_TYPES = {
