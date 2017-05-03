@@ -4,6 +4,8 @@ import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { List } from "immutable";
 import classnames from "classnames";
+import { remote } from "electron";
+
 import {
   FOLDER_DEFAULT_WIDTH,
   FOLDER_MIN_WIDTH,
@@ -17,6 +19,7 @@ import ViewWrapper from "./view-wrapper";
 import Selection from "../../filesystem/selection/sel-index";
 import FS from "../../filesystem/watch/fs-watch-index";
 import { Resizable } from "react-resizable";
+import ResizeSensor from "./resize-sensor";
 import Measure from "react-measure";
 import { TransitionMotion, spring } from "react-motion";
 import _ from "lodash";
@@ -53,7 +56,6 @@ const mapStateToProps = (state, props: Props) => {
     focusedView: Selection.selectors.getFocused(state),
     viewFilePath: ViewFile.selectors.getViewFilePath(state),
     selectionRoot: Selection.selectors.getSelectionRoot(state)
-    // displayType: App.selectors.getDisplayType(state)
   };
 };
 
@@ -70,15 +72,15 @@ class ViewPlacer extends React.Component {
       innerWidth: 0
     };
     this.state = { ...this.state, ...this.calcStateByProps(props) };
+
+    remote.getCurrentWindow().on("resize", () => {
+      this.setState(this.calcStateByProps(this.props));
+    });
   }
 
   render() {
     const classes = classnames({
       "view-placer": true
-      // "view-placer--display-columns": this.props.displayType ==
-      //   App.constants.DISPLAY_TYPE_COLUMNS,
-      // "view-placer--display-single": this.props.displayType ==
-      //   App.constants.DISPLAY_TYPE_SINGLE
     });
 
     return (

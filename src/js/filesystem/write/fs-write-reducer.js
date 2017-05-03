@@ -5,7 +5,7 @@ import nodePath from "path";
 
 import type { Action } from "../../types";
 
-const INITIAL_STATE = OrderedMap({});
+const INITIAL_STATE = Map({});
 
 export default function reducer(
   state: any = INITIAL_STATE,

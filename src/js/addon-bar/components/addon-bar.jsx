@@ -20,8 +20,8 @@ class AddonBar extends React.Component {
     return (
       <div className="addon-bar">
         <div className="addon-bar__icon-toolbar">
-          {this.getViewIcon("search")}
           {this.getViewIcon("fs-write")}
+          {this.getViewIcon("settings")}
         </div>
         <div className="addon-bar__css-transition-group">
           {this.props.currentView
@@ -39,12 +39,8 @@ class AddonBar extends React.Component {
       case "fs-write":
         return <FsWrite.component />;
 
-      case "search":
-        return (
-          <div className="no-search">
-            Sorry, search is not there jet...
-          </div>
-        );
+      case "settings":
+        return <div className="no-settings" />;
 
       default:
         return <div>Error</div>;

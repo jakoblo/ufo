@@ -5,10 +5,10 @@ import Portal from "react-portal";
 import { Motion, spring } from "react-motion";
 import classnames from "classnames";
 import HrefInput from "./slate-link-href-input";
-import { MARK_TYPES, INLINE_TYPES } from "../../rich-text-types";
+import { shell } from "electron";
+import normalizeUrl from "normalize-url";
 
-const TOOLBAR_WIDTH = 140;
-const TOOLBAR_HEIGHT = 40;
+import { MARK_TYPES, INLINE_TYPES } from "../../rich-text-types";
 
 type Props = {
   toggleMark: (type: string, editor: any) => void,
@@ -32,6 +32,7 @@ export default class HoverToolbar extends React.Component {
     left: number,
     top: number
   };
+  menu: any;
   constructor(props: Props) {
     super(props);
     this.currentCoordinates = {
@@ -48,45 +49,71 @@ export default class HoverToolbar extends React.Component {
     const isLink = this.props.isLink(this.props.editor);
 
     return (
-      <Portal isOpened>
-        <Motion
-          defaultStyle={{
-            left: this.currentCoordinates.left,
-            top: this.currentCoordinates.top,
-            opacity: 0
-          }}
-          style={this.getToolbarStyle()}
-          onRest={() => {
-            if (!this.shouldShowToolbar(this.props)) {
-              // Unclickable after fadeout
-              this.setState({
-                visible: false
-              });
-            }
-          }}
-        >
-          {interpolatedPosition => {
-            return (
-              <div
-                className="menu hover-toolbar"
-                style={{
-                  display: this.state.visible ? "flex" : "none",
-                  ...interpolatedPosition
-                }}
-              >
-                {isLink
-                  ? this.renderLinkEdit()
-                  : [
-                      this.renderMarkToggleButtons(),
-                      this.renderLinkToggleButton()
-                    ]}
-              </div>
-            );
-          }}
-        </Motion>
-      </Portal>
+      <div
+        className="rc-tooltip rc-tooltip-placement-top slate-marks-toolbar"
+        ref={ref => {
+          this.menu = ref;
+        }}
+      >
+        <div className="rc-tooltip-inner">
+          {isLink
+            ? this.renderLinkEdit()
+            : [this.renderMarkToggleButtons(), this.renderLinkToggleButton()]}
+        </div>
+      </div>
     );
   }
+
+  componentDidMount = () => {
+    this.updateMenu();
+  };
+
+  componentDidUpdate = () => {
+    this.updateMenu();
+  };
+
+  updateMenu = () => {
+    const { menu } = this;
+    const { freeze } = this.state;
+    const { editor, isLink } = this.props;
+    const state: any = this.props.editor.getState();
+
+    if (!menu) return;
+
+    if (this.state.freeze) {
+      menu.style.opacity = 1;
+      menu.style.top = this.currentCoordinates.top + "px";
+      menu.style.left = this.currentCoordinates.left + "px";
+      return;
+    }
+
+    if (state.isBlurred || (state.isCollapsed && !isLink(editor))) {
+      menu.removeAttribute("style");
+      return;
+    }
+
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const selectionRect = range.getBoundingClientRect();
+    const container = range.commonAncestorContainer.parentNode.closest(
+      ".view-folder__editor-container" // @TODO
+    );
+    const containerRect = container.getBoundingClientRect();
+
+    const top = selectionRect.top - containerRect.top - menu.offsetHeight - 5;
+    const left =
+      selectionRect.left -
+      containerRect.left -
+      menu.offsetWidth / 2 +
+      selectionRect.width / 2;
+
+    this.currentCoordinates.top = top;
+    this.currentCoordinates.left = left;
+
+    menu.style.opacity = 1;
+    menu.style.top = top + "px";
+    menu.style.left = left + "px";
+  };
 
   activateFreeze = () => {
     this.setState({
@@ -95,83 +122,9 @@ export default class HoverToolbar extends React.Component {
   };
 
   disableFreeze = () => {
-    console.log("CLEAR");
     this.setState({
       freeze: false
     });
-  };
-
-  getToolbarStyle = () => {
-    const { freeze } = this.state;
-    const isVisible = this.shouldShowToolbar(this.props);
-    const keepPosition = this.currentCoordinates;
-    const show = { opacity: spring(1) };
-    const hide = { opacity: spring(0) };
-
-    if (freeze) {
-      return { ...keepPosition, ...show };
-    }
-
-    if (!isVisible) {
-      return { ...keepPosition, ...hide };
-    }
-
-    const selection = window.getSelection();
-    if (selection.rangeCount == 0) {
-      return { ...keepPosition, ...show };
-    }
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-
-    const left =
-      rect.left + window.scrollX - TOOLBAR_WIDTH / 2 + rect.width / 2;
-    const top = rect.top + window.scrollY - TOOLBAR_HEIGHT;
-
-    if (top < 0 || left < 0) {
-      // position out of window
-      return { ...keepPosition, ...hide };
-    }
-
-    // Save the new position for the next render
-    this.currentCoordinates = { top, left };
-
-    const shouldMoveAnimated =
-      // Dont move in from the outside of the window
-      keepPosition.top > 0 &&
-      keepPosition.left > 0 &&
-      // Dont move to far
-      Math.abs(keepPosition.top - top) < 600 &&
-      Math.abs(keepPosition.left - left) < 600;
-
-    return {
-      // Dont move from the outside of the window, looks anoying
-      top: shouldMoveAnimated ? spring(top) : top,
-      left: shouldMoveAnimated ? spring(left) : left,
-      opacity: spring(1)
-    };
-  };
-
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.shouldShowToolbar(nextProps)) {
-      this.setState({
-        visible: true
-      });
-    }
-  }
-
-  shouldShowToolbar = (props: Props) => {
-    const state: any = props.editor.getState();
-    if (this.props.isLink(props.editor)) {
-      return true;
-    }
-    if (state.isCollapsed) {
-      return false;
-    }
-    if (window.getSelection().rangeCount < 1) {
-      // Browser does not know the selection
-      return false;
-    }
-    return true;
   };
 
   renderMarkToggleButtons = () => {
@@ -199,8 +152,8 @@ export default class HoverToolbar extends React.Component {
       onClick();
     };
     const classes = classnames({
-      ["hover-toolbar__button-" + className]: true,
-      ["hover-toolbar__button-" + className + "--active"]: isActive
+      ["slate-marks-toolbar__button-" + className]: true,
+      ["slate-marks-toolbar__button-" + className + "--active"]: isActive
     });
 
     return (
@@ -236,7 +189,7 @@ export default class HoverToolbar extends React.Component {
 
   renderLinkEdit = () => {
     return (
-      <div className="hover-toolbar__link-edit">
+      <div className="slate-marks-toolbar__link-edit">
         <HrefInput
           href={this.props.getHrefFromSelectedInline(this.props.editor)}
           handleFocus={this.activateFreeze}
@@ -245,7 +198,23 @@ export default class HoverToolbar extends React.Component {
             this.props.setLinkHref(value, this.props.editor);
           }}
         />
-        {this.renderLinkToggleButton()}
+        {this.renderToggleButton("open-link", false, () => {
+          let href = null;
+          try {
+            href = normalizeUrl(
+              this.props.getHrefFromSelectedInline(this.props.editor)
+            );
+          } catch (e) {
+            href = null;
+          }
+
+          if (href) {
+            shell.openExternal(href);
+          }
+        })}
+        {this.renderToggleButton("remove", false, () => {
+          this.props.toggleLink(this.props.editor);
+        })}
       </div>
     );
   };

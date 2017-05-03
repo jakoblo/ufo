@@ -1,11 +1,17 @@
 //@flow
 import React from "react";
 
-var ResizeSensor = React.createClass({
-  propTypes: {
-    onResize: React.PropTypes.func.isRequired
-  },
-  render: function() {
+type Props = {
+  onResize: Function
+};
+
+export default class ResizeSensor extends React.Component {
+  props: Props;
+  constructor(props: Props) {
+    super(props);
+  }
+
+  render() {
     return (
       <iframe
         ref="iframe"
@@ -17,24 +23,23 @@ var ResizeSensor = React.createClass({
         }}
       />
     );
-  },
+  }
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.refs.iframe.contentWindow.addEventListener(
       "resize",
       this._handleResize
     );
-  },
+  }
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     this.refs.iframe.contentWindow.removeEventListener(
       "resize",
       this._handleResize
     );
-  },
+  }
 
-  _handleResize: function() {
+  _handleResize() {
     window.requestAnimationFrame(this.props.onResize);
   }
-});
-export default ResizeSensor;
+}

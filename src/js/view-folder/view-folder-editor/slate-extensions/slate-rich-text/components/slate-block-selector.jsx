@@ -49,26 +49,28 @@ export default class BlockSelector extends React.Component {
         })}
       </div>
     );
+    const classes = classnames({
+      "block-status": true,
+      ["block-status--" + BLOCK_TYPES[this.props.block.type].className]: true
+    });
 
     return (
-      <Tooltip
-        placement="left"
-        trigger={["click"]}
-        key={this.props.block.key}
-        transitionName="rc-tooltip-zoom"
-        overlay={tooltipContent}
-        getTooltipContainer={this.props.getScrollContainer}
+      <div
+        contentEditable={false}
+        className={classes}
+        style={{ userSelect: "none" }}
       >
-        <div
-          contentEditable={false}
-          className="block-status"
-          style={{ userSelect: "none" }}
+        <Tooltip
+          placement="left"
+          trigger={["click"]}
+          key={this.props.block.key}
+          transitionName="rc-tooltip-zoom"
+          overlay={tooltipContent}
+          getTooltipContainer={this.props.getScrollContainer}
         >
-          <div className="block-status__current">
-            {BLOCK_TYPES[this.props.block.type].short}
-          </div>
-        </div>
-      </Tooltip>
+          <div className="block-status__icon" />
+        </Tooltip>
+      </div>
     );
   }
 

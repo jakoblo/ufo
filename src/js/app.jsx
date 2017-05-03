@@ -11,9 +11,6 @@ import { storeSetup } from "./store-setup";
 // React Components
 import { Provider } from "react-redux";
 import EventCatcher from "./shortcuts/components/root-event-catcher";
-import AppControls from "./app/components/app-controls";
-import ReadOnlyToggle from "./app/components/read-only-toggle";
-import Sidebar from "./general-components/sidebar";
 import Navbar from "./navbar/navbar-index";
 import ViewPlacer from "./view-placer/vp-index";
 import AddonBar from "./addon-bar/components/addon-bar";
@@ -36,11 +33,7 @@ window.store = store;
 ReactDOM.render(
   <Provider store={store}>
     <EventCatcher>
-      <Sidebar>
-        <AppControls />
-        <Navbar.components.parent />
-        <ReadOnlyToggle />
-      </Sidebar>
+      <Navbar.components.parent />
       <ViewPlacer.components.parent />
       <AddonBar />
     </EventCatcher>

@@ -28,7 +28,8 @@ export default class ViewWrapper extends React.Component {
 
   componentWillReceiveProps(nextProps: Props) {
     if (
-      this.props.scrollToTrigger === false && nextProps.scrollToTrigger === true
+      this.props.scrollToTrigger === false &&
+      nextProps.scrollToTrigger === true
     ) {
       this.scrollIntoView();
     }

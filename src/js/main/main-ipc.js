@@ -5,9 +5,31 @@ import fs from "fs";
 
 export default function ipcListener(/*handleNewWindow: Function */) {
   ipcMain.on("ondragstart", (event, filePath) => {
+    const count = filePath.length;
+    let imageName;
+    switch (count) {
+      case 1:
+        imageName = "1";
+        break;
+
+      case 2:
+        imageName = "2";
+        break;
+
+      case 3:
+        imageName = "3";
+        break;
+
+      default:
+        imageName = "4+";
+    }
+
     event.sender.startDrag({
       files: filePath,
-      icon: __dirname + "/../../themes/default/img/multiDragPlaceholder.png"
+      icon: __dirname +
+        "/../../themes/light-blue/img/dragging-count-" +
+        imageName +
+        ".png"
     });
   });
 

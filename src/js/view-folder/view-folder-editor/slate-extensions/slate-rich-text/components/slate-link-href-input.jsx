@@ -26,9 +26,6 @@ export default class HrefInput extends React.Component {
         onChange={event => {
           this.props.handleChange(event.target.value);
         }}
-        style={{
-          width: 70
-        }}
         onFocus={this.props.handleFocus}
         onBlur={this.props.handleBlur}
         // Stop & Cancel events

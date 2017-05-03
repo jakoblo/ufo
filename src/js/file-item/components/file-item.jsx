@@ -9,6 +9,7 @@ import { Map } from "immutable";
 import RenameInput from "../../filesystem/rename/components/rename-input";
 import ProgressPie from "../../general-components/progress-pie";
 import FileItemUnkown from "./file-item-unknown";
+import FileIcon from "./file-icon";
 import * as DnD from "../../utils/dragndrop";
 import * as FileActions from "../fi-actions";
 import Selection from "../../filesystem/selection/sel-index";
@@ -21,7 +22,6 @@ type Props = {
   path: string,
   asImage?: boolean,
   toggleImageCallback?: Function,
-  // isFocused: boolean,
   className: string,
   onDrop: Function,
   dispatch: Function
@@ -44,6 +44,7 @@ class FileItemComp extends React.Component {
   props: Props;
   state: State;
   element: any;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -55,7 +56,6 @@ class FileItemComp extends React.Component {
         icon: null
       })
     };
-    // this.requestIcon(this.props.file.get("path"));
   }
 
   render() {
@@ -76,7 +76,6 @@ class FileItemComp extends React.Component {
           [className + "--theme-image"]: this.props.asImage,
           [className + "--active"]: file.get("active"),
           [className + "--selected"]: file.get("selected"),
-          // [className + "--is-focused"]: isFocused,
           [className + "--drop-target"]: file.get("stats").isDirectory() &&
             immState.get("dropTarget"),
           [className + "--drop-target-top"]: immState.get("dropTarget") ==
@@ -90,41 +89,42 @@ class FileItemComp extends React.Component {
           this.element = ref;
         }}
       >
-        <div className={className + "__underlay"} />
-
-        {file.get("progress")
-          ? <ProgressPie
-              className={className + "__progress-pie"}
-              progress={file.get("progress")}
-              size={16}
-            />
-          : this.props.asImage
-              ? <div className={className + "__image-container"}>
-                  <img
-                    className={className + "__image"}
-                    src={this.props.file.get("path")}
-                  />
-                </div>
-              : <div
-                  className={className + "__icon"}
-                  style={
-                    immState.get("icon")
-                      ? {
-                          backgroundImage: 'url("' + immState.get("icon") + '")'
-                        }
-                      : null
-                  }
-                />}
-
-        <div className={className + "__name-base"}>{file.get("name")}</div>
-        <div className={className + "__name-suffix"}>{file.get("suffix")}</div>
-        {file.get("renaming")
-          ? <RenameInput
-              className={className + "__rename-input"}
-              path={file.get("path")}
-              dispatch={this.props.dispatch}
-            />
-          : <div
+        <div className={className + "--inner"}>
+          <div className={className + "__underlay"} />
+          {file.get("progress")
+            ? <ProgressPie
+                className={className + "__progress-pie"}
+                progress={file.get("progress")}
+                size={16}
+              />
+            : <FileIcon
+                isDirectory={file.get("stats").isDirectory()}
+                suffix={file.get("suffix")}
+              />}
+          <div className={className + "__name-base"}>{file.get("name")}</div>
+          <div className={className + "__name-suffix"}>
+            {file.get("suffix")}
+          </div>
+          {file.get("renaming")
+            ? <RenameInput
+                className={className + "__rename-input"}
+                path={file.get("path")}
+                dispatch={this.props.dispatch}
+              />
+            : null}
+        </div>
+        {this.props.asImage
+          ? <div className={className + "__image-container"}>
+              <div className={className + "__image-border"}>
+                <img
+                  className={className + "__image"}
+                  src={this.props.file.get("path")}
+                />
+              </div>
+            </div>
+          : null}
+        {!file.get("renaming")
+          ? <div
               className={className + "__event-catcher"}
               draggable={true}
               onDragStart={this.onDragStart}
@@ -133,7 +133,9 @@ class FileItemComp extends React.Component {
               onContextMenu={this.onContextMenu}
               onDoubleClick={this.onDoubleClick}
               {...this.enhancedDropZoneListener}
-            />}
+            />
+          : null}
+        <div className={className + "__dropline"} />
       </div>
     );
   }
