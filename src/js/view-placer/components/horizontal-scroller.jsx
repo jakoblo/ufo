@@ -62,6 +62,10 @@ export default class Scroller extends React.Component {
               }}
               className={this.props.className}
               scrollLeft={value.scrollPosition}
+              scrollable={
+                this.state.currentScrollPosition > 0 ||
+                  this.props.scrollPosition > 0
+              }
             >
               <div
                 className={this.props.className + "__scroll-width"}

@@ -13,13 +13,14 @@ export default class DisplayPDF extends React.Component {
 
   render() {
     return (
-      <iframe
-        className="renderer-pdf"
-        src={
-          "__dirname/../../../node_modules/pdfjs-dist-viewer-min/build/minified/web/viewer.html?file=" +
-            this.props.path
-        }
-      />
+      <div className="renderer-pdf">
+        <iframe
+          src={
+            "__dirname/../../../node_modules/pdfjs-dist-viewer-min/build/minified/web/viewer.html?file=" +
+              this.props.path
+          }
+        />
+      </div>
     );
   }
 }
