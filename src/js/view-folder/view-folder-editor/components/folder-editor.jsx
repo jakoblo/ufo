@@ -88,7 +88,7 @@ class FolderEditor extends React.Component {
     );
   }
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: Props) {
     return (
       this.props.editorState != nextProps.editorState ||
       this.props.readOnly != nextProps.readOnly ||

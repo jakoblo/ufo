@@ -12,8 +12,6 @@ import Loading from "../general-components/loading";
 import Error from "../general-components/error";
 import fsWrite from "../filesystem/write/fs-write-index";
 import Selection from "../filesystem/selection/sel-index";
-
-// import ViewFolderList from "./view-folder-list/view-folder-list";
 import ViewFolderEditor from "./view-folder-editor/components/folder-editor";
 
 import { dragndrop } from "../utils/utils-index";
@@ -46,21 +44,6 @@ class DisplayList extends React.Component {
   }
 
   render() {
-    // const typeToggleClasses = classnames({
-    //   "view-folder__type-toggle": true,
-    //   "view-folder__type-toggle--editor": this.props.viewSettings.get("type") ==
-    //     App.constants.FOLDER_VIEW_EDITOR,
-    //   "view-folder__type-toggle--list": this.props.viewSettings.get("type") ==
-    //     App.constants.FOLDER_VIEW_LIST
-    // });
-    //
-    // const displayToggleClasses = classnames({
-    //   "view-folder__display-toggle": true,
-    //   "view-folder__display-toggle--single": this.props.displayType ==
-    //     App.constants.DISPLAY_TYPE_SINGLE,
-    //   "view-folder__display-toggle--columns": this.props.displayType ==
-    //     App.constants.DISPLAY_TYPE_COLUMNS
-    // });
     return (
       <div
         className={classnames({
@@ -78,17 +61,8 @@ class DisplayList extends React.Component {
           <div className="view-folder__name">
             {nodePath.basename(this.props.path)}
           </div>
-
-          {/*  Disable View Features, maybe use in future
-            <div className={typeToggleClasses} onClick={this.toggleViewType}>
-              <div className="view-folder__type-toggle__bullet" />
-            </div>
-            <div
-              className={displayToggleClasses}
-              onClick={this.toggleDisplayType}
-            /> */}
         </div>
-        {this.renderViewType()}
+        {this.props.renderContent ? this.renderViewType() : null}
         <div className="view-folder__toolbar-bottom">
           <button
             className="view-folder__button-add-folder"
@@ -111,10 +85,6 @@ class DisplayList extends React.Component {
     switch (this.props.viewSettings.get("type")) {
       case App.constants.FOLDER_VIEW_EDITOR:
         return <ViewFolderEditor path={this.props.path} />;
-      // case App.constants.FOLDER_VIEW_LIST:
-      //   return <ViewFolderList path={this.props.path} />;
-
-
       default:
         throw "No valid folder view type";
     }

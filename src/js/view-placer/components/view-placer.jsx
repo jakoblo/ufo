@@ -20,22 +20,23 @@ import Selection from "../../filesystem/selection/sel-index";
 import FS from "../../filesystem/watch/fs-watch-index";
 import { Resizable } from "react-resizable";
 import ResizeSensor from "./resize-sensor";
+import HorizontalScroller from "./horizontal-scroller";
 import Measure from "react-measure";
 import { TransitionMotion, spring } from "react-motion";
 import _ from "lodash";
 
 const TYPE_FOLDER = "TYPE_FOLDER";
 const TYPE_FILE = "TYPE_FILE";
+
 const springSettings = {
-  stiffness: 210,
-  damping: 20
+  stiffness: 300,
+  damping: 25,
+  precision: 0.1
 };
 
 type Props = {
   viewFolderList: any,
   viewFilePath: string,
-  selectionRoot: string,
-  // displayType: string,
   focusedView: string,
   dispatch: Function
 };
@@ -54,15 +55,13 @@ const mapStateToProps = (state, props: Props) => {
       return FS.selectors.getDirState(state, dir);
     }),
     focusedView: Selection.selectors.getFocused(state),
-    viewFilePath: ViewFile.selectors.getViewFilePath(state),
-    selectionRoot: Selection.selectors.getSelectionRoot(state)
+    viewFilePath: ViewFile.selectors.getViewFilePath(state)
   };
 };
 
 class ViewPlacer extends React.Component {
   props: Props;
   state: State;
-  viewPlacerComp: any;
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -74,15 +73,12 @@ class ViewPlacer extends React.Component {
     this.state = { ...this.state, ...this.calcStateByProps(props) };
 
     remote.getCurrentWindow().on("resize", () => {
+      // Calcualte everything again if the Windows is getting resized
       this.setState(this.calcStateByProps(this.props));
     });
   }
 
   render() {
-    const classes = classnames({
-      "view-placer": true
-    });
-
     return (
       <Measure
         onMeasure={dimensions => {
@@ -97,11 +93,10 @@ class ViewPlacer extends React.Component {
           willLeave={this.willLeave}
         >
           {views => (
-            <section
-              ref={ref => {
-                this.viewPlacerComp = ref;
-              }}
-              className={classes}
+            <HorizontalScroller
+              className="view-placer"
+              innerWidth={this.state.innerWidth} // The innerContainer has a fixed and Calculated with, to allow smooth transitions, if it shrinks
+              scrollPosition={this.getScrollPosition()}
             >
               {views.map((view, position) => {
                 if (view.data.type == TYPE_FILE) {
@@ -120,7 +115,7 @@ class ViewPlacer extends React.Component {
                       key={position}
                       width={view.style.width}
                       onResize={(event, data) => {
-                        this.resizeToState(event, data, position, view);
+                        this.applyResizeToState(event, data, position, view);
                       }}
                       axis="x"
                     >
@@ -134,13 +129,14 @@ class ViewPlacer extends React.Component {
                           error={view.data.dirState.error}
                           fsWatchState={view.data.dirState}
                           focused={view.data.focused}
+                          renderContent={true /*view.style.marginLeft > -10*/}
                         />
                       </ViewWrapper>
                     </Resizable>
                   );
                 }
               })}
-            </section>
+            </HorizontalScroller>
           )}
         </TransitionMotion>
       </Measure>
@@ -150,6 +146,43 @@ class ViewPlacer extends React.Component {
   componentWillReceiveProps(nextProps: Props) {
     this.setState(this.calcStateByProps(nextProps));
   }
+
+  /**
+   * scrollLeft Only
+   */
+  getScrollPosition = () => {
+    const { viewFolderList, focusedView } = this.props;
+    const { innerWidth, foldersWidth, containerWidth } = this.state;
+    const focusedIndex = viewFolderList.findIndex(view => {
+      return view.path == focusedView;
+    });
+    const minScrollPosition = 0;
+    const maxScrollPosition = innerWidth - containerWidth;
+
+    if (focusedIndex == viewFolderList.length - 1) {
+      return maxScrollPosition; // Last view, go the end
+    }
+
+    if (focusedIndex == 0) {
+      return minScrollPosition; // First View, go to start
+    }
+
+    let focusedCenterOffset = (() => {
+      let calcOffset = 0;
+      for (var i = 0; i < focusedIndex; i++) {
+        // add Previous View widths
+        calcOffset = calcOffset + foldersWidth[i];
+      }
+
+      //Add the half of the current, to get the final center offset
+      calcOffset = calcOffset + foldersWidth[focusedIndex] / 2;
+      return calcOffset;
+    })();
+
+    let centerScrollPosition = focusedCenterOffset - containerWidth / 2;
+
+    return centerScrollPosition; // Center foused View in container
+  };
 
   calcStateByProps(props) {
     // Calcualte Folder View Widths
@@ -175,7 +208,7 @@ class ViewPlacer extends React.Component {
 
   // Distance from left border of the container
   // css absolute positioned > left
-  getLeftOffset = positon => {
+  getOffsetOfView = positon => {
     var offset = 0;
     this.state.foldersWidth.forEach((width, index) => {
       if (index < positon) {
@@ -185,7 +218,7 @@ class ViewPlacer extends React.Component {
     return offset;
   };
 
-  resizeToState = (event, { element, size }, position, config) => {
+  applyResizeToState = (event, { element, size }, position, config) => {
     this.state.foldersWidth[position] = size.width;
     this.setState({ foldersWidth: this.state.foldersWidth });
   };
@@ -195,6 +228,9 @@ class ViewPlacer extends React.Component {
       return this.state.foldersWidth[index] || FOLDER_DEFAULT_WIDTH;
     });
   };
+
+  // React Motion Transition
+  // https://github.com/chenglou/react-motion#transitionmotion-
 
   getStyles = () => {
     const styles = this.props.viewFolderList.map((dirState, position) => {
@@ -207,16 +243,17 @@ class ViewPlacer extends React.Component {
           focused: this.props.focusedView == dirState.path
         },
         style: {
-          left: this.getLeftOffset(position),
+          left: this.getOffsetOfView(position),
+          zIndex: position * -1,
           width: this.state.foldersWidth[position],
-          opacity: spring(1)
+          opacity: spring(1, springSettings)
         }
       };
     });
 
     if (this.props.viewFilePath) {
       const position = this.props.viewFolderList.length;
-      const fileOffset = this.getLeftOffset(position);
+      const fileOffset = this.getOffsetOfView(position);
       styles.push({
         key: "FILE",
         data: {
@@ -225,8 +262,9 @@ class ViewPlacer extends React.Component {
         },
         style: {
           left: fileOffset,
+          zIndex: position * -1,
           width: this.state.fileWidth,
-          opacity: spring(1)
+          opacity: spring(1, springSettings)
         }
       });
     }
@@ -242,12 +280,10 @@ class ViewPlacer extends React.Component {
   };
 
   // Fadeout
-  // Needed that not every change of a view triggers a new enter Animation
-  // Don't really know why
   willLeave = (config: any) => {
     return {
       ...config.style,
-      opacity: spring(0)
+      opacity: spring(0, springSettings)
     };
   };
 }

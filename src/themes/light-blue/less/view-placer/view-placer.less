@@ -7,6 +7,16 @@
   width: 100%;
   position: relative;
   overflow-x: auto;
+  will-change: transform;
+
+  .view-placer__scroll-width {
+    position: absolute;
+    will-change: transform;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
 
   @bg-image: '../../img/view-placer__background.svg';
   background: url(@bg-image);
@@ -14,7 +24,7 @@
   background-position: 75% bottom;
   background-repeat: no-repeat;
 
-  @color-bg: #fff;
+  @color-bg: @color__background__default;
 
   &::-webkit-scrollbar {
     width: 10px;
