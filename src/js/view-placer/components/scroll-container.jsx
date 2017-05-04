@@ -3,6 +3,7 @@ import React from "react";
 
 type Props = {
   scrollLeft: number,
+  scrollable: boolean,
   className: string,
   children?: Element
 };
@@ -24,6 +25,9 @@ export default class ScrollContainer extends React.Component {
         className={this.props.className}
         ref={ref => {
           this.scroller = ref;
+        }}
+        style={{
+          overflowX: this.props.scrollable ? "scroll" : "hidden"
         }}
       >
         {this.props.children}

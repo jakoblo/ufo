@@ -157,7 +157,9 @@ class ViewPlacer extends React.Component {
       return view.path == focusedView;
     });
     const minScrollPosition = 0;
-    const maxScrollPosition = innerWidth - containerWidth;
+    const maxScrollPosition = innerWidth < containerWidth
+      ? 0
+      : innerWidth - containerWidth;
 
     if (focusedIndex == viewFolderList.length - 1) {
       return maxScrollPosition; // Last view, go the end
@@ -180,6 +182,10 @@ class ViewPlacer extends React.Component {
     })();
 
     let centerScrollPosition = focusedCenterOffset - containerWidth / 2;
+
+    if (centerScrollPosition < 0) {
+      return 0;
+    }
 
     return centerScrollPosition; // Center foused View in container
   };
