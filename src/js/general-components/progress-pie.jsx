@@ -19,27 +19,29 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 var React = require("react");
 
-export default React.createClass({
-  displayName: "ProgressLabel",
+type Props = {
+  size: number,
+  startDegree: number,
+  endDegree: number,
+  borderWith: number,
+  progress: number,
+  className: string
+};
 
-  propTypes: {
-    size: React.PropTypes.number,
-    startDegree: React.PropTypes.number,
-    endDegree: React.PropTypes.number,
-    borderWith: React.PropTypes.number,
-    progress: React.PropTypes.number,
-    className: React.PropTypes.string
-  },
+export default class ProgressPie extends React.Component {
+  props: Props;
 
-  getDefaultProps() {
-    return {
-      startDegree: 0,
-      progress: 0,
-      borderWith: 1,
-      size: 200,
-      className: "progress-pie"
-    };
-  },
+  constructor(props: Props) {
+    super(props);
+  }
+
+  // static defaultProps: {
+  //     startDegree: 0,
+  //     progress: 0,
+  //     borderWith: 1,
+  //     size: 200,
+  //     className: "progress-pie"
+  // },
 
   getPoint(r, degree) {
     var size = this.props.size;
@@ -49,7 +51,7 @@ export default React.createClass({
       x: r * Math.sin(d) + size / 2,
       y: this.props.size / 4 + r * (1 - Math.cos(d))
     };
-  },
+  }
 
   render() {
     var size = this.props.size;
@@ -104,4 +106,4 @@ export default React.createClass({
       </svg>
     );
   }
-});
+}

@@ -5,6 +5,9 @@ import * as Actions from "../navbar-actions";
 import * as constants from "../navbar-constants";
 import NavGroup from "./navgroup";
 import nodePath from "path";
+import AppControls from "../../app/components/app-controls";
+import ReadOnlyToggle from "../../app/components/read-only-toggle";
+
 import _ from "lodash";
 import { remote } from "electron";
 import classnames from "classnames";
@@ -42,42 +45,49 @@ class Navbar extends React.Component {
 
   render() {
     const { navbar } = this.props;
-    let classname = classnames({
-      "nav-bar": true,
-      "nav-bar--drop-target": this.state.dragOver
+    let classes = classnames({
+      sidebar: true,
+      "sidebar--drop-target": this.state.dragOver
     });
 
     this.groupsHeight = this.calcGroupsHeight();
 
     return (
-      <div className={classname} {...this.dropZoneListener}>
-        <TransitionMotion
-          defaultStyles={this.getDefaultStyles()}
-          styles={this.getStyles()}
-          willLeave={this.willLeave}
-          willEnter={this.willEnter}
-        >
-          {groupConfig => {
-            return (
-              <div>
-                {groupConfig.map(({ key, data, style }, position) => (
-                  <NavGroup
-                    key={data.group.id}
-                    group={data.group}
-                    position={position}
-                    style={style}
-                    activeItem={this.props.navbar.get("activeItem")}
-                    dispatch={this.props.dispatch}
-                    draggingGroup={this.state.draggingGroup}
-                    setDraggingGroup={this.setDraggingGroup}
-                    clearDraggingGroup={this.clearDraggingGroup}
-                  />
-                ))}
-              </div>
-            );
-          }}
-        </TransitionMotion>
-      </div>
+      <section className={classes} {...this.dropZoneListener}>
+        <AppControls />
+        <div className="nav-bar">
+          <TransitionMotion
+            defaultStyles={this.getDefaultStyles()}
+            styles={this.getStyles()}
+            willLeave={this.willLeave}
+            willEnter={this.willEnter}
+          >
+            {groupConfig => {
+              return (
+                <div>
+                  {groupConfig.map(({ key, data, style }, position) => (
+                    <NavGroup
+                      key={data.group.id}
+                      group={data.group}
+                      position={position}
+                      style={style}
+                      activeItem={this.props.navbar.get("activeItem")}
+                      dispatch={this.props.dispatch}
+                      draggingGroup={this.state.draggingGroup}
+                      setDraggingGroup={this.setDraggingGroup}
+                      clearDraggingGroup={this.clearDraggingGroup}
+                    />
+                  ))}
+                </div>
+              );
+            }}
+          </TransitionMotion>
+        </div>
+        <ReadOnlyToggle />
+        <div className="sidebar__drop-zone">
+          Drop it here to create a new group
+        </div>
+      </section>
     );
   }
 

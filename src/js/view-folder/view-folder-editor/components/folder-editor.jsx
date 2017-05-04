@@ -27,10 +27,6 @@ type Props = {
   dispatch: Function
 };
 
-type State = {
-  scrollPosition: number
-};
-
 const mapStateToProps = (state, props) => {
   return {
     focused: Selection.selectors.getSelectionRoot(state) == props.path,
@@ -43,15 +39,10 @@ class FolderEditor extends React.Component {
   props: Props;
   filePlugin: any;
   richtTextPlugin: any;
-  editor: any;
-  state: State;
   container: any;
 
   constructor(props: Props) {
     super(props);
-    this.state = {
-      scrollPosition: 0
-    };
     this.filePlugin = SlateFile.slatePlugin_Factory({
       BLOCK_TYPE: c.BLOCK_TYPE_FILE,
       folderPath: props.path,
@@ -81,51 +72,26 @@ class FolderEditor extends React.Component {
           // Focus typeSelection & Scroll to
           this.props.dispatch(Selection.actions.focusDir(this.props.path));
         }}
-        onScroll={() => {
-          this.setState({
-            scrollPosition: this.container.scrollTop
-          });
-        }}
       >
         {this.props.editorState
           ? <Editor
               state={this.props.editorState}
               className="slate-editor"
-              ref={editor => (this.editor = editor)}
               plugins={[this.filePlugin, this.richtTextPlugin]}
               onChange={this.onChange}
               readOnly={this.props.readOnly}
-              scrollPosition={this.state.scrollPosition}
               getScrollContainer={() => this.container}
               onDocumentChange={this.onDocumentChange}
-              onFocus={() => {
-                // Not needed right now
-                // this.props.dispatch(
-                //   Selection.actions.focusDir(this.props.path)
-                // );
-              }}
-              onBlur={() => {
-                // Not needed right now
-                //
-                // process.nextTick(() => {
-                //   // Keep focus on editor
-                //   // by click on a button or somewhere in the app
-                //   if (this.props && this.props.focused) {
-                //     this.editor.focus();
-                //   }
-                // });
-              }}
             />
           : <Loading />}
       </div>
     );
   }
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: Props) {
     return (
       this.props.editorState != nextProps.editorState ||
       this.props.readOnly != nextProps.readOnly ||
-      this.state.scrollPosition != nextState.scrollPosition ||
       this.props.focused != nextProps.focused
     );
   }

@@ -1,10 +1,10 @@
 //@flow
 
 export const BLOCK_TYPES = {
-  QUOTE: {
-    type: "QUOTE",
-    short: "“",
-    className: "quote"
+  PARAGRAPH: {
+    type: "PARAGRAPH",
+    short: "p",
+    className: "paragraph"
   },
   HEADING_ONE: {
     type: "HEADING_ONE",
@@ -37,10 +37,10 @@ export const BLOCK_TYPES = {
     short: "•",
     className: "list-item"
   },
-  PARAGRAPH: {
-    type: "PARAGRAPH",
-    short: "p",
-    className: "paragraph"
+  QUOTE: {
+    type: "QUOTE",
+    short: "“",
+    className: "quote"
   }
 };
 

@@ -85,7 +85,7 @@ const toggleLink = (editor: any) => {
       .transform()
       .wrapInline({
         type: INLINE_TYPES.LINK.type,
-        data: { href: null }
+        data: { href: "" }
       })
       .apply();
   } else {
@@ -186,9 +186,7 @@ const inlineSchema = {
               shell.openExternal(href);
             }
           }}
-        >
-          X
-        </span>
+        />
       </span>
     );
   }
@@ -216,16 +214,19 @@ export default function RichText(): any {
     render: (props: Object, state: any, editor: any) => {
       return (
         <div>
-          <HoverToolbar
-            hasMark={hasMark}
-            toggleMark={toggleMark}
-            isLink={isLink}
-            toggleLink={toggleLink}
-            setLinkHref={setLinkHref}
-            getHrefFromSelectedInline={getHrefFromSelectedInline}
-            editor={editor}
-          />
           {props.children}
+          <div className="overlayContainer">
+            <HoverToolbar
+              hasMark={hasMark}
+              toggleMark={toggleMark}
+              isLink={isLink}
+              toggleLink={toggleLink}
+              setLinkHref={setLinkHref}
+              getScrollContainer={props.getScrollContainer}
+              getHrefFromSelectedInline={getHrefFromSelectedInline}
+              editor={editor}
+            />
+          </div>
         </div>
       );
     },

@@ -1,0 +1,6 @@
+{
+  "paths": ['src/themes'],
+  "ieCompat": true,
+  "strictUnits": false,
+  relativeUrls: true
+}

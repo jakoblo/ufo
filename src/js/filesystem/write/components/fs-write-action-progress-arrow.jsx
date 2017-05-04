@@ -6,9 +6,9 @@ const itemHeight = 24;
 const arrowWidth = 17;
 const topSpacing = 11;
 const bottomSpacing = 9;
-const mainColor = "#3A606F";
+const mainColor = "#3C96DA";
 const errorColor = "#D1335B";
-const sallowColor = "#E1E1E1";
+const sallowColor = "#CFCFCF";
 const bgColor = "#FFFFFF";
 
 type Props = {
@@ -66,9 +66,8 @@ export default class ProgressArrow extends React.Component {
     error?: boolean
   ) => {
     let height = itemHeight * (this.props.sourceCount + 1);
-    let progressHeight = (height - topSpacing - bottomSpacing) *
-      (progress / 100) +
-      topSpacing;
+    let progressHeight =
+      (height - topSpacing - bottomSpacing) * (progress / 100) + topSpacing;
     let betweenParts = [];
     for (var index = 1; index < this.props.sourceCount; index++) {
       betweenParts.push(this.arrowPartBetween(6, index * itemHeight, color));

@@ -35,7 +35,7 @@ class FilterTypeInput extends React.Component {
             this.props.input.length > 0
         })}
       >
-        <label className="filter-type__label">Filter By:</label>
+        <label className="filter-type__label">Filter By</label>
         <input
           className="filter-type__input"
           readOnly={true}
