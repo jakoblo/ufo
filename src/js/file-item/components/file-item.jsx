@@ -118,7 +118,7 @@ class FileItemComp extends React.Component {
               <div className={className + "__image-border"}>
                 <img
                   className={className + "__image"}
-                  src={this.props.file.get("path")}
+                  src={"local://" + this.props.file.get("path")}
                 />
               </div>
             </div>

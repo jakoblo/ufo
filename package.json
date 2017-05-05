@@ -1,16 +1,18 @@
 {
   "name": "ufo",
   "productName": "ufo",
-  "main": "./src/js/init.js",
+  "main": "./src/js/main/main.js",
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "start": "NODE_ENV=development ./node_modules/.bin/electron .",
+    "start": "electron-forge start",
     "prod": "NODE_ENV=production ./node_modules/.bin/electron .",
     "main-debug": "./node_modules/.bin/electron . --debug=5858",
     "install": "gulp install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/electron-packager-compile . -all --overwrite"
+    "build": "./node_modules/.bin/electron-packager-compile . -all --overwrite",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +21,7 @@
     "classnames": "^2.2.5",
     "dom-scroll-into-view": "^1.2.1",
     "drivelist-watcher": "^0.1.1",
-    "electron-compile": "^6.4.0",
+    "electron-compile": "^6.4.1",
     "electron-compilers": "^5.8.3",
     "electron-json-storage": "^3.0.1",
     "electron-window-state": "^4.1.0",
@@ -56,6 +58,7 @@
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-eslint": "^7.1.1",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-class-properties": "^6.11.5",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
@@ -64,9 +67,10 @@
     "babel-plugin-transform-react-constant-elements": "^6.23.0",
     "babel-plugin-transform-react-inline-elements": "^6.22.0",
     "babel-plugin-transform-react-jsx": "^6.8.0",
-    "electron": "^1.6.6",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-react": "^6.24.1",
     "electron-devtools-installer": "^2.0.1",
-    "electron-packager": "^8.5.0",
+    "electron-prebuilt-compile": "1.6.6",
     "eslint": "^3.3.0",
     "eslint-plugin-jsdoc": "^3.0.2",
     "eslint-plugin-react": "^6.1.0",
@@ -75,5 +79,37 @@
     "gulp-google-webfonts": "0.0.14",
     "i": "^0.3.5",
     "npm": "^4.4.1"
+  },
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "icon": "./src/icon/icon",
+        "overwrite": true
+      },
+      "electronWinstallerConfig": {
+        "name": ""
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": ""
+      }
+    }
   }
 }

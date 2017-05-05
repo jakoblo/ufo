@@ -15,7 +15,10 @@ export default class DisplayImage extends React.Component {
     return (
       <div className="render-image__container">
         <div className="render-image__wrapper">
-          <img className="render-image__img" src={this.props.path} />
+          <img
+            className="render-image__img"
+            src={"local://" + this.props.path}
+          />
         </div>
       </div>
     );
