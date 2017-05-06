@@ -18,10 +18,11 @@ let mainWindowState;
 app.on("ready", function() {
   enableLiveReload();
   loadAppMenu();
+
+  // Register Protocol to load and show local images
   protocol.registerFileProtocol(
     "local",
     (request, callback) => {
-      console.log(request);
       const url = request.url.substr(7);
       callback({ path: url });
     },
@@ -29,6 +30,7 @@ app.on("ready", function() {
       if (error) console.error("Failed to register protocol");
     }
   );
+
   mainWindowState = windowStateKeeper({
     defaultWidth: 1000,
     defaultHeight: 800

@@ -74,7 +74,6 @@ class ChokidarHandler {
     errorCallback: ErrorCallback
   ): Object => {
     this._verify(path, settings);
-
     let watcher = chokidar.watch(path, settings);
     this.watcherStack[path] = {
       watcher: watcher,
@@ -141,22 +140,22 @@ class ChokidarHandler {
   };
 
   _handleEventChange(
-    changeCallback: Callback, // Bound in watch()
-    root: string, // Bound in watch()
-    type: string, // Bound in watch()
-    path: string, // From Chokidar
-    stats: Stats // From Chokidar
+    changeCallback: Callback,
+    root: string,
+    type: string,
+    path: string,
+    stats: Stats
   ) {
     let fileObj = this._createFileObj(...arguments);
     changeCallback(fileObj);
   }
 
   _handleEventDelete(
-    unlinkCallback: UnlinkCallback, // Bound in watch()
-    root: string, // Bound in watch()
-    type: string, // Bound in watch()
-    path: string, // From Chokidar
-    stats: Stats // From Chokidar
+    unlinkCallback: UnlinkCallback,
+    root: string,
+    type: string,
+    path: string,
+    stats: Stats
   ) {
     if (path == root) {
       console.error(
@@ -171,11 +170,11 @@ class ChokidarHandler {
   }
 
   _handleEventAdd(
-    addCallback: Callback, // Bound in watch()
-    root: string, // Bound in watch()
-    type: string, // Bound in watch()
-    path: string, // From Chokidar
-    stats: Stats // From Chokidar
+    addCallback: Callback,
+    root: string,
+    type: string,
+    path: string,
+    stats: Stats
   ) {
     let fileObj = this._createFileObj(...arguments);
     if (root == path) {
@@ -183,6 +182,11 @@ class ChokidarHandler {
     }
     if (stats.isSymbolicLink()) {
       return; // Ignore Symbolic Links, they are anoying... and can crash node/chokidar on windows
+    }
+    if (nodePath.dirname(path) != root) {
+      // Prevent adding of subfolder files
+      // Dont know why, depth: 0 seems not to work that well in chokidar
+      return;
     }
     if (this.watcherStack[root].ready) {
       addCallback(fileObj);
@@ -207,11 +211,11 @@ class ChokidarHandler {
   };
 
   _createFileObj(
-    callback: Function, // Bound in watch()
-    root: string, // Bound in watch()
-    type: string, // Bound in watch()
-    path: string, // From Chokidar
-    stats: Stats // From Chokidar
+    callback: Function,
+    root: string,
+    type: string,
+    path: string,
+    stats: Stats
   ): WatchedFile {
     let pathObj = nodePath.parse(path);
     return {
@@ -231,12 +235,15 @@ class ChokidarHandler {
       .on("change", path => console.log(`File ${path} has been changed`, root))
       .on("unlink", path => console.log(`File ${path} has been removed`, root))
       .on("addDir", path =>
-        console.log(`Directory ${path} has been added`, root))
+        console.log(`Directory ${path} has been added`, root)
+      )
       .on("unlinkDir", path =>
-        console.log(`Directory ${path} has been removed`, root))
+        console.log(`Directory ${path} has been removed`, root)
+      )
       .on("error", error => console.log(`Watcher error: ${error}`, root))
       .on("ready", () =>
-        console.log("Initial scan complete. Ready for changes", root));
+        console.log("Initial scan complete. Ready for changes", root)
+      );
   }
 }
 
