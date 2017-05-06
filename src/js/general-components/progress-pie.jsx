@@ -35,13 +35,13 @@ export default class ProgressPie extends React.Component {
     super(props);
   }
 
-  // static defaultProps: {
-  //     startDegree: 0,
-  //     progress: 0,
-  //     borderWith: 1,
-  //     size: 200,
-  //     className: "progress-pie"
-  // },
+  static defaultProps = {
+    startDegree: 0,
+    progress: 0,
+    borderWith: 1,
+    size: 200,
+    className: "progress-pie"
+  };
 
   getPoint(r, degree) {
     var size = this.props.size;

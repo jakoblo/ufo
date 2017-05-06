@@ -37,7 +37,6 @@ export default function folderEditorReducer(
         return editorState.transform().collapseToEnd().apply();
       });
       return state;
-
     // Add file at the end of the Document if not exists
     case fsWatch.actiontypes.FILE_ADD:
       if (action.payload.base == c.INDEX_BASE_NAME) return state;
@@ -64,7 +63,6 @@ export default function folderEditorReducer(
         action.payload.root,
         transformAddFile.apply({ save: false })
       );
-
     // Remove file from document is exists
     case fsWatch.actiontypes.FILE_UNLINK:
       let transformRemoveFile = state.get(action.payload.root).transform();
@@ -76,7 +74,6 @@ export default function folderEditorReducer(
         action.payload.root,
         transformRemoveFile.apply({ save: false })
       );
-
     // Rename File in Document
     case fsWrite.actiontypes.FS_WRITE_NEW:
       return (() => {
@@ -104,7 +101,6 @@ export default function folderEditorReducer(
             .apply({ save: false })
         );
       })();
-
     // Rename Error, undo the rename in the Document
     case fsWrite.actiontypes.FS_WRITE_ERROR:
       return (() => {
@@ -122,15 +118,16 @@ export default function folderEditorReducer(
 
         return state.set(
           renamingSourceRoot,
-          SlateFile.stateTransforms.renameFile(
-            renamingEditor,
-            renamingEditor.transform(),
-            renamingTargetBase, // Inverted
-            renamingSourceBase // Inverted
-          ).apply({ save: false })
+          SlateFile.stateTransforms
+            .renameFile(
+              renamingEditor,
+              renamingEditor.transform(),
+              renamingTargetBase, // Inverted
+              renamingSourceBase // Inverted
+            )
+            .apply({ save: false })
         );
       })();
-
     // case App.actiontypes.APP_CHANGE_PATH:
     //   // Set Selection to last folder in pathRoute
     //   if(action.payload.pathRoute.length > 1) {
@@ -160,6 +157,7 @@ export default function folderEditorReducer(
     //     editorState = editorState.transform().select(newSelection).apply({save: false})
     //     state = state.set(root, editorState)
     //   }
+
 
     default:
       return state;

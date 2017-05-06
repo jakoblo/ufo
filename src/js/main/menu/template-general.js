@@ -1,18 +1,6 @@
 //@flow
-export default function getGeneralMenuTemplate(handleNewWindow: Function) {
+export default function getGeneralMenuTemplate() {
   return [
-    {
-      label: "File",
-      submenu: [
-        {
-          label: "New Window",
-          accelerator: "CmdOrCtrl+N",
-          click: (item: any, focusedWindow: any) => {
-            handleNewWindow();
-          }
-        }
-      ]
-    },
     {
       label: "Edit",
       submenu: [

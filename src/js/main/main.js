@@ -5,14 +5,32 @@
  */
 
 import ipcListener from "./main-ipc";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, protocol } from "electron";
 import windowStateKeeper from "electron-window-state";
+import { enableLiveReload } from "electron-compile";
 import os from "os";
+import loadAppMenu from "./menu/main-menu";
+import path from "path";
 
 let window;
 let mainWindowState;
 
 app.on("ready", function() {
+  enableLiveReload();
+  loadAppMenu();
+
+  // Register Protocol to load and show local images
+  protocol.registerFileProtocol(
+    "local",
+    (request, callback) => {
+      const url = request.url.substr(7);
+      callback({ path: url });
+    },
+    error => {
+      if (error) console.error("Failed to register protocol");
+    }
+  );
+
   mainWindowState = windowStateKeeper({
     defaultWidth: 1000,
     defaultHeight: 800
@@ -43,6 +61,8 @@ function startWindow() {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
+    webSecurity: false,
+    allowRunningInsecureContent: true,
     resizable: true,
     frame: false //os.platform() != "darwin" // Windows needs the ugly frame, linux?
   });
@@ -67,9 +87,8 @@ function startWindow() {
 // may use in the future:
 //
 // import WindowManager from "./main-window";
-// import loadAppMenu from "./menu/main-menu";
+
 // let windowManager = new WindowManager();
 // App Menu is disabled until we get multiwindow support ;)
-// loadAppMenu(windowManager.new);
 // ipcListener(windowManager.new);
 // windowManager.new();

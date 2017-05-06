@@ -9,8 +9,8 @@ import { Menu } from "electron";
 import getGeneralTemplate from "./template-general";
 import getDarwinTemplate from "./template-darwin";
 
-export default function loadAppMenu(handleNewWindow: Function) {
-  let template = getGeneralTemplate(handleNewWindow);
+export default function loadAppMenu() {
+  let template = getGeneralTemplate();
   if (process.platform == "darwin") {
     template.push(getDarwinTemplate());
   }
