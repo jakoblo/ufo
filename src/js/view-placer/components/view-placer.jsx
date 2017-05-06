@@ -44,8 +44,7 @@ type Props = {
 type State = {
   foldersWidth: Array<number>,
   fileWidth: number,
-  containerWidth: number,
-  innerWidth: number
+  containerWidth: number
 };
 
 const mapStateToProps = (state, props: Props) => {
@@ -67,8 +66,7 @@ class ViewPlacer extends React.Component {
     this.state = {
       foldersWidth: [],
       fileWidth: 0,
-      containerWidth: 0,
-      innerWidth: 0
+      containerWidth: 0
     };
     this.state = { ...this.state, ...this.calcStateByProps(props) };
 
@@ -95,7 +93,7 @@ class ViewPlacer extends React.Component {
           {views => (
             <HorizontalScroller
               className="view-placer"
-              innerWidth={this.state.innerWidth} // The innerContainer has a fixed and Calculated with, to allow smooth transitions, if it shrinks
+              innerWidth={this.getInnerWidth()} // The innerContainer has a fixed and Calculated with, to allow smooth transitions, if it shrinks
               scrollPosition={this.getScrollPosition()}
             >
               {views.map((view, position) => {
@@ -152,7 +150,8 @@ class ViewPlacer extends React.Component {
    */
   getScrollPosition = () => {
     const { viewFolderList, focusedView } = this.props;
-    const { innerWidth, foldersWidth, containerWidth } = this.state;
+    const { foldersWidth, containerWidth } = this.state;
+    const innerWidth = this.getInnerWidth();
     const focusedIndex = viewFolderList.findIndex(view => {
       return view.path == focusedView;
     });
@@ -203,14 +202,17 @@ class ViewPlacer extends React.Component {
         ? FILE_MIN_WIDTH
         : calculatedFileWidth;
     }
-    const innerWidth = fileViewOffset + fileWidth;
 
     return {
       foldersWidth,
-      fileWidth,
-      innerWidth
+      fileWidth
     };
   }
+
+  getInnerWidth = () => {
+    const { foldersWidth, fileWidth } = this.state;
+    return _.sum(foldersWidth) + fileWidth;
+  };
 
   // Distance from left border of the container
   // css absolute positioned > left
