@@ -1,0 +1,37 @@
+@import '_variables.less';
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: @color__background__sidebar;
+  width: 275px;
+  will-change: transform;
+
+  &__drop-zone {
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    bottom: -150px;
+
+    display: block;
+    z-index: -10;
+    padding: 30px 20px;
+    border: 1px solid @color__border__decoration;
+    border-radius: 4px;
+    background: @color__background__default;
+
+    text-align: center;
+    font-weight: 600;
+    color: @color__decoration;
+
+    transition: bottom 0.3s ease-out;
+  }
+
+  &--drop-target &__drop-zone {
+    bottom: 5px;
+    z-index: 10;
+  }
+
+}

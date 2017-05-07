@@ -1,0 +1,28 @@
+.button__right(@icon-url, @height-wrapper) {
+
+  @button-size: 17px;
+
+  .button-reset;
+  .icon-container;
+
+  border-radius: 50%;
+  width: @button-size;
+  height: @button-size;
+
+  border: 1px solid transparent;
+  margin: calc((@height-wrapper - @button-size) / 2) 0;
+  display: none;
+
+  &::after {
+    .icon-svg(@icon-url, @color__icon__light, 15px, 15px);
+  }
+
+  &:hover {
+    // border-color: lighten(@color__background__sidebar, 50%);
+    background: @color__background__decoration;
+    &::after {
+      background-color: @color__icon__invert;
+    }
+  }
+
+}
