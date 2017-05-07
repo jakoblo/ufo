@@ -3,7 +3,7 @@
   "productName": "ufo",
   "main": "./src/js/main/main.js",
   "version": "0.0.0",
-  "description": "",
+  "description": "Custom Filemanager to make notes where you need them.",
   "scripts": {
     "start": "electron-forge start",
     "prod": "NODE_ENV=production ./node_modules/.bin/electron .",
@@ -14,8 +14,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sebastian Wolf, Jakob Lobensteiner",
+  "license": "MIT",
   "dependencies": {
     "chokidar": "^1.6.1",
     "classnames": "^2.2.5",
