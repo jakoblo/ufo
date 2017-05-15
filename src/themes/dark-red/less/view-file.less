@@ -30,11 +30,12 @@
     flex-grow: 0;
     flex-shrink: 0;
     -webkit-app-region: drag;
+    cursor: move;
     display: flex;
     box-sizing: border-box;
     padding: @padding_bar-vertical 0;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
   }
 
   &__name {
@@ -45,11 +46,16 @@
   }
 
   &__size {
-    .view-title;
+    display: inline-block;
+    color: @color__text__dark;
+    padding: 1px 5px 1px 5px;
+    margin-left: 12px;
     // color: @color__text__dark;
     flex-shrink: 0;
+    border: 1px solid @color__border__grey;
+    border-radius: 4px;
     flex-grow: 0;
-    text-align: right;
+    text-align: center
   }
 
   &__bottom-bar {

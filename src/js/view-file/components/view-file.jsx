@@ -52,12 +52,15 @@ class ViewFile extends React.Component {
         className="view-file"
       >
         <div className="view-file__top-toolbar">
-          <div className="view-file__name">{this.props.file.get("base")}</div>
-          <div className="view-file__size">
-            {filesize(file.get("stats").size)}
+          <div className="view-file__name">
+            {this.props.file.get("base")}
+            <div className="view-file__size">
+              {filesize(file.get("stats").size)}
+            </div>
           </div>
         </div>
         <FileRenderer path={this.props.path} />
+
         <div className="view-file__bottom-bar">
           <div className="view-file__time-container">
             {this.getFileTime(file.get("stats").mtime, "Modified")}

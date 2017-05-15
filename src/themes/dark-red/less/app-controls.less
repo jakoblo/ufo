@@ -9,6 +9,7 @@
   justify-content: space-between;
   align-items: center;
   -webkit-app-region: drag;
+  cursor: move;
 
   &__button-path-up {
     .app-controls__button-mixin(0deg);
@@ -22,6 +23,7 @@
     height: 35px;
     transform: rotate(@rotation);
     border-radius: 50%;
+    cursor: default;
     .icon-container;
 
     &:after {

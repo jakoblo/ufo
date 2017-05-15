@@ -123,6 +123,37 @@ const getHrefFromSelectedInline = editor => {
   return linkInlines.first().data.get("href");
 };
 
+const insertLink = (url: string, state: any) => {
+  const domain = tld.getDomain(url);
+  const transform = state.transform();
+
+  if (state.isCollapsed) {
+    return transform
+      .insertInline({
+        type: INLINE_TYPES.LINK.type,
+        data: {
+          href: url
+        },
+        nodes: [Text.createFromString(domain || url)]
+      })
+      .apply();
+  } else {
+    if (isLink()) {
+      transform.unwrapInline(INLINE_TYPES.LINK.type);
+    }
+
+    return transform
+      .wrapInline({
+        type: INLINE_TYPES.LINK.type,
+        data: {
+          href: data.text
+        }
+      })
+      .collapseToEnd()
+      .apply();
+  }
+};
+
 /*
   Build Render schema
   https://docs.slatejs.org/reference/models/schema.html
@@ -261,36 +292,13 @@ export default function RichText(): any {
       if (data.type != "text" && data.type != "html") return;
       if (!isUrl(data.text)) return;
 
-      const url = data.text;
-      const domain = tld.getDomain(url);
+      return insertLink(data.text, state);
+    },
+    onDrop: (e: Event, data: Object, state: any) => {
+      if (data.type != "text" && data.type != "html") return;
+      if (!isUrl(data.text)) return;
 
-      const transform = state.transform();
-
-      if (state.isCollapsed) {
-        return transform
-          .insertInline({
-            type: INLINE_TYPES.LINK.type,
-            data: {
-              href: url
-            },
-            nodes: [Text.createFromString(domain || url)]
-          })
-          .apply();
-      } else {
-        if (isLink()) {
-          transform.unwrapInline(INLINE_TYPES.LINK.type);
-        }
-
-        return transform
-          .wrapInline({
-            type: INLINE_TYPES.LINK.type,
-            data: {
-              href: data.text
-            }
-          })
-          .collapseToEnd()
-          .apply();
-      }
+      return insertLink(data.text, state);
     },
     schema: {
       nodes: { ...blockSchema, ...inlineSchema },
