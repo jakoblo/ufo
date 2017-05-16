@@ -2,7 +2,8 @@
 @import '_mixins.less';
 @import 'mixins-animation.less';
 
-@icon-size: 45px;
+@icon-size: 38px;
+@icon-spacing: 4px;
 @width-container: 250px;
 @border-color: darken(@color__grey-light-bg, 10%);
 
@@ -12,35 +13,50 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: stretch;
-  background: @color__background__sidebar;
+  background: @color__lightest-grey;
 
   &__icon-toolbar {
-    width: 45px;
+    width: calc(@icon-size + @icon-spacing * 2);
     z-index: 1;
-    border-left: 1px solid @color__border__on-dark;
+    // border-left: 1px solid @color__border__grey;
   }
 
   .addon-bar-icon(@icon) {
     height: @icon-size;
     width: @icon-size;
-    margin-top: 10px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin: 5px @icon-spacing;
 
     .icon-container;
 
     &:after {
-      .icon-svg('../img/@{icon}', @color__icon__on-dark)
+      .icon-svg('../img/@{icon}', @color__icon__dark)
     }
 
     position: relative;
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
 
+    &:hover {
+      background: @color__decoration;
+      border-radius: 4px;
+      &:after {
+        background: @color__icon__invert;
+      }
+    }
+
     &--active {
       background-color: #fff;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: @icon-spacing;
+      padding-right: @icon-spacing;
       border-color: @border-color;
       border-left: 1px solid #fff;
       left: -1px;
     }
+
   }
 
   &__icon-fs-write {
