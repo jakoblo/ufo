@@ -89,6 +89,7 @@ export default class HoverToolbar extends React.Component {
 
     if (state.isBlurred || (state.isCollapsed && !isLink(editor))) {
       menu.removeAttribute("style");
+      menu.style.opacity = 0;
       return;
     }
 
