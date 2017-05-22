@@ -1,0 +1,52 @@
+@import '_variables.less';
+@import '_mixins.less';
+
+.filter-type {
+
+  @height_filter: 32px;
+  @horizontal-space: 12px;
+
+  position: absolute;
+  left: calc(@editor-padding-left + @editor__item__prefix-width);
+  right: @editor-padding-right;
+  bottom: 7px; // should use var
+  display: none;
+  border-radius: 4px;
+  overflow: hidden;
+  background: @color__grey-lightest;
+  border: 1px solid @color__blue;
+  transition: height 0.3s ease-out;
+  height: 0;
+
+  &--focused {
+    display: flex;
+  }
+
+  &--active {
+    height: @height_filter;
+  }
+
+  &__label {
+
+    @vertical-margin: 7px;
+    color: @color__blue;
+    font-size: @font__size-light;
+    line-height: calc(@height_filter - @vertical-margin - @vertical-margin);
+    margin: @vertical-margin 0 @vertical-margin 0;
+    border-right: 1px solid @color__blue;
+    padding: 0 @horizontal-space;
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
+
+  &__input {
+    .input-reset;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: @height_filter;
+    font-size: @font__size-light;
+    color: @color__grey-strong;
+    padding: 0 @horizontal-space;
+  }
+
+}

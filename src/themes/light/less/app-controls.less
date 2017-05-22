@@ -1,0 +1,53 @@
+@import '_variables.less';
+@import '_mixins.less';
+
+.app-controls {
+  height: @height__top-toolbar;
+  display: flex;
+  flex-shrink: 0;
+  padding: 0 @padding__sidebar-horizonal;
+  justify-content: space-between;
+  align-items: center;
+  -webkit-app-region: drag;
+  cursor: move;
+
+  &__button-path-up {
+    .app-controls__button-mixin(0deg);
+  }
+}
+
+// Mixin for Button History Back/Forward and Navigate Up
+.app-controls__button-mixin(@rotation) {
+
+    .button-reset;
+    width: 35px;
+    height: 35px;
+    border: 1px solid transparent;
+    transform: rotate(@rotation);
+    border-radius: 50%;
+    cursor: default;
+    .icon-container;
+
+    &:after {
+      .icon-svg('../img/icon__arrow__25x25.svg', @color__icon__default);
+    }
+
+    &:hover {
+      border-color: @color__grey-light;
+    }
+
+    &:active {
+      background-color: @color__decoration;
+      border-color: @color__decoration;
+      &:after {
+        background-color: @color__white;
+      }
+    }
+
+    &--disabled {
+      opacity: 0.3;
+      &:hover {
+        border-color: transparent;
+      }
+    }
+  }

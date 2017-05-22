@@ -1,0 +1,104 @@
+@import '_variables.less';
+@import '_mixins.less';
+@import 'editor.less';
+
+
+.view-folder {
+
+  @local__color__bg: @color__grey-lightest;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: @local__color__bg;
+  height: 100%;
+  width: 100%;
+
+  &__toolbar-top {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-app-region: drag;
+    left: 0;
+    right: 7px;
+    z-index: 10;
+    height: @height__top-toolbar;
+    background: linear-gradient(to bottom, @color__grey-lightest 95%, fadeout(@color__grey-lightest, 100%) 100%);
+    cursor: move;
+  }
+
+  &__name {
+    .view-title;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+  }
+
+  &__editor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    & > div { // Empty React element, should be fixed
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      flex-shrink: 0;
+      flex-grow: 1;
+    }
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    height: 100%;
+    will-change: transform;
+    outline: none;
+
+
+    .nicer-scrollbars(@color__grey-lightest);
+  }
+
+  &__toolbar-bottom {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    left: 0;
+    right: 7px;
+    bottom: 0;
+    z-index: 10;
+    height: 25px;
+    background: linear-gradient(to top, @color__grey-lightest 50%, fadeout(@color__grey-lightest, 100%) 100%);
+  }
+
+  &__button-add-folder {
+    .button-reset;
+    .icon-container;
+    &:after {
+      .icon-svg('../img/icon__add-folder__25x25.svg', @color__icon__default);
+    }
+
+    opacity: 0;
+    display: block;
+    position: absolute;
+    bottom: -10px;
+    padding: 5px;
+    border-radius: 50%;
+    background: @color__grey-lightest;
+    left: calc(@padding__sidebar-horizonal - 5px);
+    border: 1px solid transparent;
+    transition: opacity 0.3s ease-out;
+    &:hover {
+      border-color: @color__grey-light;
+      opacity: 1 !important;
+      &:after {
+        background: @color__decoration;
+      }
+    }
+  }
+  &:hover &__button-add-folder {
+    opacity: 0.5;
+  }
+
+  &__empty-text {
+    .empty-text
+  }
+}

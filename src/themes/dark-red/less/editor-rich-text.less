@@ -1,0 +1,110 @@
+@import '_variables.less';
+@import '_mixins.less';
+
+.text-block--paragraph {
+  margin: 7px 0;
+  .text-block__content {
+    font-family: @font-family__serif;
+    color: @color__text__editor;
+    font-size: @font__size-small;
+    line-height: 20px;
+  }
+}
+
+.text-block--heading-one {
+  margin: 20px 0 10px;
+  .block-status .block-status__icon {
+    margin-top: 8px;
+  }
+  .text-block__content {
+    font-family: @font-family__serif;
+    font-weight: 400;
+    font-size: 22px;
+    color: @color__text__dark;
+  }
+}
+
+.text-block--heading-two {
+  margin: 20px 0 10px;
+  .text-block__content {
+    font-family: @font-family__serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: @color__text__dark;
+  }
+}
+
+.text-block--heading-three {
+  margin: 15px 0 7px;
+  .text-block__content {
+    font-family: @font-family__serif;
+    line-height: 1.6;
+    font-size: @font__size-normal;
+    color: @color__text__dark;
+    border-bottom: 1px solid @color__border__light;
+  }
+}
+
+.text-block--list-item {
+  margin: 2px 0;
+  .text-block__content {
+    line-height: 1.6;
+    font-size: @font__size-small;
+    font-family: @font-family__serif;
+    color: @color__text__editor;
+  }
+}
+
+.text-block--quote {
+  margin: 10px 0;
+  .text-block__content {
+    font-family: @font-family__serif;
+    font-size: @font__size-small;
+    border-left: 2px solid #ccc;
+    padding-left: 12px;
+  }
+}
+
+.inline--link {
+
+  @link-height: 17px;
+
+  background: lighten(@color__blue, 35%);
+  color: @color__blue;
+  border-radius: 14px;
+  padding: 0 22px 0 7px;
+  margin-left: 2px;
+  margin-right: 2px;
+  display: inline-block;
+  line-height: @link-height;
+  height: @link-height;
+  position: relative;
+  transition: padding 0.3s;
+
+  &__link-opener {
+
+    position: absolute;
+    right: 5px;
+    top: 0;
+    width: @link-height;
+    height: @link-height;
+    .icon-container;
+    &::after {
+      .icon-svg('../img/icon__link__11x11.svg', @color__blue)
+    }
+    cursor: pointer;
+  }
+}
+
+.mark--bold {
+  font-weight: bold;
+  color: @color__text__dark;
+}
+
+.mark--underline {
+  text-decoration: underline;
+}
+
+.mark--italic {
+  font-style: italic;
+}

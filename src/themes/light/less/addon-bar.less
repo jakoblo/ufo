@@ -1,0 +1,96 @@
+@import '_variables.less';
+@import '_mixins.less';
+@import 'mixins-animation.less';
+
+@icon-size: 38px;
+@icon-spacing: 4px;
+@width-container: 300px;
+@border-color: darken(@color__grey-light, 10%);
+
+
+.addon-bar {
+
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: stretch;
+  background: @color__grey-lightest;
+  border-left: 1px solid @color__grey-light;
+
+  &__icon-toolbar {
+    width: calc(@icon-size + @icon-spacing * 2);
+    z-index: 1;
+    // border-left: 1px solid @color__grey-light;
+  }
+
+  .addon-bar-icon(@icon) {
+
+    border-left: 2px solid transparent;
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    position: relative;
+    left: -2px;
+    margin-right: -2px;
+    height: @icon-size;
+    flex-grow: 0;
+    flex-shrink: 0;
+    .icon-container;
+
+    &:after {
+      .icon-svg('../img/@{icon}', @color__icon__default)
+    }
+
+    &:first-child {
+      border-top-color: transparent !important;
+    }
+
+    &--active {
+      background-color: @color__grey-lightest;
+      margin-left: 0;
+      padding-left: @icon-spacing;
+      padding-right: @icon-spacing;
+      border-left: 2px solid @color__grey-lightest;
+      border-top: 2px solid @color__grey-light;
+      border-bottom: 2px solid @color__grey-light;
+    }
+
+  }
+
+  &__icon-fs-write {
+    .addon-bar-icon('icon__transfer__25x25.svg');
+  }
+
+  &__icon-settings {
+    .addon-bar-icon('icon__settings__25x25.svg');
+  }
+
+  &__css-transition-group {
+    display: flex;
+    align-items: stretch;
+  }
+
+  &__view-container {
+    background: @color__grey-lightest;
+    .animation__slide-right(@width-container);
+    border-right: 2px solid @color__grey-light;
+    position: relative;
+    width: @width-container;
+    overflow-y: auto;
+    will-change: transform;
+    .nicer-scrollbars;
+  }
+}
+
+.no-settings {
+  width: 100%;
+  height: 100%;
+  .icon-container;
+  align-items: flex-start;
+  padding-top: 30%;
+  box-sizing: border-box;
+
+  &::after {
+    opacity: 0.5;
+    .icon-svg('../img/no-settings-yet.svg', @color__icon__default)
+  }
+}

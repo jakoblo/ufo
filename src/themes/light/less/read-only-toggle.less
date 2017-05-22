@@ -1,0 +1,58 @@
+@import '_variables.less';
+@import '_mixins.less';
+
+.read-only-toggle {
+
+  height: 100px;
+  background-image: url('../img/edit-toggle__bg.svg');
+  background-size: 135px 30px;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+
+  &:before {
+    content: "";
+    position: absolute;
+    opacity:
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../img/edit-toggle__bg-disabled.svg');
+    background-size: 135px 30px;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.20s ease-out;
+  }
+  &:active {
+    opacity: 0.7;
+  }
+
+  @bubblet-move-distance: 19px;
+
+  &__bullet {
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    border-radius: 50%;
+    margin-left: -@bubblet-move-distance;
+    transition: margin 0.20s ease-out;
+  }
+
+  &--read-only {
+    .read-only-toggle__bullet {
+      margin-left: @bubblet-move-distance;
+    }
+    &:before {
+      opacity: 1;
+    }
+  }
+
+}
