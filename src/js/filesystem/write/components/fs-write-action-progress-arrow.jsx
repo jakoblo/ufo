@@ -6,10 +6,10 @@ const itemHeight = 24;
 const arrowWidth = 17;
 const topSpacing = 11;
 const bottomSpacing = 9;
-const mainColor = "#474747";
-const errorColor = "#D1335B";
-const sallowColor = "#CFCFCF";
-const bgColor = "#FFFFFF";
+const mainColor = "#555";
+const errorColor = "#D1335D";
+const sallowColor = "#E0E0E0";
+const bgColor = "#F7F7F7";
 
 type Props = {
   finished: boolean,

@@ -1,0 +1,52 @@
+@import '_variables.less';
+@import '_mixins.less';
+
+.view-wrapper {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 450px;
+  display: flex;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: auto;
+  padding: 0;
+  padding-bottom: 15px;
+  will-change: transform;
+  background: @color__grey-lightest;
+  border-left: 1px solid @color__grey-light;
+  border-right: 1px solid @color__grey-light;
+
+  .view-placer--display-single & {
+    width: 100%;
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
+
+  .react-resizable-handle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 25px;
+    height: 15px;
+    margin-right: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    border-radius: 4px 0px 0 0;
+    .icon-container;
+    justify-content: flex-end;
+    &::after {
+      .icon-svg('../img/view-wrapper__resize-arrows.svg', @color__grey-mid)
+    }
+
+    &:hover, &:active, &:focus {
+      background-color: @color__decoration;
+      &::after {
+        background-color: @color__white;
+      }
+    }
+  }
+}
