@@ -18,7 +18,7 @@ type Props = {
   style: Object,
   onClick: Function,
   onItemRemove: Function,
-  setDraggingItem: (types.itemDragData) => void,
+  setDraggingItem: types.itemDragData => void,
   clearDraggingItem: Function,
   onMoveGroupItem: Function
 };
@@ -83,12 +83,9 @@ export default class NavGroupItem extends React.Component {
       // Avoid dragOver handling in transations
       this.inTransition = true;
 
-      setTimeout(
-        () => {
-          this.inTransition = false;
-        },
-        c.ANIMATION_TIME
-      );
+      setTimeout(() => {
+        this.inTransition = false;
+      }, c.ANIMATION_TIME);
     }
   }
 
@@ -108,13 +105,10 @@ export default class NavGroupItem extends React.Component {
 
     // We use the DataType of the event, but we cant access the data in dragOver.. useless
     event.dataTransfer.setData(DnDTypes.GROUPITEM, "uselesData");
-    setTimeout(
-      () => {
-        // Wait, to do not apply the dragging css to the dragging image
-        this.props.setDraggingItem(dragData);
-      },
-      1
-    );
+    setTimeout(() => {
+      // Wait, to do not apply the dragging css to the dragging image
+      this.props.setDraggingItem(dragData);
+    }, 1);
   };
 
   // Clear the stored dragging item
@@ -194,13 +188,10 @@ export default class NavGroupItem extends React.Component {
       (this.props.item.type == "folder" || this.props.item.type == "device") &&
       this.dragOverTimeout == null
     ) {
-      this.dragOverTimeout = setTimeout(
-        () => {
-          console.log("click", this.props.onClick);
-          this.props.onClick();
-        },
-        1000
-      );
+      this.dragOverTimeout = setTimeout(() => {
+        console.log("click", this.props.onClick);
+        this.props.onClick();
+      }, 1000);
     }
   };
 

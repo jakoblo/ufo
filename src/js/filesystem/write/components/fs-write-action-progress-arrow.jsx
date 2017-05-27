@@ -6,10 +6,11 @@ const itemHeight = 24;
 const arrowWidth = 17;
 const topSpacing = 11;
 const bottomSpacing = 9;
-const mainColor = "#555";
-const errorColor = "#D1335D";
-const sallowColor = "#E0E0E0";
-const bgColor = "#F7F7F7";
+const mainColor = "#fff";
+const successColor = "#329242";
+const errorColor = "#E93657";
+const sallowColor = "#999";
+const bgColor = "#403E45";
 
 type Props = {
   finished: boolean,
@@ -32,7 +33,7 @@ export default class ProgressArrow extends React.Component {
       arrow = this.renderArrow(errorColor, 100, false, this.props.error);
     } else if (this.props.finished) {
       arrow = this.renderArrow(
-        mainColor,
+        successColor,
         100,
         this.props.finished,
         this.props.error

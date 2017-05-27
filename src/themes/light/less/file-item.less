@@ -6,11 +6,12 @@
 
 .view-folder-item {
 
-  @height__item: 20px;
+  @height__item: 18px;
   @vertical-padding: 9px;
   @icon-width: 20px;
+  margin: -1px 0px;
   position: relative;
-  color: @color__black;
+  color: @color__grey-dark;
   font-weight: 400;
 
 
@@ -20,30 +21,30 @@
     height: @height__item;
     padding: 0 @vertical-padding;
     position: relative;
-    box-sizing: border-box;
     border-radius: calc(@height__item / 2);
     overflow: hidden;
     // background: @color__blue;
-    font-size: @font__size-normal;
+    border: 1px solid transparent;
+    font-size: @font__size-light;
   }
 
   .file-icon {
     margin-right: calc(@editor__item__prefix-width - @vertical-padding - @icon-width );
   }
-  &--selected .file-icon,
-  &--active .file-icon {
-    background: @color__white;
-  }
+  // &--selected .file-icon,
+  // &--active .file-icon {
+  //   background: @color__white;
+  // }
 
   // right leading arrow
 
   &--theme-folder &--inner::after {
-    .icon-svg('../img/icon__arrow-small.svg', @color__icon__default);
-    height: 20px;
+    .icon-svg('../img/icon__arrow-small.svg', @color__grey-mid);
+    height: @height__item;
   }
-  &--theme-folder&--active &--inner::after {
-    background-color: @color__white;
-  }
+  // &--theme-folder&--active &--inner::after {
+  //   background-color: @color__white;
+  // }
 
   // -----------------------------------
   // File Name
@@ -192,15 +193,15 @@
   // Other Modifier
   // ---
   &:hover &--inner {
-    background: darken(@color__grey-lightest, 4%);
+    border: 1px solid fadeout(@color__blue, 50%);
   }
 
   &--active &--inner,
   &--active:hover &--inner {
-    background-color: lighten(@color__grey-dark, 10%);
-    color: @color__white;
-    &::before, &::after {
-      background-color: @color__white;
+    background: @color__grey-light;
+    color: @color__black;
+    &:after {
+      background-color: @color__black !important;
     }
   }
 
@@ -208,6 +209,10 @@
   &--selected:hover &--inner {
     background-color: @color__blue;
     color: @color__white;
+    border-color: @color__blue;
+    .file-icon, &::before, &::after {
+      background-color: @color__white !important;
+    }
   }
 
   &--unkown{
@@ -232,6 +237,7 @@
   &--theme-image &__image-container {
     text-align: center;
     position: relative;
+    display: inline-block;
     padding-left: @editor__item__prefix-width;
     &::before {
       @bgIcon: '../img/editor-image-line.svg';

@@ -29,25 +29,30 @@
     .icon-container;
 
     &:after {
-      .icon-svg('../img/icon__arrow__25x25.svg', @color__icon__default);
+      .icon-svg('../img/icon__arrow__25x25.svg', @color__grey-light);
     }
 
-    &:hover {
-      border-color: @color__grey-light;
-    }
-
-    &:active {
-      background-color: @color__decoration;
+    &:active, &:hover {
+      // background-color: @color__decoration;
       border-color: @color__decoration;
       &:after {
         background-color: @color__white;
       }
     }
 
+    &:active {
+      background: @gradient__decoration;
+    }
+
     &--disabled {
-      opacity: 0.3;
+      opacity: 0.2;
+
       &:hover {
         border-color: transparent;
+        background: transparent;
+        &:after {
+          background-color: @color__grey-light;
+        }
       }
     }
   }

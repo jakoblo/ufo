@@ -1,5 +1,6 @@
 //@flow
 import React from "react";
+import classnames from "classnames";
 
 type Props = {
   scrollLeft: number,
@@ -20,14 +21,15 @@ export default class ScrollContainer extends React.Component {
   };
 
   render() {
+    let classes = classnames(this.props.className, {
+      [this.props.className + "--scroll"]: this.props.scrollable
+    });
+
     return (
       <div
-        className={this.props.className}
+        className={classes}
         ref={ref => {
           this.scroller = ref;
-        }}
-        style={{
-          overflowX: this.props.scrollable ? "scroll" : "hidden"
         }}
       >
         {this.props.children}

@@ -27,7 +27,7 @@ export default function ipcListener(/*handleNewWindow: Function */) {
     event.sender.startDrag({
       files: filePath,
       icon: __dirname +
-        "/../../themes/light-blue/img/dragging-count-" +
+        "/../../themes/light/img/dragging-count-" +
         imageName +
         ".png"
     });

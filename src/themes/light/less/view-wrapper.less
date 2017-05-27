@@ -15,9 +15,8 @@
   padding: 0;
   padding-bottom: 15px;
   will-change: transform;
-  background: @color__grey-lightest;
-  border-left: 1px solid @color__grey-light;
-  border-right: 1px solid @color__grey-light;
+  background: @color__white;
+  box-shadow: 0 0 7px rgba(0,0,0,.2);
 
   .view-placer--display-single & {
     width: 100%;
@@ -37,15 +36,15 @@
     flex-shrink: 0;
     border-radius: 4px 0px 0 0;
     .icon-container;
-    justify-content: flex-end;
+    justify-content: center;
     &::after {
       .icon-svg('../img/view-wrapper__resize-arrows.svg', @color__grey-mid)
     }
 
     &:hover, &:active, &:focus {
-      background-color: @color__decoration;
+      background-color: @color__grey-light;
       &::after {
-        background-color: @color__white;
+        background-color: @color__icon__default;
       }
     }
   }

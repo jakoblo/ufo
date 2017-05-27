@@ -2,41 +2,32 @@
 @import '_mixins.less';
 @import 'view-wrapper.less';
 
+@color-bg: @color__white;
+
 .view-placer {
-  display: block;
   width: 100%;
   position: relative;
-  overflow-x: auto;
-  will-change: transform;
+  display: block;
+  border-radius: 3px;
+  z-index: 1; // Need to fix border radius overflow hidden
+  overflow-x: hidden;
 
-  .view-placer__scroll-width {
-    position: absolute;
-    will-change: transform;
-    overflow: hidden;
-    top: 0;
-    bottom: 0;
-    left: 0;
+  &--scroll {
+    overflow-x: scroll;
+    background: #fff;
   }
-
-  // @bg-image: '../img/view-placer__background.svg';
-  // background: url(@bg-image);
-  // background-size: image-size(@bg-image);
-  // background-position: 75% bottom;
-  // background-repeat: no-repeat;
-
-  @color-bg: @color__grey-lightest;
 
   &::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
   &::-webkit-scrollbar-track {
-    background: @color-bg;
+    background: transparent;
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 5px;
-    border: 2px solid @color-bg;
-    background: @color__grey-dark;
+    border: 3px solid transparent;
+    background: lighten(@color__grey-dark, 10%);
     background-clip: content-box;
   }
   &::-webkit-scrollbar-corner {
@@ -48,6 +39,29 @@
     border-radius: 0;
     border-width: 0;
   }
+
+
+  .view-placer__scroll-width {
+    position: absolute;
+    will-change: transform;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 3px;
+    // margin: 5px 0;
+    background: @color__grey-lightest;
+    // box-shadow: 0 0 20px rgba(0,0,0,.7);
+
+  }
+
+  // @bg-image: '../img/view-placer__background.svg';
+  // background: url(@bg-image);
+  // background-size: image-size(@bg-image);
+  // background-position: 75% bottom;
+  // background-repeat: no-repeat;
+
+
 
   // &--display-single {
 

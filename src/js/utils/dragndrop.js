@@ -63,15 +63,13 @@ function getCursorPosition(event: any): string {
  * you have to event.preventDefault(); in the dragHover callback if you want to get drop
  * Or not, if you want to pass the drop to children (used by navbar-items)
  */
-export function getEnhancedDropZoneListener(
-  options: {
-    acceptableTypes: string | Array<string>,
-    possibleEffects: string,
-    dragHover: (event: SyntheticDragEvent, cursorPosition: string) => void,
-    dragOut: (event: SyntheticDragEvent) => void,
-    drop: (event: SyntheticDragEvent, cursorPosition: string) => void
-  }
-): {
+export function getEnhancedDropZoneListener(options: {
+  acceptableTypes: string | Array<string>,
+  possibleEffects: string,
+  dragHover: (event: SyntheticDragEvent, cursorPosition: string) => void,
+  dragOut: (event: SyntheticDragEvent) => void,
+  drop: (event: SyntheticDragEvent, cursorPosition: string) => void
+}): {
   onDragOver: Function,
   onDragLeave: Function,
   onDrop: Function

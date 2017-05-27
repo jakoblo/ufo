@@ -2,8 +2,8 @@
 @import '_mixins.less';
 
 
-@font-size__editor-default: 16.5px;
-@text-color: lighten(@color__grey-dark, 5%);
+@font-size__editor-default: 13px;
+@text-color: lighten(@color__grey-dark, 30%);
 
 .text-block--paragraph {
   margin: 7px 0;
@@ -19,16 +19,16 @@
 .text-block--heading-one {
   margin: 20px 0 10px;
   .block-status .block-status__icon {
-    margin-top: 11px;
+    margin-top: 5px;
   }
   .text-block__content {
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     font-family: @font-family__serif;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1;
-    font-size: 32px;
-    color: @color__black;
+    font-size: 23px;
+    color: darken(@text-color, 20%);
   }
 }
 
@@ -39,14 +39,17 @@
   }
   .text-block__content {
     font-family: @font-family__serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 20px;
-    color: @color__grey-dark;
+    color: darken(@text-color, 20%);
   }
 }
 
 .text-block--heading-three {
   margin: 15px 0 7px;
+  .block-status .block-status__icon {
+    margin-top: 3px;
+  }
   .text-block__content {
     font-family: @font-family__serif;
     line-height: 1.4;
@@ -57,7 +60,7 @@
 }
 
 .text-block--list-item {
-  margin: 0px 0;
+  margin: 3px 0;
   .text-block__content {
     line-height: 1.4;
     font-size: @font-size__editor-default;
@@ -81,7 +84,7 @@
 
   @link-height: 17px;
 
-  background: lighten(@color__blue, 30%);
+  background: lighten(@color__blue, 35%);
   color: darken(@color__blue, 10%);
   border-radius: 14px;
   padding: 0 22px 0 7px;

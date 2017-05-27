@@ -15,8 +15,9 @@
   overflow: hidden;
   background: @color__grey-lightest;
   border: 1px solid @color__blue;
-  transition: height 0.3s ease-out;
+  transition: height 0.3s ease-out, opacity 0.3s ease-out;
   height: 0;
+  opacity: 0;
 
   &--focused {
     display: flex;
@@ -24,6 +25,7 @@
 
   &--active {
     height: @height_filter;
+    opacity: 1;
   }
 
   &__label {

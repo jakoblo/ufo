@@ -47,7 +47,7 @@
       }
     }
     &:hover &__arrow::after {
-      background: @color__icon__default;
+      background: @color__white;
     }
 
     &__text {
@@ -64,7 +64,7 @@
       color: @color__title-text;
     }
     &:hover &__text {
-      color: @color__icon__default;
+      color: @color__white;
     }
 
     &__rename-input {
@@ -74,14 +74,11 @@
       box-sizing: border-box;
       height: @height__title;
       border-bottom: 1px solid @color__decoration;
-      background: @color__grey-lightest;
+      background: transparent;
       line-height: @height__title;
       font-size: @font-size__title-text;
-      color: @color__grey-dark;
+      color: @color__white;
       white-space: nowrap;
-    }
-    &:hover &__rename-input {
-      background: darken(@color__grey-lightest, 3%);
     }
 
     &__button-burger-menu {
