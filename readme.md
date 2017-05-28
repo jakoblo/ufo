@@ -19,7 +19,7 @@ Custom desktop filemanager to add text, links and image to your filesystem.
 + chokidar
 
 ## install
-> npm install
+> npm install   
 > npm i electron-forge -g
 
 ## commands
