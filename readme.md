@@ -20,7 +20,7 @@ Custom desktop filemanager to add text, links and image to your filesystem.
 
 ## install
 > npm install   
-> npm i electron-forge -g
+> npm install electron-forge -g
 
 ## commands
 > npm start   
