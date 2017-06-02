@@ -48,7 +48,7 @@ export default class NavGroupItem extends React.Component {
         "nav-bar-item": true,
         "nav-bar-item--active": this.props.active,
         "nav-bar-item--is-dragging": this.props.draggingItem &&
-          this.props.draggingItem.itemPosition === this.props.position,
+          this.props.draggingItem.itemId === this.props.item.get("path"),
         "nav-bar-item--drop-target": this.state.dropTarget
       }
     );
@@ -99,7 +99,7 @@ export default class NavGroupItem extends React.Component {
 
     // Store dragData this Group, to access them in other Groups onDragOver
     const dragData: types.itemDragData = {
-      itemPosition: this.props.position,
+      itemId: this.props.item.path,
       groupId: this.props.groupId
     };
 
@@ -118,30 +118,38 @@ export default class NavGroupItem extends React.Component {
 
   /**
    * Dropzone
-   *
    */
-
-  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+  dropZoneListener = dragndrop.getPerformantDropZoneListener({
     acceptableTypes: [DnDTypes.GROUPITEM, dragndrop.constants.TYPE_FILE],
     possibleEffects: dragndrop.constants.effects.ALL,
 
-    dragHover: (event, cursorPosition) => {
+    hoverEventProcessor: (event: SyntheticDragEvent): any => {
       if (dragndrop.shouldAcceptDrop(event, DnDTypes.GROUPITEM)) {
+        // sort items
         event.preventDefault(); // Drop is valid, will avoid cancel animation onDrop
-        this.itemDragOverToSort(event, cursorPosition);
+        if (this.props.draggingItem === false) return; // no needed data, jet
+        if (this.props.groupId !== this.props.draggingItem.groupId) return; // dragging only navgroup internal
+        if (this.inTransition) return; // Transtion in progess, stop event handling will avoid bouncing
+
+        // const dragginOriginPosition = this.props.draggingItem.itemId;
+        const overPosition = this.props.position;
+
+        return (cursorPosition: string) => {
+          // Render Callback
+          // Set dragging item to new position
+          // Move the item in the redux store
+          this.props.onMoveGroupItem(overPosition);
+        };
       } else if (
         dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)
       ) {
         // Drop is not valid, no preventDefault
-        this.fileDragOver(event, cursorPosition);
+        return this.fileDragOver;
       }
     },
 
-    dragOut: (event: SyntheticDragEvent) => {
-      this.cancelPeakTimeout();
-      this.setState({
-        dropTarget: false
-      });
+    outEventProcessor: (event: SyntheticDragEvent) => {
+      return this.fileDragOut;
     },
 
     drop: (event, cursorPosition) => {
@@ -153,32 +161,20 @@ export default class NavGroupItem extends React.Component {
     }
   });
 
-  itemDragOverToSort = (event: SyntheticDragEvent, cursorPosition: string) => {
-    if (this.props.draggingItem === false) return; // no needed data, jet
-    if (this.props.groupId !== this.props.draggingItem.groupId) return; // dragging only navgroup internal
-    if (this.inTransition) return; // Transtion in progess, stop event handling will avoid bouncing
-
-    const dragginOriginPosition = this.props.draggingItem.itemPosition;
-    const overPosition = this.props.position;
-
-    // Don't replace items with themselves
-    if (dragginOriginPosition === overPosition) return;
-
-    // Time to actually perform the action
-    // Set dragging item to new position
-    this.props.setDraggingItem({
-      itemPosition: overPosition,
-      groupId: this.props.groupId
-    });
-    // Move the item in the redux store
-    this.props.onMoveGroupItem(dragginOriginPosition, overPosition);
-  };
-
-  fileDragOver = (event: SyntheticDragEvent, cursorPosition: string) => {
+  fileDragOver = () => {
     this.startPeakTimeout();
     this.setState({
       dropTarget: true
     });
+  };
+
+  fileDragOut = () => {
+    if (this.state.dropTarget) {
+      this.cancelPeakTimeout();
+      this.setState({
+        dropTarget: false
+      });
+    }
   };
 
   dragOverTimeout = null;

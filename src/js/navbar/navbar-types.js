@@ -5,14 +5,13 @@ import * as c from "./navbar-constants";
 export type itemDragData =
   | false
   | {
-      itemPosition: number,
+      itemId: string,
       groupId: number
     };
 
 export type groupDragData =
   | false
   | {
-      groupPosition: number,
       groupId: number
     };
 

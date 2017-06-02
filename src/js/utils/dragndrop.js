@@ -120,6 +120,114 @@ export function getEnhancedDropZoneListener(options: {
     }
   };
 }
+/**
+ * Drag & Drop events are anoying...
+ * This function will return drag & drop listeners which will handle the anoying things
+ * and then call the given callbacks in a clean way
+ *
+ * you have to event.preventDefault(); in the hoverEventProcessor callback if you want to get drop
+ * Or not, if you want to pass the drop to children (used by navbar-items)
+ */
+export function getPerformantDropZoneListener(options: {
+  acceptableTypes: string | Array<string>,
+  possibleEffects: string, // see constants.effects
+
+  // The EventProcess handels the event (preventDefault, stopPropagation etc.)
+  // And can return a render callback wich is called with performance improvments
+  hoverEventProcessor: (
+    event: SyntheticDragEvent
+  ) => (cursorPosition: string) => any,
+  outEventProcessor: (event: SyntheticDragEvent) => () => any,
+
+  drop: (event: SyntheticDragEvent, cursorPosition: string) => void
+}): {
+  onDragOver: Function,
+  onDragLeave: Function,
+  onDrop: Function
+} {
+  const {
+    acceptableTypes,
+    possibleEffects,
+    hoverEventProcessor,
+    outEventProcessor,
+    drop
+  } = options;
+
+  const clear = event => {
+    const outRender = outEventProcessor(event);
+    enterTimeStamp = 0;
+    if (outRender && hover) {
+      hover = false;
+      requestAnimationFrame(() => {
+        if (hover == false) {
+          // Check if still out, (maybe onDragOver way called since the requestAnimationFrame)
+          outRender();
+        }
+      });
+    }
+  };
+
+  let enterTimeStamp = 0;
+  let hover = false;
+  return {
+    onDragOver: (event: SyntheticDragEvent) => {
+      if (shouldAcceptDrop(event, acceptableTypes)) {
+        if (event.isDefaultPrevented()) {
+          // Child Element is catching the drop
+          // call out to
+          clear(event);
+          return;
+        }
+
+        event.dataTransfer.dropEffect = getDropEffectByModifierKey(
+          possibleEffects,
+          event
+        );
+
+        const hoverRender = hoverEventProcessor(event);
+
+        if (enterTimeStamp == 0) {
+          // First Hover Event. Lets wait for the next events, before render
+          enterTimeStamp = event.timeStamp;
+          return;
+        }
+
+        if (hoverRender && enterTimeStamp + 25 < event.timeStamp) {
+          // Waited long enough, lets render
+          enterTimeStamp = event.timeStamp;
+          hover = true;
+          const cursorPosition = getCursorPosition(event);
+          requestAnimationFrame(() => {
+            if (hover) {
+              // Check if still hover, (maybe onDragLeave way called since the requestAnimationFrame)
+              hoverRender(cursorPosition);
+            }
+          });
+        }
+      }
+    },
+
+    onDragLeave: (event: any) => {
+      const x = event.clientX,
+        y = event.clientY,
+        top = event.currentTarget.offsetTop,
+        bottom = top + event.currentTarget.offsetHeight,
+        left = event.currentTarget.offsetLeft,
+        right = left + event.currentTarget.offsetWidth;
+
+      if (y <= top || y >= bottom || x <= left || x >= right) {
+        clear(event);
+      }
+    },
+
+    onDrop: (event: SyntheticDragEvent) => {
+      if (shouldAcceptDrop(event, acceptableTypes)) {
+        clear(event);
+        drop(event, getCursorPosition(event));
+      }
+    }
+  };
+}
 
 export const constants = {
   TYPE_FILE: "Files",

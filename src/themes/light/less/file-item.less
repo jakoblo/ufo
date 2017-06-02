@@ -13,7 +13,7 @@
   position: relative;
   color: @color__grey-dark;
   font-weight: 400;
-
+  will-change: transform;
 
   &--inner {
     display: flex;
@@ -169,7 +169,6 @@
     display: none;
     background: url('../img/drop-line.svg') center left no-repeat;
     background-size: image-size('../img/drop-line.svg');
-    transition: top 0.2s;
   }
 
   &--drop-target-top &__dropline {
