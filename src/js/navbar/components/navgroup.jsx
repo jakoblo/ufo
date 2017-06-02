@@ -25,8 +25,9 @@ type Props = {
   position: number,
   style: Object,
   dispatch: Function,
-  setDraggingGroup: (types.groupDragData) => void,
-  clearDraggingGroup: Function
+  setDraggingGroup: types.groupDragData => void,
+  clearDraggingGroup: Function,
+  onGroupMove: Function
 };
 
 type State = {
@@ -62,7 +63,6 @@ export default class NavGroup extends React.Component {
 
     //Disable dragndrop listener, if transition is in progress
     //this will avoid back and forward bouncing
-
     return (
       <div
         className={classname}
@@ -131,12 +131,9 @@ export default class NavGroup extends React.Component {
     if (this.props.position != nextProps.position) {
       this.inTransition = true;
 
-      setTimeout(
-        () => {
-          this.inTransition = false;
-        },
-        c.ANIMATION_TIME
-      );
+      setTimeout(() => {
+        this.inTransition = false;
+      }, c.ANIMATION_TIME);
     }
   }
 
@@ -212,16 +209,12 @@ export default class NavGroup extends React.Component {
   onDragStart = (event: SyntheticDragEvent) => {
     // Store ids of this Group, to access them in other Groups onDragOver
     const dragData: types.groupDragData = {
-      groupId: this.props.group.id,
-      groupPosition: this.props.position
+      groupId: this.props.group.id
     };
-    setTimeout(
-      () => {
-        // Wait, to do not apply the dragging css to the dragging image
-        this.props.setDraggingGroup(dragData);
-      },
-      1
-    );
+    setTimeout(() => {
+      // Wait, to do not apply the dragging css to the dragging image
+      this.props.setDraggingGroup(dragData);
+    }, 1);
     // We use the DataType of the event, but we cant access the data in dragOver.. useless
     event.dataTransfer.setData(c.DnDTypes.NAVGROUP, "uselesData");
   };
@@ -238,64 +231,34 @@ export default class NavGroup extends React.Component {
    * the second is a Navbar-Group Drag for sorting the Navbars.
    */
 
-  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+  dropZoneListener = dragndrop.getPerformantDropZoneListener({
     acceptableTypes: [
       c.DnDTypes.NAVGROUP,
       !this.props.group.diskGroup ? dragndrop.constants.TYPE_FILE : ""
     ],
     possibleEffects: dragndrop.constants.effects.ALL,
 
-    dragHover: (event, cursorPosition) => {
+    hoverEventProcessor: (event, cursorPosition) => {
       if (this.inTransition) return;
       event.preventDefault();
 
       if (dragndrop.shouldAcceptDrop(event, dragndrop.constants.TYPE_FILE)) {
         // File DROP
         if (this.state.dragOver == true) return;
-        this.setState({
-          dragOver: true
-        });
+        return () => {
+          this.setState({
+            dragOver: true
+          });
+        };
       } else if (dragndrop.shouldAcceptDrop(event, c.DnDTypes.NAVGROUP)) {
         // Navgroup Drag
-
-        if (!this.props.draggingGroup) {
-          return; // no needed data, jet
-        }
-
-        const draggingOriginPosition = this.props.draggingGroup.groupPosition;
-        const overPosition = this.props.position;
-
-        // Don't replace items with themselves
-        if (draggingOriginPosition === overPosition) {
-          return;
-        }
-
-        if (
-          draggingOriginPosition < overPosition &&
-          cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP
-        ) {
-          return; // Not over 50% Group height downwards, do nothing for now
-        }
-        if (
-          draggingOriginPosition > overPosition &&
-          cursorPosition == dragndrop.constants.CURSOR_POSITION_BOTTOM
-        ) {
-          return; // Not over 50% Group height upwards, do nothing for now
-        }
-
-        // Time to actually perform the action
-        this.props.setDraggingGroup({
-          groupId: this.props.draggingGroup.groupId,
-          groupPosition: overPosition
-        });
-
-        this.props.dispatch(
-          Actions.groupMove(draggingOriginPosition, overPosition)
-        );
+        return cursorPosition => {
+          this.props.onGroupMove(this.props.position, cursorPosition);
+        };
       }
     },
 
-    dragOut: () => {
+    outEventProcessor: () => {
       if (this.state.dragOver === false || this.inTransition) return;
       this.setState({
         dragOver: false
@@ -344,10 +307,18 @@ export default class NavGroup extends React.Component {
     }
   };
 
-  handleMoveGroupItem = (
-    draggingItemPosition: number,
-    overItemPosition: number
-  ) => {
+  handleMoveGroupItem = (overItemPosition: number) => {
+    const { draggingItem } = this.state;
+    const { group } = this.props;
+    if (!draggingItem) return;
+    const { itemId } = draggingItem;
+    const draggingItemPosition = group.items.findIndex(item => {
+      return item.get("path") == itemId;
+    });
+
+    // Dont replace with itself
+    if (draggingItemPosition === overItemPosition) return;
+
     this.props.dispatch(
       Actions.itemMove(
         this.props.position,

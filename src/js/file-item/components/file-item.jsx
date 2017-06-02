@@ -169,7 +169,6 @@ class FileItemComp extends React.Component {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     return (
       nextProps.file !== this.props.file ||
-      // nextProps.isFocused !== this.props.isFocused ||
       nextState.data !== this.state.data ||
       this.props.asImage != nextProps.asImage
     );
@@ -201,24 +200,30 @@ class FileItemComp extends React.Component {
     }
   };
 
-  enhancedDropZoneListener = DnD.getEnhancedDropZoneListener({
+  enhancedDropZoneListener = DnD.getPerformantDropZoneListener({
     acceptableTypes: [DnD.constants.TYPE_FILE],
     possibleEffects: DnD.constants.effects.COPY_MOVE,
 
-    dragHover: (event, cursorPosition) => {
+    hoverEventProcessor: event => {
       event.preventDefault();
       event.stopPropagation();
-      this.startPeakTimeout();
-      this.setImmState(prevState =>
-        prevState.set("dropTarget", cursorPosition)
-      );
+      return cursorPosition => {
+        this.startPeakTimeout();
+        this.setImmState(prevState =>
+          prevState.set("dropTarget", cursorPosition)
+        );
+      };
     },
 
-    dragOut: event => {
+    outEventProcessor: event => {
       event.preventDefault();
       event.stopPropagation();
-      this.cancelPeakTimeout();
-      this.setImmState(prevState => prevState.set("dropTarget", false));
+      return () => {
+        requestAnimationFrame(() => {
+          this.cancelPeakTimeout();
+          this.setImmState(prevState => prevState.set("dropTarget", false));
+        });
+      };
     },
 
     drop: (event, cursorPosition) => {

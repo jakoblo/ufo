@@ -94,6 +94,13 @@ export default class HoverToolbar extends React.Component {
     }
 
     const selection = window.getSelection();
+
+    if (selection.rangeCount < 1) {
+      menu.removeAttribute("style");
+      menu.style.opacity = 0;
+      return;
+    }
+
     const range = selection.getRangeAt(0);
     const selectionRect = range.getBoundingClientRect();
     const container = range.commonAncestorContainer.parentNode.closest(

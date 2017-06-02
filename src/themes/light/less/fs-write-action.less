@@ -6,7 +6,6 @@
 .fs-write-action {
   display: flex;
   flex-direction: column;
-  // border-bottom: 2px solid @color__grey-light;
   padding: 15px 25px 15px 20px;
   position: relative;
 
@@ -16,7 +15,7 @@
     &:after {
       .icon-svg(
         '../img/fs-write-action__button-close.svg',
-        @color__icon__default
+        @color__icon__light
       );
     }
 
@@ -38,6 +37,7 @@
     font-size: 14px;
     padding-left: 23px;
     margin-bottom: 5px;
+    color: @color__white;
   }
 
   &__container {
@@ -47,7 +47,7 @@
   }
 
   &__error-container {
-    color: @color__red;
+    color: lighten(@color__red, 20%);
     margin: 0 0 0 22px;
   }
 
@@ -64,12 +64,13 @@
     text-align: center;
     border: 1px solid @color__green;
 
-    color: darken(@color__green, 15%);
+    background: fadeout(@color__green, 50%);
+    color: @color__white;
     border-radius: 6px;
     padding: 5px 20px;
     font-size: 12px;
     line-height: 12px;
-    margin: 2px 5px 2px 0;
+    margin: 7px 5px 7px 0;
 
     &:hover {
       background: @color__green;
@@ -87,10 +88,12 @@
     .button-reset;
     display: block;
     text-align: center;
-    color: darken(@color__red, 15%);
+    color: @color__white;
+
     border: 1px solid @color__red;
     border-radius: 6px;
     padding: 5px 20px;
+    background: fadeout(@color__red, 50%);
     font-size: 12px;
     line-height: 12px;
     margin-right: 5px;
@@ -138,7 +141,7 @@
     flex-grow: 1;
 
     &__filename {
-      color: @color__grey-dark;
+      color: @color__icon__light;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -146,13 +149,15 @@
 
     &--theme-file::before {
       flex-shrink: 0;
-      .icon-svg('../img/icon__file__any__20x20.svg', @color__icon__default);
+      .icon-svg('../img/icon__file__any__20x20.svg', @color__icon__light);
+      height: 18px;
       margin-right: 5px;
     }
 
     &--theme-folder::before {
       flex-shrink: 0;
-      .icon-svg('../img/icon__file__folder__20x20.svg', @color__icon__default);
+      .icon-svg('../img/icon__file__folder__20x20.svg', @color__icon__light);
+      height: 18px;
       margin-right: 5px;
     }
   }

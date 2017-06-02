@@ -76,6 +76,7 @@ class Navbar extends React.Component {
                       draggingGroup={this.state.draggingGroup}
                       setDraggingGroup={this.setDraggingGroup}
                       clearDraggingGroup={this.clearDraggingGroup}
+                      onGroupMove={this.handleGroupMove}
                     />
                   ))}
                 </div>
@@ -178,24 +179,28 @@ class Navbar extends React.Component {
     });
   };
 
-  dropZoneListener = dragndrop.getEnhancedDropZoneListener({
+  dropZoneListener = dragndrop.getPerformantDropZoneListener({
     acceptableTypes: [dragndrop.constants.TYPE_FILE],
     possibleEffects: dragndrop.constants.effects.ALL,
 
-    dragHover: event => {
+    hoverEventProcessor: (event): any => {
       event.preventDefault();
       if (this.state.dragOver != true) {
-        this.setState({
-          dragOver: true
-        });
+        return () => {
+          this.setState({
+            dragOver: true
+          });
+        };
       }
     },
 
-    dragOut: event => {
+    outEventProcessor: (event): any => {
       if (this.state.dragOver != false) {
-        this.setState({
-          dragOver: false
-        });
+        return () => {
+          this.setState({
+            dragOver: false
+          });
+        };
       }
     },
 
@@ -210,5 +215,33 @@ class Navbar extends React.Component {
       }
     }
   });
+
+  handleGroupMove = (targetPosition, cursorPosition) => {
+    const { draggingGroup } = this.state;
+    if (!draggingGroup) return; // no needed data, jet
+    const draggingOriginPosition = this.props.navbar
+      .get("groups")
+      .findIndex(group => {
+        return group.get("id") == this.state.draggingGroup.groupId;
+      });
+
+    if (draggingOriginPosition === targetPosition) return; // Don't replace items with themselves
+    if (
+      draggingOriginPosition < targetPosition &&
+      cursorPosition == dragndrop.constants.CURSOR_POSITION_TOP
+    ) {
+      return; // Not over 50% Group height downwards, do nothing for now
+    }
+    if (
+      draggingOriginPosition > targetPosition &&
+      cursorPosition == dragndrop.constants.CURSOR_POSITION_BOTTOM
+    ) {
+      return; // Not over 50% Group height upwards, do nothing for now
+    }
+
+    this.props.dispatch(
+      Actions.groupMove(draggingOriginPosition, targetPosition)
+    );
+  };
 }
 export default connect(mapStateToProps)(Navbar);
