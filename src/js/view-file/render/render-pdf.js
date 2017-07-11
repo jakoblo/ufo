@@ -13,12 +13,17 @@ export default class DisplayPDF extends React.Component {
 
   render() {
     return (
-      <div className="renderer-pdf">
-        <iframe
-          src={
-            "__dirname/../../../node_modules/pdfjs-dist-viewer-min/build/minified/web/viewer.html?file=" +
-              this.props.path
-          }
+      <div
+        className="renderer-pdf"
+        onMouseDown={e => {
+          e.stopPropagation(); // avoid cancel events by Root Event Catcher
+        }}
+      >
+        <webview
+          src={"local://" + this.props.path}
+          style={{
+            width: "100%"
+          }}
         />
       </div>
     );

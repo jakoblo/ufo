@@ -11,6 +11,7 @@
   border-radius: 3px;
   z-index: 1; // Need to fix border radius overflow hidden
   overflow-x: hidden;
+  margin: 4px 4px 4px 0;
 
   &--scroll {
     overflow-x: scroll;
@@ -35,11 +36,9 @@
   }
   &::-webkit-scrollbar-thumb:active {
     background: @color__decoration;
-
     border-radius: 0;
     border-width: 0;
   }
-
 
   .view-placer__scroll-width {
     position: absolute;

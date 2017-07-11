@@ -61,12 +61,15 @@ function startWindow() {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    webSecurity: false,
-    allowRunningInsecureContent: true,
     resizable: true,
     frame: false //os.platform() != "darwin" // Windows needs the ugly frame, linux?
   });
-  window.loadURL("file://" + __dirname + "/../../html/window.html");
+  window.loadURL(
+    "file://" + __dirname + "/../../html/window.html" + process.env.NODE_ENV ==
+      "development"
+      ? "?react_perf"
+      : ""
+  );
   window.webContents.on("will-navigate", event => {
     // Disable Navigation
     // prevent Drop files on window
