@@ -1,16 +1,10 @@
 {
   "plugins": [
-    ["transform-flow-strip-types"],
-    "transform-decorators-legacy",
-    "transform-object-rest-spread",
-    "transform-class-properties",
-    ["transform-es2015-modules-commonjs", { "loose": true }],
-    "transform-react-jsx",
-    "transform-react-inline-elements",
-    "transform-react-constant-elements"
+    "@babel/plugin-transform-flow-strip-types",
+    "@babel/plugin-transform-react-jsx",
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    "@babel/plugin-proposal-object-rest-spread",
+    ["@babel/plugin-transform-modules-commonjs", { "loose": true }]
   ],
-  "sourceMaps": "inline",
-  "ignore": [
-    "library/**/*"
-  ]
+  "sourceMaps": "inline"
 }

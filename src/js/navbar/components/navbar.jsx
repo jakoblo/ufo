@@ -65,8 +65,9 @@ class Navbar extends React.Component {
             {groupConfig => {
               return (
                 <div>
-                  {groupConfig.map(({ key, data, style }, position) => (
-                    <NavGroup
+                  {groupConfig.map(({ key, data, style }, position) => {
+                    if (!data || !data.group) return null;
+                    return (<NavGroup
                       key={data.group.id}
                       group={data.group}
                       position={position}
@@ -77,8 +78,8 @@ class Navbar extends React.Component {
                       setDraggingGroup={this.setDraggingGroup}
                       clearDraggingGroup={this.clearDraggingGroup}
                       onGroupMove={this.handleGroupMove}
-                    />
-                  ))}
+                    />);
+                  })}
                 </div>
               );
             }}

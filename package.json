@@ -1,16 +1,11 @@
 {
   "name": "ufo",
   "productName": "ufo",
-  "main": "./src/js/main/main.js",
+  "main": ".webpack/main",
   "version": "0.0.0",
   "description": "Custom Filemanager to make notes where you need them.",
   "scripts": {
     "start": "electron-forge start",
-    "prod": "NODE_ENV=production ./node_modules/.bin/electron .",
-    "main-debug": "./node_modules/.bin/electron . --debug=5858",
-    "install": "gulp install",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/electron-packager-compile . -all --overwrite",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
@@ -20,11 +15,6 @@
     "chokidar": "^1.6.1",
     "classnames": "^2.2.5",
     "dom-scroll-into-view": "^1.2.1",
-    "drivelist-watcher": "^0.1.1",
-    "electron": "^1.6.11",
-    "electron-compile": "^6.4.1",
-    "electron-compilers": "^5.9.0",
-    "electron-forge": "^3.0.5",
     "electron-json-storage": "^3.0.1",
     "electron-window-state": "^4.1.0",
     "filesize": "^3.3.0",
@@ -57,61 +47,70 @@
     "trash": "^4.0.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-eslint": "^7.1.1",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-plugin-transform-class-properties": "^6.11.5",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
-    "babel-plugin-transform-flow-strip-types": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "babel-plugin-transform-react-constant-elements": "^6.23.0",
-    "babel-plugin-transform-react-inline-elements": "^6.22.0",
-    "babel-plugin-transform-react-jsx": "^6.8.0",
-    "babel-preset-env": "^1.4.0",
-    "babel-preset-flow": "^6.23.0",
-    "babel-preset-react": "^6.24.1",
-    "electron-devtools-installer": "^2.0.1",
-    "electron-prebuilt-compile": "1.6.6",
+    "@babel/core": "^7.23.0",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-decorators": "^7.23.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
+    "@babel/preset-env": "^7.23.0",
+    "@babel/preset-flow": "^7.22.15",
+    "@babel/preset-react": "^7.22.15",
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
+    "@electron-forge/plugin-webpack": "^6.4.2",
+    "babel-loader": "^9.1.3",
+    "css-loader": "^6.8.1",
+    "electron": "^13.6.9",
     "eslint": "^3.3.0",
-    "eslint-plugin-jsdoc": "^3.0.2",
     "eslint-plugin-react": "^6.1.0",
     "flow-bin": "^0.45.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-google-webfonts": "0.0.14",
-    "i": "^0.3.5",
-    "npm": "^4.4.1"
+    "less": "^4.2.0",
+    "less-loader": "^11.1.3",
+    "node-gyp": "^10.0.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.88.2",
+    "webpack-node-externals": "^3.0.0"
   },
   "config": {
     "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {
+      "packagerConfig": {
         "icon": "./src/icon/icon",
         "overwrite": true
       },
-      "electronWinstallerConfig": {
-        "name": ""
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "",
-        "name": ""
-      },
-      "windowsStoreConfig": {
-        "packageName": ""
-      }
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "ufo"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        }
+      ],
+      "plugins": [
+        {
+          "name": "@electron-forge/plugin-webpack",
+          "config": {
+            "mainConfig": "./webpack.main.config.js",
+            "renderer": {
+              "config": "./webpack.renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./src/html/window.html",
+                  "js": "./src/js/renderer.js",
+                  "name": "main_window"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   }
 }

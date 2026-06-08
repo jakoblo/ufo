@@ -62,7 +62,7 @@ export default class NavGroupTitle extends React.Component {
           "nav-bar-group__title--editing": this.state.editGroupTitle
         })}
         onClick={this.props.onToggleGroup}
-        onContextMenu={!this.props.isDiskGroup && this.onContextMenu}
+        onContextMenu={!this.props.isDiskGroup ? this.onContextMenu : null}
       >
         <div className="nav-bar-group__title__arrow" />
         {title}

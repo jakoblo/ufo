@@ -1,4 +1,5 @@
 //@flow
+/* global MAIN_WINDOW_WEBPACK_ENTRY */
 
 /**
  * @file Starting point for the application (electron main process).
@@ -7,16 +8,13 @@
 import ipcListener from "./main-ipc";
 import { app, BrowserWindow, protocol } from "electron";
 import windowStateKeeper from "electron-window-state";
-import { enableLiveReload } from "electron-compile";
 import os from "os";
 import loadAppMenu from "./menu/main-menu";
-import path from "path";
 
 let window;
 let mainWindowState;
 
 app.on("ready", function() {
-  enableLiveReload();
   loadAppMenu();
 
   // Register Protocol to load and show local images
@@ -62,9 +60,14 @@ function startWindow() {
     width: mainWindowState.width,
     height: mainWindowState.height,
     resizable: true,
-    frame: false //os.platform() != "darwin" // Windows needs the ugly frame, linux?
+    frame: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
   });
-  window.loadURL("file://" + __dirname + "/../../html/window.html");
+  window.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   window.webContents.on("will-navigate", event => {
     // Disable Navigation
     // prevent Drop files on window
@@ -75,18 +78,5 @@ function startWindow() {
     window = null;
   });
 
-  // Let us register listeners on the window, so we can update the state
-  // automatically (the listeners will be removed when the window is closed)
-  // and restore the maximized or full screen state
   mainWindowState.manage(window);
 }
-
-// Disabled Multiwindow base
-// may use in the future:
-//
-// import WindowManager from "./main-window";
-
-// let windowManager = new WindowManager();
-// App Menu is disabled until we get multiwindow support ;)
-// ipcListener(windowManager.new);
-// windowManager.new();
