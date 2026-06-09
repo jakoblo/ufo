@@ -9,6 +9,7 @@ import fsWatch from "../../filesystem/watch/fs-watch-index";
 import nodePath from "path";
 import _ from "lodash";
 import { Raw, State } from "slate";
+import { markdownToState } from "./slate-extensions/slate-file/slate-file-serialize";
 import { DEFAULT_NODE } from "./slate-extensions/rich-text-types";
 
 import type { ThunkArgs, Action } from "../../types";
@@ -29,9 +30,7 @@ export function folderEditorInit(path: string) {
       const fileContent = Utils.fs
         .loadFile(nodePath.join(path, c.INDEX_BASE_NAME))
         .then(fileContent => {
-          let editorState = Raw.deserialize(JSON.parse(fileContent), {
-            terse: true
-          });
+          let editorState = markdownToState(fileContent);
           editorState = mapFilesToEditorState(fileList, editorState);
 
           dispatch({

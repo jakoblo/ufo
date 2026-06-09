@@ -5,6 +5,7 @@ import classnames from "classnames";
 import nodePath from "path";
 import { connect } from "react-redux";
 import { Editor, Raw } from "slate";
+import { stateToMarkdown } from "../slate-extensions/slate-file/slate-file-serialize";
 import * as c from "../folder-editor-constants";
 import * as Actions from "../folder-editor-actions";
 import * as selectors from "../folder-editor-selectors";
@@ -122,9 +123,9 @@ class FolderEditor extends React.Component {
     this.savingTimout = null;
     console.log("save " + this.props.path);
     const path = nodePath.join(this.props.path, c.INDEX_BASE_NAME);
-    const content = Raw.serialize(this.props.editorState, { terse: true });
+    const content = stateToMarkdown(this.props.editorState);
 
-    Utils.fs.saveFile(path, JSON.stringify(content));
+    Utils.fs.saveFile(path, content);
   };
 
   componentWillReceiveProps(nextProps: Props) {}
