@@ -1,7 +1,8 @@
 //@flow
 
-import { BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import fs from "fs";
+import path from "path";
 
 export default function ipcListener(/*handleNewWindow: Function */) {
   ipcMain.on("ondragstart", (event, filePath) => {
@@ -26,10 +27,7 @@ export default function ipcListener(/*handleNewWindow: Function */) {
 
     event.sender.startDrag({
       files: filePath,
-      icon: __dirname +
-        "/../../themes/light/img/dragging-count-" +
-        imageName +
-        ".png"
+      icon: path.join(app.getAppPath(), "src/themes/light/img/dragging-count-" + imageName + ".png")
     });
   });
 
