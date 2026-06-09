@@ -42,6 +42,6 @@ export default function ipcListener(/*handleNewWindow: Function */) {
   // });
 
   ipcMain.on("writeFile", function(event, path, content) {
-    fs.writeFile(path, content);
+    fs.promises.writeFile(path, content).catch(err => console.error("writeFile failed:", err));
   });
 }
