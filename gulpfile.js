@@ -7,8 +7,6 @@ const config = { source: "./src" };
 config.fontsList = config.source + "/themes/googlefonts.list";
 config.fontsDest = config.source + "/themes/google-fonts/";
 
-gulp.task("install", ["fonts"]);
-
 // Download Google Webfonts
 const googleWebFontsOptions = {};
 
@@ -18,3 +16,5 @@ gulp.task("fonts", function() {
     .pipe(googleWebFonts(googleWebFontsOptions))
     .pipe(gulp.dest(config.fontsDest));
 });
+
+gulp.task("install", gulp.series("fonts"));

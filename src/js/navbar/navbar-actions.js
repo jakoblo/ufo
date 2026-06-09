@@ -3,8 +3,8 @@ import storage from "electron-json-storage";
 import { remote } from "electron";
 import _ from "lodash";
 import nodePath from "path";
-import drivelist from "drivelist";
-import DrivelistWatcher from "drivelist-watcher";
+// import drivelist from "drivelist";
+// import DrivelistWatcher from "drivelist-watcher";
 import * as Storage from "../utils/storage";
 import * as t from "./navbar-actiontypes";
 import * as c from "./navbar-constants";
@@ -42,7 +42,7 @@ export function groupsLoad(data: Object | boolean) {
     } else {
       dispatch(groupsCreateDefault());
     }
-    dispatch(drivesInit());
+    // dispatch(drivesInit()); // drivelist-watcher disabled (native build not available)
   };
 }
 
@@ -64,26 +64,26 @@ function groupsCreateDefault() {
   };
 }
 
-export function drivesInit() {
-  return function(dispatch: Function, getState: Function) {
-    drivelist.list((error, drives) => {
-      if (error) {
-        throw error;
-      }
-      dispatch(drivesSet(drives));
-    });
-
-    driveScanner = new DrivelistWatcher({
-      callbackDeviceAdded: drives => {
-        dispatch(drivesSet(drives));
-      },
-      callbackDeviceRemoved: drives => {
-        dispatch(drivesSet(drives));
-      },
-      intervalTime: 5000
-    });
-  };
-}
+// export function drivesInit() {
+//   return function(dispatch: Function, getState: Function) {
+//     drivelist.list((error, drives) => {
+//       if (error) {
+//         throw error;
+//       }
+//       dispatch(drivesSet(drives));
+//     });
+//
+//     driveScanner = new DrivelistWatcher({
+//       callbackDeviceAdded: drives => {
+//         dispatch(drivesSet(drives));
+//       },
+//       callbackDeviceRemoved: drives => {
+//         dispatch(drivesSet(drives));
+//       },
+//       intervalTime: 5000
+//     });
+//   };
+// }
 
 function drivesSet(drives) {
   return function(dispatch: Function, getState: Function) {
