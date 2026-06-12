@@ -2,6 +2,7 @@
 import { Raw, State } from "slate";
 import * as slateUtils from "./slate-file-utils";
 import * as c from "../../folder-editor-constants";
+import { BLOCK_TYPES } from "../rich-text-types";
 import nodePath from "path";
 
 // Global regEx, important for while exec
@@ -18,6 +19,33 @@ const fileLinkRegEx = /!?\[[^\]]+\]\(\.\/[^\s)]+\)/;
 function getUrl(markdownLink) {
   const urlRegEx = /\]\([^\s\)]+(?=\))/;
   return urlRegEx.exec(markdownLink)[0].slice(2); // ](url.... // remove ](
+}
+
+/**
+ * Detect the block type and strip the markdown prefix from a text line.
+ * Returns { type, text }.
+ */
+function parseLineType(line) {
+  if (/^### /.test(line)) return { type: BLOCK_TYPES.HEADING_THREE.type, text: line.slice(4) };
+  if (/^## /.test(line))  return { type: BLOCK_TYPES.HEADING_TWO.type,   text: line.slice(3) };
+  if (/^# /.test(line))   return { type: BLOCK_TYPES.HEADING_ONE.type,   text: line.slice(2) };
+  if (/^[*-] /.test(line)) return { type: BLOCK_TYPES.LIST_ITEM.type,    text: line.slice(2) };
+  if (/^> /.test(line))   return { type: BLOCK_TYPES.QUOTE.type,         text: line.slice(2) };
+  return { type: BLOCK_TYPES.PARAGRAPH.type, text: line };
+}
+
+/**
+ * Serialize a block type back to its markdown prefix.
+ */
+function typeToPrefix(type) {
+  switch (type) {
+    case BLOCK_TYPES.HEADING_ONE.type:   return "# ";
+    case BLOCK_TYPES.HEADING_TWO.type:   return "## ";
+    case BLOCK_TYPES.HEADING_THREE.type: return "### ";
+    case BLOCK_TYPES.LIST_ITEM.type:     return "- ";
+    case BLOCK_TYPES.QUOTE.type:         return "> ";
+    default:                             return "";
+  }
 }
 
 /**
@@ -69,10 +97,11 @@ export function markdownToState(string: string): Class<State> {
 
   return Raw.deserialize(raw);
 
-  function getTextBlock(text) {
+  function getTextBlock(rawText) {
+    const { type, text } = parseLineType(rawText);
     return {
       kind: "block",
-      type: "line",
+      type: type,
       nodes: [
         {
           kind: "text",
@@ -99,7 +128,7 @@ export function stateToMarkdown(state: Class<State>): string {
         const imageFlag = block.getIn(["data", "asImage"]) ? "!" : "";
         return imageFlag + "[" + filename + "](./" + encodeURI(filename) + ")";
       } else {
-        return block.text;
+        return typeToPrefix(block.type) + block.text;
       }
     })
     .join("\n");
