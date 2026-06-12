@@ -46,17 +46,16 @@ const hasBlock = (block: any, type: string, editor: any) => {
 
 const toggleBlock = (block: any, type: string, editor: any) => {
   let state = editor.getState();
-  const transform = state.transform();
-  const { document } = state;
 
-  // Handle everything but list buttons.
   const isActive = hasBlock(block, type);
 
-  transform.setNodeByKey(block.key, {
-    type: isActive ? DEFAULT_NODE.type : type
-  });
+  state = state
+    .transform()
+    .setNodeByKey(block.key, {
+      type: isActive ? DEFAULT_NODE.type : type
+    })
+    .apply();
 
-  state = transform.apply();
   editor.onChange(state);
 };
 
@@ -261,33 +260,33 @@ export default function RichText(): any {
         </div>
       );
     },
-    // @TODO
-    // onKeyDown: (e, data, state) => {
-    //   if (!data.isMod) return;
-    //   let mark;
-    //
-    //   switch (data.key) {
-    //     case "b":
-    //       mark = "bold";
-    //       break;
-    //     case "i":
-    //       mark = "italic";
-    //       break;
-    //     case "u":
-    //       mark = "underlined";
-    //       break;
-    //     case "`":
-    //       mark = "code";
-    //       break;
-    //     default:
-    //       return;
-    //   }
-    //
-    //   state = state.transform().toggleMark(mark).apply();
-    //
-    //   e.preventDefault();
-    //   return state;
-    // },
+    onKeyDown: (e: Event, data: Object, state: any) => {
+      // Markdown shortcut: pressing Space after # / ## / ### / - / > at line start
+      if (data.key !== " ") return;
+
+      const { startBlock, startOffset } = state;
+      const text = startBlock.text;
+
+      // Only trigger when cursor is right after the prefix
+      const prefixMap = [
+        { prefix: "###", type: BLOCK_TYPES.HEADING_THREE.type },
+        { prefix: "##",  type: BLOCK_TYPES.HEADING_TWO.type },
+        { prefix: "#",   type: BLOCK_TYPES.HEADING_ONE.type },
+        { prefix: "-",   type: BLOCK_TYPES.LIST_ITEM.type },
+        { prefix: ">",   type: BLOCK_TYPES.QUOTE.type }
+      ];
+
+      for (const { prefix, type } of prefixMap) {
+        if (text === prefix && startOffset === prefix.length) {
+          e.preventDefault();
+          return state
+            .transform()
+            .setNodeByKey(startBlock.key, { type })
+            .deleteBackward(prefix.length)
+            .apply();
+        }
+      }
+    },
     onPaste: (e: Event, data: Object, state: any) => {
       if (data.type != "text" && data.type != "html") return;
       if (!isUrl(data.text)) return;
