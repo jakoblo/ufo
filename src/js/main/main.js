@@ -6,7 +6,7 @@
  */
 
 import ipcListener from "./main-ipc";
-import { app, BrowserWindow, protocol } from "electron";
+import { app, BrowserWindow, protocol, globalShortcut } from "electron";
 import windowStateKeeper from "electron-window-state";
 import os from "os";
 import loadAppMenu from "./menu/main-menu";
@@ -35,6 +35,10 @@ app.on("ready", function() {
   });
   startWindow();
   ipcListener();
+
+  globalShortcut.register("CommandOrControl+Shift+I", () => {
+    if (window) window.webContents.toggleDevTools();
+  });
 });
 
 /**
