@@ -53,6 +53,18 @@ export function folderEditorInit(path: string) {
   };
 }
 
+export function folderEditorInitFile(filePath: string) {
+  return (dispatch: Function) => {
+    Utils.fs.loadFile(filePath).then(fileContent => {
+      const editorState = markdownToState(fileContent || "");
+      dispatch({
+        type: t.FOLDER_EDITOR_INIT,
+        payload: { path: filePath, editorState }
+      });
+    });
+  };
+}
+
 export function folderEditorClose(path: string): Action {
   return {
     type: t.FOLDER_EDITOR_CLOSE,

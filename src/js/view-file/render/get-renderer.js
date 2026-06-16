@@ -2,6 +2,7 @@
 import type { Element } from "react";
 import { suffixTypes } from "../vf-constants";
 import RenderEditor from "./render-editor";
+import RenderMarkdown from "./render-markdown";
 import RenderImage from "./render-image";
 import RenderHTML from "./render-html";
 import RenderDOCX from "./render-docx";
@@ -26,6 +27,8 @@ export default function getRenderer(suffix: string): any {
       return RenderImage;
     case "html":
       return RenderHTML;
+    case "markdown":
+      return RenderMarkdown;
     case "plainText":
       return RenderEditor;
     case "doc":

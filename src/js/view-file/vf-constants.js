@@ -2,12 +2,11 @@
 
 export const NAME = "preview";
 export const suffixTypes = {
+  markdown: [".md"],
   plainText: [
-    ".md",
     ".coffee",
     ".txt",
     ".js",
-    ".md",
     ".json",
     ".php",
     ".log",

@@ -8,6 +8,7 @@ import { Editor, Raw } from "slate";
 import { stateToMarkdown } from "../slate-extensions/slate-file/slate-file-serialize";
 import * as c from "../folder-editor-constants";
 import * as Actions from "../folder-editor-actions";
+import { folderEditorInitFile } from "../folder-editor-actions";
 import * as selectors from "../folder-editor-selectors";
 import Selection from "../../../filesystem/selection/sel-index";
 import SlateFile from "../slate-extensions/slate-file/slate-file-index";
@@ -21,6 +22,7 @@ import Loading from "../../../general-components/loading";
 
 type Props = {
   path: string,
+  filePath?: string,
   focused: boolean,
   editorState: any,
   fileList: Array<string>,
@@ -29,9 +31,10 @@ type Props = {
 };
 
 const mapStateToProps = (state, props) => {
+  const stateKey = props.filePath || props.path;
   return {
     focused: Selection.selectors.getSelectionRoot(state) == props.path,
-    editorState: selectors.getEditorState(state, props.path),
+    editorState: selectors.getEditorState(state, stateKey),
     readOnly: Config.selectors.getReadOnlyState(state)
   };
 };
@@ -103,12 +106,17 @@ class FolderEditor extends React.Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(Actions.folderEditorInit(this.props.path));
+    if (this.props.filePath) {
+      this.props.dispatch(folderEditorInitFile(this.props.filePath));
+    } else {
+      this.props.dispatch(Actions.folderEditorInit(this.props.path));
+    }
   }
 
   onChange = (editorState: any) => {
+    const stateKey = this.props.filePath || this.props.path;
     this.props.dispatch(
-      Actions.folderEditorChange(this.props.path, editorState)
+      Actions.folderEditorChange(stateKey, editorState)
     );
   };
 
@@ -121,11 +129,9 @@ class FolderEditor extends React.Component {
 
   saveDocument = () => {
     this.savingTimout = null;
-    console.log("save " + this.props.path);
-    const path = nodePath.join(this.props.path, c.INDEX_BASE_NAME);
+    const savePath = this.props.filePath || nodePath.join(this.props.path, c.INDEX_BASE_NAME);
     const content = stateToMarkdown(this.props.editorState);
-
-    Utils.fs.saveFile(path, content);
+    Utils.fs.saveFile(savePath, content);
   };
 
   componentWillReceiveProps(nextProps: Props) {}
@@ -135,7 +141,8 @@ class FolderEditor extends React.Component {
       clearTimeout(this.savingTimout);
       this.saveDocument();
     }
-    this.props.dispatch(Actions.folderEditorClose(this.props.path));
+    const stateKey = this.props.filePath || this.props.path;
+    this.props.dispatch(Actions.folderEditorClose(stateKey));
   }
 }
 

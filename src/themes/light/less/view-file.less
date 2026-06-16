@@ -3,6 +3,7 @@
 @import 'mixins-animation.less';
 
 @import 'renderer.less';
+@import 'editor.less';
 
 .view-file {
 
@@ -73,6 +74,22 @@
     flex-shrink: 1;
     margin-bottom: 30px;
     width: 400px;
+  }
+}
+
+// Markdown file editor — overrides the folder-editor-container defaults
+// so it flows naturally inside .view-file instead of trying to fill 100% height
+.render-markdown {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  .view-folder__editor-container {
+    height: auto !important;
+    overflow-y: visible !important;
+    flex-grow: 1;
   }
 }
 
