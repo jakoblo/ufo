@@ -67,3 +67,8 @@ node_modules
 
 out/
 .webpack/
+
+# Playwright
+e2e/screenshots/*.png
+playwright-report/
+test-results/

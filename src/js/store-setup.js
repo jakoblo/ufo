@@ -4,6 +4,7 @@ import { createStore, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
 import { rootReducer } from "./reducerIndex";
 import { createLogger } from "redux-logger";
+import { ipcRenderer } from "electron";
 // import promiseMiddleware from '../middleware/promise-middleware'
 
 export function storeSetup(initialState: any) {
@@ -20,6 +21,16 @@ export function storeSetup(initialState: any) {
   return store;
 }
 
+function reduxFileLogger() {
+  return next => action => {
+    ipcRenderer.send("ufo-log", {
+      level: "info",
+      args: ["[redux] " + action.type]
+    });
+    return next(action);
+  };
+}
+
 function getMiddleware() {
   const logger = createLogger({
     collapsed: true,
@@ -32,7 +43,7 @@ function getMiddleware() {
   ];
 
   if (process.env.NODE_ENV !== "production") {
-    middleware = [...middleware, logger];
+    middleware = [...middleware, logger, reduxFileLogger()];
   }
 
   return applyMiddleware(...middleware);

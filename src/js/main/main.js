@@ -5,6 +5,7 @@
  * @file Starting point for the application (electron main process).
  */
 
+import "./logger";
 import ipcListener from "./main-ipc";
 import { app, BrowserWindow, protocol, globalShortcut } from "electron";
 import windowStateKeeper from "electron-window-state";
