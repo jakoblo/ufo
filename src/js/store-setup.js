@@ -43,7 +43,7 @@ function getMiddleware() {
   ];
 
   if (process.env.NODE_ENV !== "production") {
-    middleware = [...middleware, logger, reduxFileLogger()];
+    middleware = [...middleware, logger, reduxFileLogger];
   }
 
   return applyMiddleware(...middleware);
